@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova de Estudo – Fundamentos Matemáticos para Computação</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #15151a;
+    --card: #1c1c24;
+    --border: #2a2a38;
+    --accent: #7c6dfa;
+    --accent2: #fa6d8a;
+    --accent3: #6dfabc;
+    --accent4: #fadc6d;
+    --text: #e8e8f0;
+    --muted: #7878a0;
+    --correct: #2ecc71;
+    --wrong: #e74c3c;
+    --partial: #f39c12;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BACKGROUND GRID */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-1 { background: var(--accent); top: -200px; left: -200px; }
+  .glow-2 { background: var(--accent2); bottom: -200px; right: -200px; }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 20px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    padding: 4px 14px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-size: clamp(28px, 5vw, 54px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 15px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* SCORE BAR */
+  .score-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .score-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .score-info span strong {
+    color: var(--text);
+  }
+
+  .progress-wrap {
+    flex: 1;
+    min-width: 200px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 10px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .btn-check-all {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-check-all:hover { opacity: 0.85; }
+
+  /* TABS */
+  .tabs {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+  }
+
+  .tab {
+    padding: 18px 28px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .tab .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+
+  /* CONTENT */
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  .section-title .icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .section-title h2 {
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .section-title p {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-card:nth-child(2) { animation-delay: 0.05s; }
+  .q-card:nth-child(3) { animation-delay: 0.1s; }
+  .q-card:nth-child(4) { animation-delay: 0.15s; }
+  .q-card:nth-child(5) { animation-delay: 0.2s; }
+
+  .q-card.answered-correct { border-color: var(--correct); box-shadow: 0 0 20px rgba(46,204,113,0.1); }
+  .q-card.answered-wrong { border-color: var(--wrong); box-shadow: 0 0 20px rgba(231,76,60,0.1); }
+
+  .q-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .q-text {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+    color: var(--text);
+  }
+
+  .q-text .math {
+    font-family: 'Space Mono', monospace;
+    background: rgba(124,109,250,0.1);
+    border: 1px solid rgba(124,109,250,0.2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  /* OPTIONS */
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .option:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: rgba(124,109,250,0.05);
+  }
+
+  .option.selected {
+    border-color: var(--accent);
+    background: rgba(124,109,250,0.1);
+  }
+
+  .option.correct-answer {
+    border-color: var(--correct);
+    background: rgba(46,204,113,0.08);
+    color: var(--correct);
+  }
+
+  .option.wrong-answer {
+    border-color: var(--wrong);
+    background: rgba(231,76,60,0.08);
+    color: var(--wrong);
+  }
+
+  .option.disabled { cursor: default; pointer-events: none; }
+
+  .opt-letter {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .option.selected .opt-letter { background: var(--accent); color: #fff; }
+  .option.correct-answer .opt-letter { background: var(--correct); color: #fff; }
+  .option.wrong-answer .opt-letter { background: var(--wrong); color: #fff; }
+
+  /* TEXT ANSWERS */
+  .text-answer {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+
+  .text-answer:focus { border-color: var(--accent); }
+
+  /* FEEDBACK */
+  .feedback {
+    display: none;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3); color: var(--correct); }
+  .feedback.wrong { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: #ff8080; }
+  .feedback.info { background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.3); color: #b8b0ff; }
+
+  .feedback strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
+  /* BUTTONS */
+  .q-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.4; cursor: default; }
+  .btn-secondary { background: var(--border); color: var(--muted); }
+  .btn-secondary:hover { background: var(--surface); color: var(--text); }
+  .btn-reveal { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-reveal:hover { border-color: var(--accent4); color: var(--accent4); }
+
+  /* HINT */
+  .hint {
+    display: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent4);
+    border-left: 3px solid var(--accent4);
+    padding: 10px 14px;
+    background: rgba(250,220,109,0.05);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .hint.show { display: block; }
+
+  /* FINAL SCORE */
+  .final-score {
+    display: none;
+    text-align: center;
+    padding: 50px 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .final-score.show { display: block; }
+
+  .score-ring {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 6px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+
+  .score-ring::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 6px solid var(--accent);
+    clip-path: inset(0);
+    animation: none;
+  }
+
+  .score-pct { font-size: 40px; font-weight: 800; }
+  .score-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  .restart-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 10px;
+  }
+  .restart-btn:hover { opacity: 0.85; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-important { border-color: var(--accent2); color: var(--accent2); background: rgba(250,109,138,0.08); }
+
+  @media (max-width: 600px) {
+    .score-bar { padding: 10px 16px; }
+    .tab { padding: 14px 16px; font-size: 11px; }
+    .q-card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<header>
+  <div class="tag">UFMS · Campus Ponta Porã</div>
+  <h1>Prova de Estudo<br>Fundamentos Matemáticos</h1>
+  <p>Conjuntos · Relações · Funções · Combinatória</p>
+</header>
+
+<div class="score-bar">
+  <div class="score-info">
+    <span>Respondidas: <strong id="answered-count">0</strong> / <strong id="total-count">0</strong></span>
+    <span>Acertos: <strong id="correct-count" style="color:var(--correct)">0</strong></span>
+    <span>Erros: <strong id="wrong-count" style="color:var(--wrong)">0</strong></span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <button class="btn-check-all" onclick="checkAll()">Corrigir Tudo</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('conjuntos')">
+    <span class="dot" style="background:#7c6dfa"></span>Conjuntos
+  </div>
+  <div class="tab" onclick="showTab('relacoes')">
+    <span class="dot" style="background:#fa6d8a"></span>Relações
+  </div>
+  <div class="tab" onclick="showTab('funcoes')">
+    <span class="dot" style="background:#6dfabc"></span>Funções
+  </div>
+  <div class="tab" onclick="showTab('combinatoria')">
+    <span class="dot" style="background:#fadc6d"></span>Combinatória
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- =================== CONJUNTOS =================== -->
+  <div class="section active" id="conjuntos">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(124,109,250,0.15)">∩</div>
+      <div>
+        <h2 style="color:#a89fff">Teoria dos Conjuntos</h2>
+        <p>6 questões selecionadas — inclui tópicos de maior incidência em prova</p>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-card" id="qc1">
+      <div class="q-number">Conjuntos · Questão 1 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Seja <span class="math">A = {x ∈ ℝ | 0 &lt; x &lt; ¾}</span>. Quais das afirmativas abaixo são VERDADEIRAS?
+      </div>
+      <div class="options" id="opts-qc1">
+        <div class="option" onclick="toggleMC('qc1','A')"><span class="opt-letter">A</span> 1 ∈ A, pois 1 é positivo</div>
+        <div class="option" onclick="toggleMC('qc1','B')"><span class="opt-letter">B</span> ½ ∈ A, pois 0 &lt; ½ &lt; ¾</div>
+        <div class="option" onclick="toggleMC('qc1','C')"><span class="opt-letter">C</span> ¾ ∈ A, pois está no limite do intervalo</div>
+        <div class="option" onclick="toggleMC('qc1','D')"><span class="opt-letter">D</span> 2/3 ∈ A, pois 0 &lt; 2/3 &lt; ¾</div>
+        <div class="option" onclick="toggleMC('qc1','E')"><span class="opt-letter">E</span> 2 ∉ A, pois 2 &gt; ¾</div>
+      </div>
+      <div class="hint" id="hint-qc1">💡 O conjunto A usa intervalo <strong>aberto</strong> em ¾, ou seja, ¾ não pertence ao conjunto.</div>
+      <div class="feedback" id="fb-qc1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkMC('qc1',['B','D','E'])">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc1')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc1')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card" id="qc2">
+      <div class="q-number">Conjuntos · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Seja <span class="math">K = {1, 4, 7, 9, 10, 11}</span>. Qual é o conjunto <span class="math">B = {x ∈ K | x é primo}</span>?
+      </div>
+      <div class="options" id="opts-qc2">
+        <div class="option" onclick="selectOpt('qc2','A')"><span class="opt-letter">A</span> B = {1, 7, 11}</div>
+        <div class="option" onclick="selectOpt('qc2','B')"><span class="opt-letter">B</span> B = {7, 11}</div>
+        <div class="option" onclick="selectOpt('qc2','C')"><span class="opt-letter">C</span> B = {1, 7, 9, 11}</div>
+        <div class="option" onclick="selectOpt('qc2','D')"><span class="opt-letter">D</span> B = {7, 9, 11}</div>
+      </div>
+      <div class="hint" id="hint-qc2">💡 Lembre: 1 <strong>não é primo</strong>. 9 = 3×3, então também não é primo. Verifique 7 e 11.</div>
+      <div class="feedback" id="fb-qc2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc2','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc2')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc2')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-card" id="qc3">
+      <div class="q-number">Conjuntos · Questão 3</div>
+      <div class="q-text">
+        Considerando <span class="math">A = {2, {4,5}, 4}</span>, qual alternativa contém APENAS sentenças verdadeiras?
+      </div>
+      <div class="options" id="opts-qc3">
+        <div class="option" onclick="selectOpt('qc3','A')"><span class="opt-letter">A</span> 5 ∈ A &nbsp;|&nbsp; {4,5} ⊂ A &nbsp;|&nbsp; {2} ⊂ A</div>
+        <div class="option" onclick="selectOpt('qc3','B')"><span class="opt-letter">B</span> {4,5} ∈ A &nbsp;|&nbsp; {{4,5}} ⊂ A &nbsp;|&nbsp; {2} ⊂ A</div>
+        <div class="option" onclick="selectOpt('qc3','C')"><span class="opt-letter">C</span> 5 ∈ A &nbsp;|&nbsp; {4,5} ∈ A &nbsp;|&nbsp; {2} ⊂ A</div>
+        <div class="option" onclick="selectOpt('qc3','D')"><span class="opt-letter">D</span> 5 ∉ A &nbsp;|&nbsp; {4,5} ∈ A &nbsp;|&nbsp; {{4,5}} ⊂ A</div>
+      </div>
+      <div class="hint" id="hint-qc3">💡 5 é elemento de {4,5}, mas não é elemento direto de A. {4,5} como um todo SIM é elemento de A. {2} ⊂ A pois 2 ∈ A.</div>
+      <div class="feedback" id="fb-qc3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc3','D')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc3')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc3')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-card" id="qc4">
+      <div class="q-number">Conjuntos · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Considere <span class="math">A = {2,4,5,6,8}</span>, <span class="math">B = {1,4,5,9}</span> e <span class="math">S = {0,1,...,9}</span>. Qual é o resultado de <span class="math">A − B</span>?
+      </div>
+      <div class="options" id="opts-qc4">
+        <div class="option" onclick="selectOpt('qc4','A')"><span class="opt-letter">A</span> {2, 6, 8}</div>
+        <div class="option" onclick="selectOpt('qc4','B')"><span class="opt-letter">B</span> {4, 5}</div>
+        <div class="option" onclick="selectOpt('qc4','C')"><span class="opt-letter">C</span> {1, 9}</div>
+        <div class="option" onclick="selectOpt('qc4','D')"><span class="opt-letter">D</span> {2, 4, 5, 6, 8, 1, 9}</div>
+      </div>
+      <div class="hint" id="hint-qc4">💡 A − B = elementos que estão em A mas NÃO estão em B. Remova de A tudo que aparece em B.</div>
+      <div class="feedback" id="fb-qc4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc4','A')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc4')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc4')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-card" id="qc5">
+      <div class="q-number">Conjuntos · Questão 5 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Quantos subconjuntos tem o conjunto <span class="math">{a, b, c}</span>? E qual é o conjunto das partes <span class="math">P({a,b,c})</span>?
+      </div>
+      <div class="options" id="opts-qc5">
+        <div class="option" onclick="selectOpt('qc5','A')"><span class="opt-letter">A</span> 6 subconjuntos; P = { {a}, {b}, {c}, {a,b}, {a,c}, {b,c} }</div>
+        <div class="option" onclick="selectOpt('qc5','B')"><span class="opt-letter">B</span> 8 subconjuntos; P = { ∅, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c} }</div>
+        <div class="option" onclick="selectOpt('qc5','C')"><span class="opt-letter">C</span> 8 subconjuntos; P = { {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c}, ∅ } — sem repetição</div>
+        <div class="option" onclick="selectOpt('qc5','D')"><span class="opt-letter">D</span> 7 subconjuntos; fórmula 2ⁿ − 1 (excluindo ∅)</div>
+      </div>
+      <div class="hint" id="hint-qc5">💡 Um conjunto com n elementos tem 2ⁿ subconjuntos, incluindo ∅ e o próprio conjunto. Para n=3: 2³ = 8.</div>
+      <div class="feedback" id="fb-qc5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc5','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc5')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc5')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q6 – aberta -->
+    <div class="q-card" id="qc6">
+      <div class="q-number">Conjuntos · Questão 6 — Dissertativa</div>
+      <div class="q-text">
+        Quais das proposições abaixo são verdadeiras para todos os conjuntos A, B e C?<br>
+        <span class="math">i)</span> A ∪ A = A &nbsp;&nbsp; <span class="math">ii)</span> A − B = (B̄ − Ā) &nbsp;&nbsp; <span class="math">iii)</span> (A − B) ∩ (B − A) = ∅ &nbsp;&nbsp; <span class="math">iv)</span> ∅ × A = ∅<br><br>
+        Escreva as letras das verdadeiras separadas por vírgula (ex: i, iii):
+      </div>
+      <textarea class="text-answer" id="ans-qc6" placeholder="Sua resposta aqui..."></textarea>
+      <div class="hint" id="hint-qc6">💡 Pense: a diferença entre A e B é disjunta da diferença entre B e A por definição. O produto cartesiano de ∅ com qualquer conjunto é ∅.</div>
+      <div class="feedback" id="fb-qc6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkOpen('qc6', ['i, iii, iv','i,iii,iv','i iii iv','i, iv, iii','iii, i, iv'])">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc6')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc6')">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== RELAÇÕES =================== -->
+  <div class="section" id="relacoes">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(250,109,138,0.15)">↔</div>
+      <div>
+        <h2 style="color:#ff9db5">Relações Binárias</h2>
+        <p>6 questões selecionadas — foco em propriedades e classificação</p>
+      </div>
+    </div>
+
+    <!-- QR1 -->
+    <div class="q-card" id="qr1">
+      <div class="q-number">Relações · Questão 1 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Sejam <span class="math">E = {0,1,2}</span> e <span class="math">F = {1,2,3,4,5}</span>. A relação <span class="math">x R y ↔ x = y − 2</span> (x ∈ E, y ∈ F) resulta em qual conjunto de pares ordenados?
+      </div>
+      <div class="options" id="opts-qr1">
+        <div class="option" onclick="selectOpt('qr1','A')"><span class="opt-letter">A</span> R = {(0,2), (1,3), (2,4)}</div>
+        <div class="option" onclick="selectOpt('qr1','B')"><span class="opt-letter">B</span> R = {(1,3), (2,4)}</div>
+        <div class="option" onclick="selectOpt('qr1','C')"><span class="opt-letter">C</span> R = {(0,2), (1,3), (2,4), (0,1)}</div>
+        <div class="option" onclick="selectOpt('qr1','D')"><span class="opt-letter">D</span> R = {(2,4), (1,3), (0,3)}</div>
+      </div>
+      <div class="hint" id="hint-qr1">💡 Substitua cada x ∈ E: y = x + 2. Verifique se y ∈ F. Para x=0: y=2 ✓; x=1: y=3 ✓; x=2: y=4 ✓.</div>
+      <div class="feedback" id="fb-qr1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr1','A')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr1')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr1')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR2 -->
+    <div class="q-card" id="qr2">
+      <div class="q-number">Relações · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Classifique a relação <span class="math">R = {(1,1), (2,3), (3,2)}</span> sobre <span class="math">X = {1,2,3}</span>. Ela é:
+      </div>
+      <div class="options" id="opts-qr2">
+        <div class="option" onclick="selectOpt('qr2','A')"><span class="opt-letter">A</span> Reflexiva, simétrica e transitiva (relação de equivalência)</div>
+        <div class="option" onclick="selectOpt('qr2','B')"><span class="opt-letter">B</span> Reflexiva e simétrica, mas NÃO transitiva</div>
+        <div class="option" onclick="selectOpt('qr2','C')"><span class="opt-letter">C</span> Simétrica, mas NÃO reflexiva e NÃO transitiva</div>
+        <div class="option" onclick="selectOpt('qr2','D')"><span class="opt-letter">D</span> NÃO é reflexiva, NÃO simétrica, mas é transitiva</div>
+      </div>
+      <div class="hint" id="hint-qr2">💡 Reflexiva: (1,1),(2,2),(3,3) ∈ R? Simétrica: (2,3) ∈ R implica (3,2) ∈ R? Transitiva: (2,3) e (3,2) ∈ R implica (2,2) ∈ R?</div>
+      <div class="feedback" id="fb-qr2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr2','C')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr2')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr2')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR3 -->
+    <div class="q-card" id="qr3">
+      <div class="q-number">Relações · Questão 3</div>
+      <div class="q-text">
+        Classifique como um-para-um, um-para-muitos, muitos-para-um ou muitos-para-muitos:<br>
+        <span class="math">R = {(1,2), (1,4), (1,6), (2,3), (4,3)}</span>
+      </div>
+      <div class="options" id="opts-qr3">
+        <div class="option" onclick="selectOpt('qr3','A')"><span class="opt-letter">A</span> Um-para-um (cada x tem um único y e vice-versa)</div>
+        <div class="option" onclick="selectOpt('qr3','B')"><span class="opt-letter">B</span> Um-para-muitos (cada x pode ter vários y, mas cada y tem apenas um x)</div>
+        <div class="option" onclick="selectOpt('qr3','C')"><span class="opt-letter">C</span> Muitos-para-um (vários x podem ter o mesmo y)</div>
+        <div class="option" onclick="selectOpt('qr3','D')"><span class="opt-letter">D</span> Muitos-para-muitos (vários x com vários y e vice-versa)</div>
+      </div>
+      <div class="hint" id="hint-qr3">💡 O elemento 1 aparece 3 vezes à esquerda (1→2, 1→4, 1→6) = um-para-muitos. Mas 3 aparece à direita de dois elementos (2→3 e 4→3) = muitos-para-um. Ambos juntos = muitos-para-muitos.</div>
+      <div class="feedback" id="fb-qr3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr3','D')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr3')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr3')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR4 -->
+    <div class="q-card" id="qr4">
+      <div class="q-number">Relações · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Seja R a relação &lt; de <span class="math">A = {1,2,3,4}</span> em <span class="math">B = {1,3,5}</span> ("x é menor que y"). Qual é R como conjunto de pares ordenados?
+      </div>
+      <div class="options" id="opts-qr4">
+        <div class="option" onclick="selectOpt('qr4','A')"><span class="opt-letter">A</span> R = {(1,3),(1,5),(2,3),(2,5),(3,5),(4,5)}</div>
+        <div class="option" onclick="selectOpt('qr4','B')"><span class="opt-letter">B</span> R = {(1,3),(1,5),(2,3),(2,5),(3,5)}</div>
+        <div class="option" onclick="selectOpt('qr4','C')"><span class="opt-letter">C</span> R = {(1,1),(1,3),(1,5),(2,3),(2,5),(3,5),(4,5)}</div>
+        <div class="option" onclick="selectOpt('qr4','D')"><span class="opt-letter">D</span> R = {(2,3),(2,5),(3,5),(4,5)}</div>
+      </div>
+      <div class="hint" id="hint-qr4">💡 Para cada x ∈ A, liste os y ∈ B tais que x &lt; y. Ex: x=1 → y pode ser 3 ou 5. x=4 → y pode ser 5.</div>
+      <div class="feedback" id="fb-qr4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr4','A')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr4')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr4')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR5 -->
+    <div class="q-card" id="qr5">
+      <div class="q-number">Relações · Questão 5 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Qual das coleções a seguir é uma partição de <span class="math">X = {a,b,c,d,e,f,g}</span>?
+      </div>
+      <div class="options" id="opts-qr5">
+        <div class="option" onclick="selectOpt('qr5','A')"><span class="opt-letter">A</span> A1={a,c,e}, A2={b}, A3={d,g} — faltam f</div>
+        <div class="option" onclick="selectOpt('qr5','B')"><span class="opt-letter">B</span> B1={a,c,g}, B2={c,d}, B3={b,e,f} — c aparece em B1 e B2</div>
+        <div class="option" onclick="selectOpt('qr5','C')"><span class="opt-letter">C</span> C1={a,b,e,g}, C2={c}, C3={d,f} — cobrindo todos sem interseção</div>
+        <div class="option" onclick="selectOpt('qr5','D')"><span class="opt-letter">D</span> D1={a,b,c,d,e,f,g} — apenas um bloco</div>
+      </div>
+      <div class="hint" id="hint-qr5">💡 Uma partição exige: 1) todos os subconjuntos não-vazios, 2) disjuntos entre si, 3) a união é o conjunto inteiro X.</div>
+      <div class="feedback" id="fb-qr5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr5','C')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr5')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr5')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR6 dissertativa -->
+    <div class="q-card" id="qr6">
+      <div class="q-number">Relações · Questão 6 — Dissertativa</div>
+      <div class="q-text">
+        Construa uma relação T em <span class="math">S = {1,2,3,4}</span> que seja <strong>reflexiva e transitiva, mas NÃO simétrica e NÃO antissimétrica</strong>. Escreva os pares ordenados:
+      </div>
+      <textarea class="text-answer" id="ans-qr6" placeholder="Ex: {(1,1),(2,2),...}"></textarea>
+      <div class="hint" id="hint-qr6">💡 Comece com todos os pares (x,x) para reflexividade. Adicione (1,2) e (2,1) para quebrar a antissimetria, mas certifique-se de incluir os pares transitivos necessários.</div>
+      <div class="feedback" id="fb-qr6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="revealAnswer('qr6', 'Uma possível resposta: T = {(1,1),(2,2),(3,3),(4,4),(1,2),(2,1),(1,3),(2,3),(1,4),(2,4)} — reflexiva (todos (x,x)), transitiva (verifique), não simétrica (ex: (1,3) ∈ T mas (3,1) ∉ T), não antissimétrica (1R2 e 2R1 com 1≠2).')">Ver Gabarito</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr6')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr6')">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== FUNÇÕES =================== -->
+  <div class="section" id="funcoes">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(109,250,188,0.15)">f(x)</div>
+      <div>
+        <h2 style="color:#6dfabc">Funções</h2>
+        <p>6 questões selecionadas — injetora, sobrejetora, bijetora, composição</p>
+      </div>
+    </div>
+
+    <!-- QF1 -->
+    <div class="q-card" id="qf1">
+      <div class="q-number">Funções · Questão 1 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Sendo <span class="math">E = {a,b,c,d}</span> e <span class="math">F = {1,2,3}</span>, qual das relações abaixo É uma função de E em F? Identifique também domínio, contradomínio e imagem.
+      </div>
+      <div class="options" id="opts-qf1">
+        <div class="option" onclick="selectOpt('qf1','A')"><span class="opt-letter">A</span> R1 = {(a,1),(b,2),(c,3)} — falta d no domínio</div>
+        <div class="option" onclick="selectOpt('qf1','B')"><span class="opt-letter">B</span> R2 = {(a,1),(b,1),(c,2),(d,3)} — função; Im={1,2,3}</div>
+        <div class="option" onclick="selectOpt('qf1','C')"><span class="opt-letter">C</span> R3 = {(a,1),(a,2),(b,1),(c,2),(d,3)} — a tem duas imagens</div>
+        <div class="option" onclick="selectOpt('qf1','D')"><span class="opt-letter">D</span> R1 e R2 são ambas funções</div>
+      </div>
+      <div class="hint" id="hint-qf1">💡 Uma função exige que CADA elemento do domínio tenha EXATAMENTE UMA imagem. R1 não cobre d; R3 tem a→1 e a→2.</div>
+      <div class="feedback" id="fb-qf1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf1','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf1')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf1')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF2 -->
+    <div class="q-card" id="qf2">
+      <div class="q-number">Funções · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Quais das funções de <span class="math">E = {a,b,c,d}</span> em <span class="math">F = {0,1,2,3,4}</span> são INJETORAS?<br>
+        f1={(a,0),(b,1),(c,2),(d,4)} &nbsp;|&nbsp; f2={(a,1),(b,2),(c,3),(d,1)} &nbsp;|&nbsp; f3={(a,2),(b,4),(c,3),(d,0)}
+      </div>
+      <div class="options" id="opts-qf2">
+        <div class="option" onclick="selectOpt('qf2','A')"><span class="opt-letter">A</span> Apenas f1</div>
+        <div class="option" onclick="selectOpt('qf2','B')"><span class="opt-letter">B</span> f1 e f3</div>
+        <div class="option" onclick="selectOpt('qf2','C')"><span class="opt-letter">C</span> f1, f2 e f3</div>
+        <div class="option" onclick="selectOpt('qf2','D')"><span class="opt-letter">D</span> Nenhuma</div>
+      </div>
+      <div class="hint" id="hint-qf2">💡 Injetora = sem dois elementos do domínio com a mesma imagem. f2: a→1 e d→1 = não injetora. Verifique f1 e f3.</div>
+      <div class="feedback" id="fb-qf2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf2','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf2')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf2')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF3 -->
+    <div class="q-card" id="qf3">
+      <div class="q-number">Funções · Questão 3 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Quais das funções de <span class="math">E = {r,s,t}</span> em <span class="math">F = {1,2,3}</span> são BIJETORAS?<br>
+        f1={(r,1),(s,1),(t,2)} &nbsp;|&nbsp; f2={(r,3),(s,1),(t,2)} &nbsp;|&nbsp; f3={(r,3),(s,2),(t,3)} &nbsp;|&nbsp; f4={(r,1),(s,2),(t,3)}
+      </div>
+      <div class="options" id="opts-qf3">
+        <div class="option" onclick="selectOpt('qf3','A')"><span class="opt-letter">A</span> f1 e f4</div>
+        <div class="option" onclick="selectOpt('qf3','B')"><span class="opt-letter">B</span> f2 e f4</div>
+        <div class="option" onclick="selectOpt('qf3','C')"><span class="opt-letter">C</span> Apenas f4</div>
+        <div class="option" onclick="selectOpt('qf3','D')"><span class="opt-letter">D</span> f2, f3 e f4</div>
+      </div>
+      <div class="hint" id="hint-qf3">💡 Bijetora = injetora E sobrejetora. f1: r e s→1 (não injetora). f3: t e r→3 (não injetora). f2: cobre 1,2,3 e sem repetição ✓. f4: cobre 1,2,3 e sem repetição ✓.</div>
+      <div class="feedback" id="fb-qf3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf3','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf3')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf3')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF4 -->
+    <div class="q-card" id="qf4">
+      <div class="q-number">Funções · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Sejam <span class="math">f(x) = x + 1</span> e <span class="math">g(x) = 3x</span>, ambas de ℕ em ℕ. Calcule <span class="math">(g ∘ f)(5)</span> e <span class="math">(f ∘ g)(5)</span>.
+      </div>
+      <div class="options" id="opts-qf4">
+        <div class="option" onclick="selectOpt('qf4','A')"><span class="opt-letter">A</span> (g∘f)(5) = 18 &nbsp;|&nbsp; (f∘g)(5) = 16</div>
+        <div class="option" onclick="selectOpt('qf4','B')"><span class="opt-letter">B</span> (g∘f)(5) = 16 &nbsp;|&nbsp; (f∘g)(5) = 18</div>
+        <div class="option" onclick="selectOpt('qf4','C')"><span class="opt-letter">C</span> (g∘f)(5) = 15 &nbsp;|&nbsp; (f∘g)(5) = 18</div>
+        <div class="option" onclick="selectOpt('qf4','D')"><span class="opt-letter">D</span> (g∘f)(5) = 18 &nbsp;|&nbsp; (f∘g)(5) = 15</div>
+      </div>
+      <div class="hint" id="hint-qf4">💡 g∘f significa aplicar f primeiro, depois g. (g∘f)(5) = g(f(5)) = g(6) = 18. (f∘g)(5) = f(g(5)) = f(15) = 16.</div>
+      <div class="feedback" id="fb-qf4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf4','A')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf4')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf4')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF5 -->
+    <div class="q-card" id="qf5">
+      <div class="q-number">Funções · Questão 5</div>
+      <div class="q-text">
+        Sejam <span class="math">f(x) = 2x + 1</span> e <span class="math">g(x) = x² − 2</span>. Qual é a fórmula de <span class="math">(g ∘ f)(x)</span>?
+      </div>
+      <div class="options" id="opts-qf5">
+        <div class="option" onclick="selectOpt('qf5','A')"><span class="opt-letter">A</span> 4x² + 4x − 1</div>
+        <div class="option" onclick="selectOpt('qf5','B')"><span class="opt-letter">B</span> 4x² + 4x + 1</div>
+        <div class="option" onclick="selectOpt('qf5','C')"><span class="opt-letter">C</span> 2x² − 3</div>
+        <div class="option" onclick="selectOpt('qf5','D')"><span class="opt-letter">D</span> 4x² − 1</div>
+      </div>
+      <div class="hint" id="hint-qf5">💡 (g∘f)(x) = g(f(x)) = g(2x+1) = (2x+1)² − 2 = 4x² + 4x + 1 − 2 = 4x² + 4x − 1.</div>
+      <div class="feedback" id="fb-qf5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf5','A')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf5')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf5')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF6 dissertativa -->
+    <div class="q-card" id="qf6">
+      <div class="q-number">Funções · Questão 6 — Dissertativa</div>
+      <div class="q-text">
+        Sejam <span class="math">S = {1,2,3,4}</span>, <span class="math">T = {1,...,6}</span>, <span class="math">f = {(1,2),(2,4),(3,3),(4,6)}</span> de S em T e <span class="math">g = {(1,7),(2,6),(3,9),(4,7),(5,8),(6,9)}</span> de T em U={6,...,10}. Escreva os pares ordenados de <span class="math">g ∘ f</span>:
+      </div>
+      <textarea class="text-answer" id="ans-qf6" placeholder="Ex: {(1,?),(2,?),(3,?),(4,?)}"></textarea>
+      <div class="hint" id="hint-qf6">💡 (g∘f)(x) = g(f(x)). Para x=1: f(1)=2, g(2)=6 → (1,6). Para x=2: f(2)=4, g(4)=7 → (2,7).</div>
+      <div class="feedback" id="fb-qf6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="revealAnswer('qf6', 'g∘f = {(1,6),(2,7),(3,9),(4,9)} — Passo a passo: f(1)=2→g(2)=6; f(2)=4→g(4)=7; f(3)=3→g(3)=9; f(4)=6→g(6)=9.')">Ver Gabarito</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf6')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf6')">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== COMBINATÓRIA =================== -->
+  <div class="section" id="combinatoria">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(250,220,109,0.15)">C(n,k)</div>
+      <div>
+        <h2 style="color:#fadc6d">Contagem e Combinatória</h2>
+        <p>6 questões selecionadas — princípio multiplicativo, permutação, combinação, inclusão-exclusão</p>
+      </div>
+    </div>
+
+    <!-- QCO1 -->
+    <div class="q-card" id="qco1">
+      <div class="q-number">Combinatória · Questão 1 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Uma loja de iogurte tem 5 sabores, 3 acompanhamentos e 2 coberturas. Quantas sobremesas diferentes são possíveis?
+      </div>
+      <div class="options" id="opts-qco1">
+        <div class="option" onclick="selectOpt('qco1','A')"><span class="opt-letter">A</span> 10</div>
+        <div class="option" onclick="selectOpt('qco1','B')"><span class="opt-letter">B</span> 25</div>
+        <div class="option" onclick="selectOpt('qco1','C')"><span class="opt-letter">C</span> 30</div>
+        <div class="option" onclick="selectOpt('qco1','D')"><span class="opt-letter">D</span> 60</div>
+      </div>
+      <div class="hint" id="hint-qco1">💡 Princípio multiplicativo: multiplique as opções de cada categoria. 5 × 3 × 2 = ?</div>
+      <div class="feedback" id="fb-qco1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco1','C')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco1')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco1')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO2 -->
+    <div class="q-card" id="qco2">
+      <div class="q-number">Combinatória · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        De quantas maneiras pode-se dar o 1°, 2° e 3° prêmio em uma competição com 15 participantes?
+      </div>
+      <div class="options" id="opts-qco2">
+        <div class="option" onclick="selectOpt('qco2','A')"><span class="opt-letter">A</span> C(15,3) = 455</div>
+        <div class="option" onclick="selectOpt('qco2','B')"><span class="opt-letter">B</span> P(15,3) = 2.730</div>
+        <div class="option" onclick="selectOpt('qco2','C')"><span class="opt-letter">C</span> 15³ = 3.375</div>
+        <div class="option" onclick="selectOpt('qco2','D')"><span class="opt-letter">D</span> 15! = muito grande</div>
+      </div>
+      <div class="hint" id="hint-qco2">💡 A ordem importa (1°, 2° e 3° são distintos) e sem repetição. Use permutação: P(n,r) = n!/(n−r)! = 15×14×13.</div>
+      <div class="feedback" id="fb-qco2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco2','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco2')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco2')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO3 -->
+    <div class="q-card" id="qco3">
+      <div class="q-number">Combinatória · Questão 3 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        De quantas maneiras pode-se selecionar um júri de 5 homens e 7 mulheres em um conjunto de 17 homens e 23 mulheres?
+      </div>
+      <div class="options" id="opts-qco3">
+        <div class="option" onclick="selectOpt('qco3','A')"><span class="opt-letter">A</span> C(17,5) × C(23,7)</div>
+        <div class="option" onclick="selectOpt('qco3','B')"><span class="opt-letter">B</span> C(40,12)</div>
+        <div class="option" onclick="selectOpt('qco3','C')"><span class="opt-letter">C</span> P(17,5) × P(23,7)</div>
+        <div class="option" onclick="selectOpt('qco3','D')"><span class="opt-letter">D</span> C(17,5) + C(23,7)</div>
+      </div>
+      <div class="hint" id="hint-qco3">💡 São duas escolhas independentes (homens E mulheres) sem importar a ordem dentro de cada grupo → multiplique as combinações.</div>
+      <div class="feedback" id="fb-qco3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco3','A')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco3')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco3')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO4 -->
+    <div class="q-card" id="qco4">
+      <div class="q-number">Combinatória · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Em um grupo de 42 turistas, todos falam inglês ou francês. 35 falam inglês e 18 falam francês. Quantos falam os dois idiomas?
+      </div>
+      <div class="options" id="opts-qco4">
+        <div class="option" onclick="selectOpt('qco4','A')"><span class="opt-letter">A</span> 7</div>
+        <div class="option" onclick="selectOpt('qco4','B')"><span class="opt-letter">B</span> 11</div>
+        <div class="option" onclick="selectOpt('qco4','C')"><span class="opt-letter">C</span> 17</div>
+        <div class="option" onclick="selectOpt('qco4','D')"><span class="opt-letter">D</span> 53</div>
+      </div>
+      <div class="hint" id="hint-qco4">💡 Inclusão-Exclusão: |A ∪ B| = |A| + |B| − |A ∩ B|. Portanto |A ∩ B| = |A| + |B| − |A ∪ B| = 35 + 18 − 42.</div>
+      <div class="feedback" id="fb-qco4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco4','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco4')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco4')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO5 -->
+    <div class="q-card" id="qco5">
+      <div class="q-number">Combinatória · Questão 5</div>
+      <div class="q-text">
+        Quantas permutações da palavra <span class="math">ERRO</span> existem? (os dois R são indistinguíveis)
+      </div>
+      <div class="options" id="opts-qco5">
+        <div class="option" onclick="selectOpt('qco5','A')"><span class="opt-letter">A</span> 24</div>
+        <div class="option" onclick="selectOpt('qco5','B')"><span class="opt-letter">B</span> 12</div>
+        <div class="option" onclick="selectOpt('qco5','C')"><span class="opt-letter">C</span> 6</div>
+        <div class="option" onclick="selectOpt('qco5','D')"><span class="opt-letter">D</span> 4</div>
+      </div>
+      <div class="hint" id="hint-qco5">💡 Permutação com repetição: n! / (n1! × n2! × ...) onde ni é a frequência de cada elemento repetido. ERRO tem 4 letras com R aparecendo 2x: 4! / 2! = 24/2 = 12.</div>
+      <div class="feedback" id="fb-qco5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco5','B')">Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco5')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco5')">Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO6 -->
+    <div class="q-card" id="qco6">
+      <div class="q-number">Combinatória · Questão 6 — Dissertativa</div>
+      <div class="q-text">
+        Quantas pessoas deve ter um grupo para <strong>garantir</strong> que pelo menos 2 nasceram no mesmo mês? Explique o princípio utilizado.
+      </div>
+      <textarea class="text-answer" id="ans-qco6" placeholder="Sua resposta e explicação..."></textarea>
+      <div class="hint" id="hint-qco6">💡 Princípio das Gavetas (Pigeonhole): se há n gavetas e n+1 objetos, pelo menos uma gaveta terá 2 objetos. Os meses são as "gavetas".</div>
+      <div class="feedback" id="fb-qco6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="revealAnswer('qco6', '13 pessoas. Com 12 meses no ano (12 gavetas), pelo menos 13 pessoas garantem que duas nasceram no mesmo mês. Este é o Princípio das Gavetas (Pigeonhole Principle): se distribuirmos n+1 objetos em n gavetas, pelo menos uma gaveta terá 2 ou mais objetos.')">Ver Gabarito</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco6')">Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco6')">Limpar</button>
+      </div>
+    </div>
+
+  </div><!-- end combinatoria -->
+
+</div><!-- end content -->
+
+<script>
+  // State
+  const state = {};
+  const correct = {};
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+  let totalWrong = 0;
+
+  // Count total questions
+  const allCards = document.querySelectorAll('.q-card');
+  document.getElementById('total-count').textContent = allCards.length;
+
+  function showTab(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  function toggleHint(id) {
+    const h = document.getElementById('hint-' + id);
+    h.classList.toggle('show');
+  }
+
+  function toggleMC(id, letter) {
+    if (state[id + '_checked']) return;
+    const opts = document.querySelectorAll('#opts-' + id + ' .option');
+    const letters = ['A','B','C','D','E'];
+    const idx = letters.indexOf(letter);
+    if (!state[id]) state[id] = [];
+    const pos = state[id].indexOf(letter);
+    if (pos === -1) { state[id].push(letter); opts[idx].classList.add('selected'); }
+    else { state[id].splice(pos,1); opts[idx].classList.remove('selected'); }
+  }
+
+  function selectOpt(id, letter) {
+    if (state[id + '_checked']) return;
+    const opts = document.querySelectorAll('#opts-' + id + ' .option');
+    const letters = ['A','B','C','D','E'];
+    opts.forEach(o => o.classList.remove('selected'));
+    state[id] = letter;
+    opts[letters.indexOf(letter)].classList.add('selected');
+  }
+
+  function checkSingle(id, correctLetter) {
+    if (state[id + '_checked']) return;
+    const fb = document.getElementById('fb-' + id);
+    const opts = document.querySelectorAll('#opts-' + id + ' .option');
+    const letters = ['A','B','C','D','E'];
+    const card = document.getElementById('q' + id.replace('q',''));
+    const sel = state[id];
+
+    disableOpts(id);
+    state[id + '_checked'] = true;
+
+    const correctIdx = letters.indexOf(correctLetter);
+    opts[correctIdx].classList.add('correct-answer');
+
+    if (sel === correctLetter) {
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<strong>✓ Correto!</strong> Ótimo raciocínio!';
+      document.getElementById(id).classList.add('answered-correct');
+      totalCorrect++;
+    } else {
+      if (sel) {
+        opts[letters.indexOf(sel)].classList.add('wrong-answer');
+      }
+      fb.className = 'feedback wrong show';
+      fb.innerHTML = '<strong>✗ Incorreto.</strong> A resposta correta é a alternativa ' + correctLetter + '. Revise a dica!';
+      document.getElementById(id).classList.add('answered-wrong');
+      totalWrong++;
+    }
+    if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; }
+    updateScore();
+  }
+
+  function checkMC(id, correctLetters) {
+    if (state[id + '_checked']) return;
+    const fb = document.getElementById('fb-' + id);
+    const opts = document.querySelectorAll('#opts-' + id + ' .option');
+    const letters = ['A','B','C','D','E'];
+
+    disableOpts(id);
+    state[id + '_checked'] = true;
+
+    const selected = state[id] || [];
+    const isCorrect = correctLetters.every(l => selected.includes(l)) && selected.every(l => correctLetters.includes(l));
+
+    correctLetters.forEach(l => opts[letters.indexOf(l)].classList.add('correct-answer'));
+    selected.forEach(l => { if (!correctLetters.includes(l)) opts[letters.indexOf(l)].classList.add('wrong-answer'); });
+
+    if (isCorrect) {
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<strong>✓ Correto!</strong> Você identificou todas as alternativas verdadeiras.';
+      document.getElementById(id).classList.add('answered-correct');
+      totalCorrect++;
+    } else {
+      fb.className = 'feedback wrong show';
+      fb.innerHTML = '<strong>✗ Incorreto.</strong> As alternativas corretas são: ' + correctLetters.join(', ') + '.';
+      document.getElementById(id).classList.add('answered-wrong');
+      totalWrong++;
+    }
+    if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; }
+    updateScore();
+  }
+
+  function checkOpen(id, validAnswers) {
+    if (state[id + '_checked']) return;
+    const ans = document.getElementById('ans-' + id).value.trim().toLowerCase();
+    const fb = document.getElementById('fb-' + id);
+    state[id + '_checked'] = true;
+    const ok = validAnswers.some(v => ans === v.toLowerCase());
+    if (ok) {
+      fb.className = 'feedback correct show';
+      fb.innerHTML = '<strong>✓ Correto!</strong> Excelente!';
+      document.getElementById(id).classList.add('answered-correct');
+      totalCorrect++;
+    } else {
+      fb.className = 'feedback wrong show';
+      fb.innerHTML = '<strong>✗ Verifique sua resposta.</strong> Uma resposta aceita: ' + validAnswers[0];
+      document.getElementById(id).classList.add('answered-wrong');
+      totalWrong++;
+    }
+    if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; }
+    updateScore();
+  }
+
+  function revealAnswer(id, answer) {
+    const fb = document.getElementById('fb-' + id);
+    fb.className = 'feedback info show';
+    fb.innerHTML = '<strong>📖 Gabarito:</strong> ' + answer;
+    if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; updateScore(); }
+  }
+
+  function disableOpts(id) {
+    document.querySelectorAll('#opts-' + id + ' .option').forEach(o => o.classList.add('disabled'));
+  }
+
+  function resetQ(id) {
+    const opts = document.querySelectorAll('#opts-' + id + ' .option');
+    opts.forEach(o => { o.classList.remove('selected','correct-answer','wrong-answer','disabled'); });
+    const fb = document.getElementById('fb-' + id);
+    fb.className = 'feedback';
+    const card = document.getElementById(id);
+    card.classList.remove('answered-correct','answered-wrong');
+    const h = document.getElementById('hint-' + id);
+    if (h) h.classList.remove('show');
+    const ta = document.getElementById('ans-' + id);
+    if (ta) ta.value = '';
+
+    if (state[id + '_checked']) {
+      if (card.classList.contains('answered-correct')) totalCorrect--;
+      else totalWrong--;
+      totalAnswered--;
+      state[id + '_counted'] = false;
+      updateScore();
+    }
+    state[id] = null;
+    state[id + '_checked'] = false;
+    state[id + '_counted'] = false;
+  }
+
+  function checkAll() {
+    // Just a visual reminder
+    alert('Verifique cada questão individualmente clicando em "Verificar". O placar é atualizado automaticamente!');
+  }
+
+  function updateScore() {
+    document.getElementById('answered-count').textContent = totalAnswered;
+    document.getElementById('correct-count').textContent = totalCorrect;
+    document.getElementById('wrong-count').textContent = totalWrong;
+    const pct = Math.round((totalAnswered / allCards.length) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+</script>
+</body>
+</html>
