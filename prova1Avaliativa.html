@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Prova Avaliativa 1 · Fundamentos Matemáticos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --accent3: #6dfabc;
+            --accent4: #fadc6d;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(124,109,250,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,109,250,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+            mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%);
+        }
+
+        .glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatGlow 15s infinite alternate ease-in-out;
+        }
+        .glow-1 { background: var(--accent); top: -150px; left: -150px; }
+        .glow-2 { background: var(--accent3); bottom: -150px; right: -150px; animation-delay: -5s; }
+        .glow-3 { background: var(--accent2); top: 40%; left: 50%; width: 400px; height: 400px; opacity: 0.08; animation-delay: -10s; }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(20px, -20px) scale(1.08); }
+        }
+
+        /* ========== HAMBURGER ========== */
+        .hamburger-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 200;
+            width: 44px; height: 44px;
+            background: rgba(21,21,26,0.85); backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+            cursor: pointer; transition: all var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(124,109,250,0.2); }
+        .hamburger-line {
+            width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            transition: all 0.3s ease; transform-origin: center;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 250; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+            background: rgba(21,21,26,0.95); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); z-index: 260;
+            transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+            display: flex; flex-direction: column; padding: 0; box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 24px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 18px; color: #fff;
+        }
+        .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); }
+
+        .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 10px; color: var(--muted); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: all var(--transition);
+            cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+        }
+        .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
+        .sidebar-link.active { background: rgba(124,109,250,0.15); border: 1px solid rgba(124,109,250,0.3); color: #fff; }
+        .sidebar-link .icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); text-align: center; font-family: 'Space Mono', monospace; }
+
+        /* ========== HEADER ========== */
+        header {
+            position: relative; z-index: 1; text-align: center; padding: 30px 20px 35px;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(ellipse at 50% 0%, rgba(124,109,250,0.06), transparent 70%);
+        }
+        .back-home {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+            text-decoration: none; margin-bottom: 20px; transition: color var(--transition);
+        }
+        .back-home:hover { color: var(--accent); }
+
+        .tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent3);
+            border: 1px solid rgba(109,250,188,0.4); border-radius: 30px;
+            padding: 5px 18px; letter-spacing: 2px; margin-bottom: 20px;
+            text-transform: uppercase; background: rgba(109,250,188,0.08); backdrop-filter: blur(10px);
+        }
+        .tag::before { content: ''; width: 8px; height: 8px; background: var(--accent3); border-radius: 50%; box-shadow: 0 0 8px var(--accent3); }
+
+        header h1 {
+            font-size: clamp(28px, 5vw, 44px); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent) 60%, var(--accent3) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 12px;
+        }
+        header p { color: var(--muted); font-size: 15px; max-width: 500px; margin: 0 auto; }
+
+        /* ========== SCORE BAR ========== */
+        .score-bar {
+            position: sticky; top: 0; z-index: 110;
+            background: rgba(13,13,15,0.88); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 25px; gap: 16px; flex-wrap: wrap; box-shadow: 0 1px 20px rgba(0,0,0,0.5);
+        }
+        .score-info { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .score-stat { display: flex; align-items: center; gap: 6px; background: var(--surface); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); }
+        .progress-wrap { flex: 1; min-width: 150px; max-width: 280px; height: 7px; background: var(--border); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent4)); border-radius: 20px; transition: width 0.5s ease; width: 0%; }
+        .btn-check-all {
+            background: var(--accent); color: #fff; border: none; padding: 9px 22px; border-radius: 25px;
+            font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+            transition: all var(--transition); box-shadow: 0 4px 12px rgba(124,109,250,0.3);
+        }
+        .btn-check-all:hover { background: #8f80ff; transform: translateY(-1px); }
+
+        /* ========== CONTENT ========== */
+        .content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+
+        .q-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 26px; margin-bottom: 24px; transition: all var(--transition);
+            animation: cardAppear 0.45s ease both; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        @keyframes cardAppear { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        .q-card:nth-child(1) { animation-delay: 0s; }
+        .q-card:nth-child(2) { animation-delay: 0.05s; }
+        .q-card:nth-child(3) { animation-delay: 0.10s; }
+        .q-card:nth-child(4) { animation-delay: 0.15s; }
+        .q-card:nth-child(5) { animation-delay: 0.20s; }
+        .q-card:nth-child(6) { animation-delay: 0.25s; }
+        .q-card:nth-child(7) { animation-delay: 0.30s; }
+
+        .q-card.answered-correct { border-color: var(--correct); box-shadow: 0 0 22px rgba(46,204,113,0.12); }
+        .q-card.answered-wrong { border-color: var(--wrong); box-shadow: 0 0 22px rgba(231,76,60,0.12); }
+
+        .q-number {
+            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+            margin-bottom: 14px; letter-spacing: 1px; text-transform: uppercase;
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .q-badge {
+            font-size: 9px; padding: 3px 10px; border-radius: 15px; font-weight: 600;
+            background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.3); color: var(--accent);
+        }
+
+        .q-text { font-size: 15px; line-height: 1.7; margin-bottom: 22px; color: var(--text); font-weight: 500; }
+        .q-text .math {
+            font-family: 'Space Mono', monospace; background: rgba(124,109,250,0.12);
+            border: 1px solid rgba(124,109,250,0.25); border-radius: 5px;
+            padding: 1px 7px; font-size: 13px; color: #c3baff; font-weight: 600;
+        }
+        .q-text strong { color: #fff; }
+        .q-text ul { margin: 10px 0; padding-left: 25px; list-style-type: disc; }
+        .q-text li { margin-bottom: 6px; }
+
+        .q-subitems { margin-top: 14px; padding-left: 20px; border-left: 2px solid var(--border); }
+        .q-subitems p { margin-bottom: 10px; font-size: 14px; }
+        .q-subitems .sub-label { font-weight: 700; color: var(--accent3); }
+
+        /* OPTIONS */
+        .options { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+        .option {
+            display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+            cursor: pointer; transition: all 0.2s ease; font-size: 14px; line-height: 1.5;
+        }
+        .option:hover:not(.disabled) { border-color: var(--accent); background: rgba(124,109,250,0.06); transform: translateX(3px); }
+        .option.selected { border-color: var(--accent); background: rgba(124,109,250,0.12); box-shadow: 0 0 15px rgba(124,109,250,0.08); }
+        .option.correct-answer { border-color: var(--correct); background: rgba(46,204,113,0.1); color: var(--correct); }
+        .option.wrong-answer { border-color: var(--wrong); background: rgba(231,76,60,0.1); color: #ff8080; }
+        .option.disabled { cursor: default; pointer-events: none; opacity: 0.7; }
+        .opt-letter {
+            width: 30px; height: 30px; border-radius: 7px; background: var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .option.selected .opt-letter { background: var(--accent); color: #fff; }
+        .option.correct-answer .opt-letter { background: var(--correct); color: #fff; }
+        .option.wrong-answer .opt-letter { background: var(--wrong); color: #fff; }
+
+        /* FEEDBACK */
+        .feedback {
+            display: none; padding: 14px 18px; border-radius: var(--radius-md);
+            font-size: 13px; line-height: 1.6; margin-bottom: 16px; animation: fadeSlide 0.3s ease;
+        }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3); color: var(--correct); }
+        .feedback.wrong { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: #ff8080; }
+        .feedback.info { background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.3); color: #b8b0ff; }
+        .feedback strong { display: block; margin-bottom: 4px; font-size: 14px; }
+        .feedback pre { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 10px; overflow-x: auto; font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.5; margin: 8px 0; white-space: pre-wrap; }
+        .feedback ul { margin: 8px 0; padding-left: 20px; }
+        .feedback li { margin-bottom: 4px; }
+
+        /* BUTTONS */
+        .q-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn {
+            padding: 9px 20px; border-radius: 20px; font-family: 'Syne', sans-serif;
+            font-size: 12px; font-weight: 700; cursor: pointer; border: none;
+            transition: all var(--transition); display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 10px rgba(124,109,250,0.25); }
+        .btn-primary:hover:not(:disabled) { background: #8f80ff; transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: default; }
+        .btn-reveal { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+        .btn-reveal:hover { border-color: var(--accent3); color: var(--accent3); background: rgba(109,250,188,0.05); }
+        .btn-secondary { background: var(--border); color: var(--muted); }
+        .btn-secondary:hover { background: #3a3a48; color: var(--text); }
+
+        /* FINAL SCORE */
+        .final-score {
+            display: none; text-align: center; padding: 50px 20px;
+            animation: fadeSlide 0.6s ease; border-top: 1px solid var(--border); margin-top: 40px;
+        }
+        .final-score.show { display: block; }
+        .score-ring {
+            width: 150px; height: 150px; border-radius: 50%; border: 7px solid var(--border);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin: 0 auto 25px; background: radial-gradient(circle at 30% 20%, rgba(124,109,250,0.08), transparent);
+        }
+        .score-pct {
+            font-size: 44px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .score-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
+        .restart-btn {
+            background: var(--accent); color: #fff; border: none; padding: 14px 44px;
+            border-radius: 25px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+            cursor: pointer; transition: all var(--transition); margin-top: 15px;
+            box-shadow: 0 6px 18px rgba(124,109,250,0.3);
+        }
+        .restart-btn:hover { background: #8f80ff; transform: translateY(-2px); }
+
+        @media (max-width: 600px) {
+            .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; }
+            .score-bar { padding: 10px 14px; gap: 10px; }
+            .q-card { padding: 18px 14px; }
+            .option { padding: 12px 14px; font-size: 13px; }
+            .btn { padding: 7px 15px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ========== HAMBURGER ========== -->
+<button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+</button>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">SP</div>
+        <span class="sidebar-title">SiteParaEstudar</span>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="index.html" class="sidebar-link"><span class="icon">🏠</span> Início</a>
+        <a href="HomeMatematica.html" class="sidebar-link"><span class="icon">📚</span> Matemática</a>
+        <a href="prova1Avaliativa.html" class="sidebar-link active"><span class="icon">📝</span> Prova Avaliativa 1</a>
+        <a href="matematica.html" class="sidebar-link"><span class="icon">📖</span> Prova Completa (24Q)</a>
+        <a href="mapa_mental_Adm.html" class="sidebar-link"><span class="icon">📋</span> Mapa Mental ADM</a>
+        <a href="casos.html" class="sidebar-link"><span class="icon">📝</span> Casos ADM</a>
+    </nav>
+    <div class="sidebar-footer">UFMS · Campus Ponta Porã</div>
+</aside>
+
+<!-- ========== HEADER ========== -->
+<header>
+    <a href="HomeMatematica.html" class="back-home">← Voltar para Matemática</a>
+    <div class="tag">Prova Avaliativa</div>
+    <h1>Prova Avaliativa 1</h1>
+    <p>Fundamentos Matemáticos — Conjuntos, Relações, Funções e Combinatória</p>
+</header>
+
+<!-- ========== SCORE BAR ========== -->
+<div class="score-bar">
+    <div class="score-info">
+        <div class="score-stat">📝 <strong id="answered-count">0</strong>/<span id="total-count">7</span></div>
+        <div class="score-stat" style="color:var(--correct)">✓ <strong id="correct-count">0</strong></div>
+        <div class="score-stat" style="color:var(--wrong)">✗ <strong id="wrong-count">0</strong></div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    <button class="btn-check-all" onclick="checkAll()">📊 Progresso</button>
+</div>
+
+<!-- ========== CONTENT ========== -->
+<div class="content">
+
+    <!-- =================== QUESTÃO 1 =================== -->
+    <div class="q-card" id="q1">
+        <div class="q-number">Questão 1 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,5 pts</span></div>
+        <div class="q-text">
+            Considere <span class="math">S = {1,2,3,…,9}</span>, <span class="math">A = {3,4,5,6,7}</span>, <span class="math">B = {3,6,9}</span> e <span class="math">C = {1,4,7}</span>. Determine:<br><br>
+            <strong>a)</strong> <span class="math">(A ∪ C) ∩ B̄</span><br>
+            <strong>b)</strong> <span class="math">|P(C − B)|</span> (cardinalidade do conjunto das partes)<br>
+            <strong>c)</strong> Quantos pares tem <span class="math">A × C</span>?
+        </div>
+        <div class="options" id="opts-q1">
+            <div class="option" onclick="selectOpt('q1','A')"><span class="opt-letter">A</span> a) {2,8} &nbsp; b) 8 &nbsp; c) 12</div>
+            <div class="option" onclick="selectOpt('q1','B')"><span class="opt-letter">B</span> a) {2,8} &nbsp; b) 8 &nbsp; c) 15</div>
+            <div class="option" onclick="selectOpt('q1','C')"><span class="opt-letter">C</span> a) {2,8,9} &nbsp; b) 4 &nbsp; c) 15</div>
+            <div class="option" onclick="selectOpt('q1','D')"><span class="opt-letter">D</span> a) {2,8} &nbsp; b) 6 &nbsp; c) 20</div>
+        </div>
+        <div class="feedback" id="fb-q1"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q1','B')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ1()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q1')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- =================== QUESTÃO 2 =================== -->
+    <div class="q-card" id="q2">
+        <div class="q-number">Questão 2 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,5 pts</span></div>
+        <div class="q-text">
+            Seja <span class="math">|S| = 10</span> e A, B ⊆ S. Sabe-se que:
+            <ul>
+                <li><span class="math">|P(A)| = 64</span></li>
+                <li><span class="math">|B| = 2 · |A ∩ B|</span></li>
+                <li><span class="math">|P(A ∪ B)| = 256</span></li>
+            </ul>
+            Determine <span class="math">|A|</span>, <span class="math">|A ∩ B|</span> e <span class="math">|B|</span>, e quantos elementos estão <strong>fora</strong> de A ∪ B.
+        </div>
+        <div class="options" id="opts-q2">
+            <div class="option" onclick="selectOpt('q2','A')"><span class="opt-letter">A</span> |A|=6, |A∩B|=2, |B|=4, fora=2</div>
+            <div class="option" onclick="selectOpt('q2','B')"><span class="opt-letter">B</span> |A|=8, |A∩B|=4, |B|=8, fora=2</div>
+            <div class="option" onclick="selectOpt('q2','C')"><span class="opt-letter">C</span> |A|=6, |A∩B|=3, |B|=6, fora=1</div>
+            <div class="option" onclick="selectOpt('q2','D')"><span class="opt-letter">D</span> |A|=5, |A∩B|=2, |B|=4, fora=3</div>
+        </div>
+        <div class="feedback" id="fb-q2"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q2','A')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ2()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q2')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- =================== QUESTÃO 3 =================== -->
+    <div class="q-card" id="q3">
+        <div class="q-number">Questão 3 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,5 pts</span></div>
+        <div class="q-text">
+            Dado <span class="math">S = {11, 20, 33, 40, 55}</span>, classifique as relações quanto às propriedades <strong>reflexiva, simétrica, antissimétrica e transitiva</strong>. Assinale a alternativa <strong>CORRETA</strong>:
+            <div class="q-subitems">
+                <p><span class="sub-label">a)</span> R₁ = {(11,20), (20,11), (33,40)}</p>
+                <p><span class="sub-label">b)</span> R₂ = {(11,11),(20,20),(33,33),(40,40),(55,55),(40,55)}</p>
+                <p><span class="sub-label">c)</span> R₃ = {(11,11),(20,20),(33,33),(40,40),(55,55),(20,40),(40,20)}</p>
+                <p><span class="sub-label">d)</span> R₄ = {(11,33)}</p>
+            </div>
+        </div>
+        <div class="options" id="opts-q3">
+            <div class="option" onclick="selectOpt('q3','A')"><span class="opt-letter">A</span> R₂ é reflexiva, simétrica e transitiva; R₄ é antissimétrica</div>
+            <div class="option" onclick="selectOpt('q3','B')"><span class="opt-letter">B</span> R₁ não é reflexiva; R₂ é reflexiva, antissimétrica e transitiva; R₃ é reflexiva e simétrica; R₄ é antissimétrica e transitiva</div>
+            <div class="option" onclick="selectOpt('q3','C')"><span class="opt-letter">C</span> R₁ é simétrica; R₂ não é transitiva; R₃ é antissimétrica; R₄ é reflexiva</div>
+            <div class="option" onclick="selectOpt('q3','D')"><span class="opt-letter">D</span> R₁ é reflexiva; R₂ é simétrica; R₃ é transitiva; R₄ não é antissimétrica</div>
+        </div>
+        <div class="feedback" id="fb-q3"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q3','B')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ3()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q3')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- =================== QUESTÃO 4 =================== -->
+    <div class="q-card" id="q4">
+        <div class="q-number">Questão 4 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,5 pts</span></div>
+        <div class="q-text">
+            Considere <span class="math">A = {1,2,3,4}</span> e <span class="math">R = {(1,1),(2,2),(3,3),(1,2),(2,1),(2,3),(3,2)}</span>.
+            <br><br>
+            Essa relação é de equivalência? Se não for, quais pares faltam?
+        </div>
+        <div class="options" id="opts-q4">
+            <div class="option" onclick="selectOpt('q4','A')"><span class="opt-letter">A</span> Sim, é de equivalência</div>
+            <div class="option" onclick="selectOpt('q4','B')"><span class="opt-letter">B</span> Não. Faltam (4,4) e (1,3)</div>
+            <div class="option" onclick="selectOpt('q4','C')"><span class="opt-letter">C</span> Não. Faltam (4,4), (1,3) e (3,1)</div>
+            <div class="option" onclick="selectOpt('q4','D')"><span class="opt-letter">D</span> Não. Faltam (4,4), (1,3), (3,1) e (3,4)</div>
+        </div>
+        <div class="feedback" id="fb-q4"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q4','C')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ4()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q4')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- =================== QUESTÃO 5 =================== -->
+    <div class="q-card" id="q5">
+        <div class="q-number">Questão 5 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,5 pts</span></div>
+        <div class="q-text">
+            Dado o domínio <span class="math">A = {3,5,7,9}</span>, classifique as funções abaixo. Assinale a alternativa <strong>CORRETA</strong>:
+            <div class="q-subitems">
+                <p><span class="sub-label">a)</span> B={0,1,2,3}, f={(3,0),(5,1),(7,2),(9,3)}</p>
+                <p><span class="sub-label">b)</span> B={1,2,3}, f={(3,1),(5,1),(7,2),(9,3)}</p>
+                <p><span class="sub-label">c)</span> B={0,1,2,3,4}, f={(3,0),(5,1),(7,2),(9,3)}</p>
+                <p><span class="sub-label">d)</span> B={0,1,2,3,4}, f={(3,1),(5,1),(7,2),(9,3)}</p>
+            </div>
+        </div>
+        <div class="options" id="opts-q5">
+            <div class="option" onclick="selectOpt('q5','A')"><span class="opt-letter">A</span> a) Bijetora &nbsp; b) Sobrejetora &nbsp; c) Injetora &nbsp; d) Nenhuma</div>
+            <div class="option" onclick="selectOpt('q5','B')"><span class="opt-letter">B</span> a) Bijetora &nbsp; b) Injetora &nbsp; c) Sobrejetora &nbsp; d) Sobrejetora</div>
+            <div class="option" onclick="selectOpt('q5','C')"><span class="opt-letter">C</span> a) Injetora &nbsp; b) Sobrejetora &nbsp; c) Bijetora &nbsp; d) Nenhuma</div>
+            <div class="option" onclick="selectOpt('q5','D')"><span class="opt-letter">D</span> a) Sobrejetora &nbsp; b) Nenhuma &nbsp; c) Injetora &nbsp; d) Bijetora</div>
+        </div>
+        <div class="feedback" id="fb-q5"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q5','A')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ5()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q5')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- =================== QUESTÃO 6 =================== -->
+    <div class="q-card" id="q6">
+        <div class="q-number">Questão 6 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,25 pts</span></div>
+        <div class="q-text">
+            Quantos <strong>anagramas</strong> podem ser formados com as letras da palavra <span class="math">COCHILO</span>?
+        </div>
+        <div class="options" id="opts-q6">
+            <div class="option" onclick="selectOpt('q6','A')"><span class="opt-letter">A</span> 5040</div>
+            <div class="option" onclick="selectOpt('q6','B')"><span class="opt-letter">B</span> 2520</div>
+            <div class="option" onclick="selectOpt('q6','C')"><span class="opt-letter">C</span> 1260</div>
+            <div class="option" onclick="selectOpt('q6','D')"><span class="opt-letter">D</span> 630</div>
+        </div>
+        <div class="feedback" id="fb-q6"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q6','C')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ6()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q6')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- =================== QUESTÃO 7 =================== -->
+    <div class="q-card" id="q7">
+        <div class="q-number">Questão 7 <span class="q-badge">Múltipla Escolha</span> <span style="color:var(--accent4);font-size:10px;">★ 1,25 pts</span></div>
+        <div class="q-text">
+            Quantas <strong>senhas</strong> diferentes podem ser formadas com exatamente <span class="math">1 letra</span> (26 possíveis) seguida de <span class="math">4 algarismos</span> (0-9) <strong>distintos entre si</strong>?
+        </div>
+        <div class="options" id="opts-q7">
+            <div class="option" onclick="selectOpt('q7','A')"><span class="opt-letter">A</span> 26 × 10⁴ = 260.000</div>
+            <div class="option" onclick="selectOpt('q7','B')"><span class="opt-letter">B</span> 26 × 10 × 9 × 8 × 7 = 131.040</div>
+            <div class="option" onclick="selectOpt('q7','C')"><span class="opt-letter">C</span> 26 × C(10,4) = 5.460</div>
+            <div class="option" onclick="selectOpt('q7','D')"><span class="opt-letter">D</span> 26 × 10! / 6! = 131.040 (mesmo que B)</div>
+        </div>
+        <div class="feedback" id="fb-q7"></div>
+        <div class="q-actions">
+            <button class="btn btn-primary" onclick="checkSingle('q7','B')">✓ Verificar</button>
+            <button class="btn btn-reveal" onclick="revealQ7()">📖 Gabarito</button>
+            <button class="btn btn-secondary" onclick="resetQ('q7')">↺ Limpar</button>
+        </div>
+    </div>
+
+    <!-- Final Score -->
+    <div class="final-score" id="final-score-section">
+        <h2 style="margin-bottom:20px;color:var(--accent)">Resultado Final</h2>
+        <div class="score-ring">
+            <span class="score-pct" id="final-pct">0%</span>
+            <span class="score-label">de acerto</span>
+        </div>
+        <p style="color:var(--muted);margin-bottom:20px;">Você respondeu <strong id="final-answered">0</strong> de <strong>7</strong> questões.</p>
+        <button class="restart-btn" onclick="location.reload()">↻ Refazer Prova</button>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        // ========== SIDEBAR ==========
+        let sidebarOpen = false;
+        window.toggleSidebar = function() {
+            sidebarOpen = !sidebarOpen;
+            document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+            document.getElementById('sidebar-overlay').classList.toggle('show', sidebarOpen);
+            document.getElementById('hamburger-btn').classList.toggle('open', sidebarOpen);
+        };
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => { if (window.innerWidth < 768 && sidebarOpen) toggleSidebar(); });
+        });
+
+        // ========== SCORE LOGIC ==========
+        const state = {};
+        let totalAnswered = 0, totalCorrect = 0, totalWrong = 0;
+        const totalQuestions = 7;
+        document.getElementById('total-count').textContent = totalQuestions;
+
+        window.selectOpt = function(id, letter) {
+            if (state[id + '_checked']) return;
+            const card = document.getElementById(id);
+            if (!card) return;
+            const opts = card.querySelectorAll('.option');
+            const letters = ['A','B','C','D'];
+            opts.forEach(o => o.classList.remove('selected'));
+            state[id] = letter;
+            const idx = letters.indexOf(letter);
+            if (idx !== -1) opts[idx].classList.add('selected');
+        };
+
+        function disableOpts(card) { card.querySelectorAll('.option').forEach(o => o.classList.add('disabled')); }
+
+        window.checkSingle = function(id, correctLetter) {
+            if (state[id + '_checked']) return;
+            const card = document.getElementById(id);
+            if (!card) return;
+            const fb = card.querySelector('.feedback');
+            const opts = card.querySelectorAll('.option');
+            const letters = ['A','B','C','D'];
+            const sel = state[id];
+            disableOpts(card);
+            state[id + '_checked'] = true;
+            const correctIdx = letters.indexOf(correctLetter);
+            if (correctIdx !== -1) opts[correctIdx].classList.add('correct-answer');
+            if (sel === correctLetter) {
+                if (fb) { fb.className = 'feedback correct show'; fb.innerHTML = '<strong>✓ Correto!</strong>'; }
+                card.classList.add('answered-correct'); totalCorrect++;
+            } else {
+                if (sel && letters.indexOf(sel) !== -1) opts[letters.indexOf(sel)].classList.add('wrong-answer');
+                if (fb) { fb.className = 'feedback wrong show'; fb.innerHTML = '<strong>✗ Incorreto.</strong> Resposta: ' + correctLetter; }
+                card.classList.add('answered-wrong'); totalWrong++;
+            }
+            if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; }
+            updateScore();
+        };
+
+        function showFeedback(id, content) {
+            const fb = document.getElementById('fb-' + id);
+            if (!fb) return;
+            if (!state[id + '_checked']) {
+                state[id + '_checked'] = true;
+                const card = document.getElementById(id);
+                if (card) disableOpts(card);
+            }
+            if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; updateScore(); }
+            fb.className = 'feedback info show';
+            fb.innerHTML = '<strong>📖 Gabarito:</strong>' + content;
+            fb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.resetQ = function(id) {
+            const card = document.getElementById(id);
+            if (!card) return;
+            card.querySelectorAll('.option').forEach(o => { o.classList.remove('selected','correct-answer','wrong-answer','disabled'); });
+            const fb = document.getElementById('fb-' + id);
+            if (fb) fb.className = 'feedback';
+            card.classList.remove('answered-correct','answered-wrong');
+            if (state[id + '_checked']) {
+                totalAnswered--; state[id + '_counted'] = false;
+                if (card.classList.contains('answered-correct')) totalCorrect--;
+                else if (card.classList.contains('answered-wrong')) totalWrong--;
+                updateScore();
+            }
+            state[id] = null; state[id + '_checked'] = false; state[id + '_counted'] = false;
+        };
+
+        window.checkAll = function() {
+            alert('📊 Progresso: ' + totalAnswered + '/' + totalQuestions + ' (' + Math.round((totalAnswered/totalQuestions)*100) + '%)\n✓ Acertos: ' + totalCorrect + '\n✗ Erros: ' + totalWrong);
+        };
+
+        function updateScore() {
+            document.getElementById('answered-count').textContent = totalAnswered;
+            document.getElementById('correct-count').textContent = totalCorrect;
+            document.getElementById('wrong-count').textContent = totalWrong;
+            document.getElementById('progress-fill').style.width = (totalAnswered/totalQuestions)*100 + '%';
+            if (totalAnswered >= totalQuestions) {
+                const fs = document.getElementById('final-score-section');
+                if (fs) { fs.classList.add('show'); document.getElementById('final-pct').textContent = Math.round((totalCorrect/totalQuestions)*100) + '%'; document.getElementById('final-answered').textContent = totalAnswered; fs.scrollIntoView({behavior:'smooth'}); }
+            }
+        }
+
+        // ========== GABARITOS ==========
+        window.revealQ1 = function() {
+            showFeedback('q1', `<br><strong>a)</strong> A∪C={1,3,4,5,6,7} → compl={2,8,9}; B̄={1,2,4,5,7,8} → interseção=<strong>{2,8}</strong><br><strong>b)</strong> C−B={1,4,7} (3 elementos) → |P|=2³=<strong>8</strong><br><strong>c)</strong> |A|=5, |C|=3 → |A×C|=5×3=<strong>15</strong><br><br>✅ <strong>Alternativa B</strong>`);
+        };
+        window.revealQ2 = function() {
+            showFeedback('q2', `2<sup>|A|</sup>=64→<strong>|A|=6</strong>; 2<sup>|A∪B|</sup>=256→<strong>|A∪B|=8</strong>; 8=6+|B|−|A∩B| e |B|=2|A∩B| → <strong>|A∩B|=2, |B|=4</strong>; fora de A∪B: 10−8=<strong>2</strong><br><br>✅ <strong>Alternativa A</strong>`);
+        };
+        window.revealQ3 = function() {
+            showFeedback('q3', `<strong>R₁:</strong> Não reflexiva (faltam pares (x,x)); Não simétrica ((33,40) sem (40,33)); Não antissimétrica ((11,20) e (20,11)); Não transitiva ((11,20)+(20,11) sem (11,11))<br><strong>R₂:</strong> Reflexiva ✓; NÃO simétrica ((40,55) sem (55,40)); Antissimétrica ✓; Transitiva ✓<br><strong>R₃:</strong> Reflexiva ✓; Simétrica ✓; NÃO antissimétrica ((20,40) e (40,20)); Transitiva ✓<br><strong>R₄:</strong> Não reflexiva; Não simétrica; Antissimétrica ✓ (vacuosamente); Transitiva ✓ (vacuosamente)<br><br>✅ <strong>Alternativa B</strong>`);
+        };
+        window.revealQ4 = function() {
+            showFeedback('q4', `Reflexiva: faltou <strong>(4,4)</strong>. Simétrica: OK. Transitiva: (1,2)+(2,3) → falta <strong>(1,3)</strong>; (3,2)+(2,1) → falta <strong>(3,1)</strong>.<br><br>Total de pares faltantes: <strong>(4,4), (1,3), (3,1)</strong><br><br>✅ <strong>Alternativa C</strong>`);
+        };
+        window.revealQ5 = function() {
+            showFeedback('q5', `<strong>a)</strong> Im={0,1,2,3}=B, imagens distintas → <strong>Bijetora</strong><br><strong>b)</strong> Im={1,2,3}=B, mas 3 e 5 → 1 → <strong>Sobrejetora</strong> (não injetora)<br><strong>c)</strong> Im={0,1,2,3}≠B (falta 4), imagens distintas → <strong>Injetora</strong> (não sobrejetora)<br><strong>d)</strong> Im={1,2,3}≠B, 3 e 5 → 1 → <strong>Nenhuma</strong><br><br>✅ <strong>Alternativa A</strong>`);
+        };
+        window.revealQ6 = function() {
+            showFeedback('q6', `COCHILO: 7 letras. C=2, O=2, H=1, I=1, L=1<br>7!/(2!·2!) = 5040/4 = <strong>1260</strong><br><br>✅ <strong>Alternativa C</strong>`);
+        };
+        window.revealQ7 = function() {
+            showFeedback('q7', `Letra: 26 opções. 4 algarismos distintos: 10×9×8×7=5040<br>Total: 26×5040=<strong>131.040</strong><br><br>✅ <strong>Alternativa B (e D — equivalentes)</strong>`);
+        };
+
+        updateScore();
+    })();
+</script>
+</body>
+</html>
