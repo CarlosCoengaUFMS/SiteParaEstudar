@@ -77,7 +77,7 @@
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 300;
+    z-index: 200;
     width: 44px;
     height: 44px;
     background: rgba(21, 21, 26, 0.85);
@@ -297,6 +297,7 @@
   .btn-home {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     padding: 16px 40px;
     border-radius: 50px;
@@ -311,6 +312,8 @@
     color: #fff;
     position: relative;
     overflow: hidden;
+    min-width: 320px;
+    text-align: center;
   }
 
   .btn-home-primary {
@@ -325,14 +328,15 @@
   }
 
   .btn-home-secondary {
-    background: transparent;
-    border: 2px solid var(--border);
-    color: var(--muted);
+    background: linear-gradient(135deg, #6dfabc, #3dd68c);
+    box-shadow: 0 8px 30px rgba(109,250,188,0.25);
+    font-size: 16px;
+    padding: 16px 40px;
+    color: #0d0d0f;
   }
   .btn-home-secondary:hover {
-    border-color: var(--accent);
-    color: var(--text);
-    background: rgba(124,109,250,0.05);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(109,250,188,0.35);
   }
 
   .home-features {
@@ -366,9 +370,11 @@
   }
 
   @media (max-width: 600px) {
-    .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; }
+    .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; z-index: 200; }
     .home-title { font-size: 32px; }
+    .btn-home { min-width: 260px; font-size: 14px; }
     .btn-home-primary { font-size: 16px; padding: 16px 36px; }
+    .btn-home-secondary { font-size: 14px; padding: 14px 32px; }
   }
 </style>
 </head>
@@ -401,6 +407,9 @@
     <a href="matematica.html" class="sidebar-link">
       <span class="icon">📚</span> Fundamentos Matemáticos
     </a>
+    <a href="mapa_mental_Adm.html" class="sidebar-link">
+      <span class="icon">📋</span> Mapa Mental de Administração
+    </a>
     <a href="matematica.html#conjuntos" class="sidebar-link">
       <span class="icon" style="color:#a89fff">∩</span> Conjuntos
     </a>
@@ -423,11 +432,14 @@
   <h1 class="home-title">SiteParaEstudar</h1>
   <p class="home-subtitle">Plataforma de estudos interativos com provas, gabaritos e dicas para você dominar os conteúdos de computação.</p>
   <div class="home-buttons">
-    <a href="matematica.html" class="btn-home btn-home-primary">
-      Fundamentos Matemáticos
+    <a href="HomeMatematica.html" class="btn-home btn-home-primary">
+      📖 Fundamentos Matemáticos
     </a>
     <a href="mapa_mental_Adm.html" class="btn-home btn-home-primary">
-      Mapa Mental de Administração
+      📋 Mapa Mental de Administração
+    </a>
+      <a href="casos.html" class="btn-home btn-home-primary">
+      Casos
     </a>
   </div>
   <div class="home-features">

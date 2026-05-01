@@ -79,7 +79,7 @@
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 300;
+    z-index: 200;
     width: 44px;
     height: 44px;
     background: rgba(21, 21, 26, 0.85);
@@ -331,7 +331,7 @@
   .score-bar {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 110;
     background: rgba(13,13,15,0.88);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
@@ -751,8 +751,8 @@
   .badge-important { border-color: var(--accent2); color: var(--accent2); background: rgba(250,109,138,0.08); }
 
   @media (max-width: 600px) {
-    .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; }
-    .score-bar { padding: 10px 14px; gap: 10px; }
+    .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; z-index: 200; }
+    .score-bar { padding: 10px 14px; gap: 10px; z-index: 110; }
     .tab { padding: 12px 14px; font-size: 10px; }
     .q-card { padding: 18px 14px; }
     .option { padding: 12px 14px; }
@@ -788,6 +788,9 @@
     </a>
     <a href="matematica.html" class="sidebar-link active">
       <span class="icon">📚</span> Fundamentos Matemáticos
+    </a>
+    <a href="mapa_mental_Adm.html" class="sidebar-link">
+      <span class="icon">📋</span> Mapa Mental de Administração
     </a>
     <button class="sidebar-link" onclick="showTab('conjuntos'); if(window.innerWidth<768)toggleSidebar();">
       <span class="icon" style="color:#a89fff">∩</span> Conjuntos
@@ -1409,7 +1412,7 @@
     // Fechar sidebar ao clicar em links
     document.querySelectorAll('.sidebar-link').forEach(link => {
       link.addEventListener('click', (e) => {
-        if (link.tagName === 'A' && link.getAttribute('href').startsWith('matematica.html#')) {
+        if (link.tagName === 'A' && link.getAttribute('href')?.startsWith('matematica.html#')) {
           e.preventDefault();
           const sectionId = link.getAttribute('href').split('#')[1];
           showTab(sectionId);

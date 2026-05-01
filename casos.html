@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Casos de Administração · SiteParaEstudar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --accent3: #6dfabc;
+            --accent4: #fadc6d;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(124,109,250,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,109,250,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+            mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%);
+        }
+
+        .glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatGlow 15s infinite alternate ease-in-out;
+        }
+        .glow-1 { background: var(--accent); top: -150px; left: -150px; animation-delay: 0s; }
+        .glow-2 { background: var(--accent2); bottom: -150px; right: -150px; animation-delay: -5s; }
+        .glow-3 { background: var(--accent3); top: 40%; left: 50%; width: 400px; height: 400px; opacity: 0.08; animation-delay: -10s; }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(20px, -20px) scale(1.08); }
+        }
+
+        /* ========== HAMBURGER MENU ========== */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            background: rgba(21, 21, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hamburger-btn:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(124,109,250,0.2);
+        }
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* SIDEBAR OVERLAY */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(21, 21, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            z-index: 260;
+            transform: translateX(-100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #fff;
+        }
+        .sidebar-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar-link:hover {
+            background: rgba(124,109,250,0.1);
+            color: var(--text);
+        }
+        .sidebar-link.active {
+            background: rgba(124,109,250,0.15);
+            border: 1px solid rgba(124,109,250,0.3);
+            color: #fff;
+        }
+        .sidebar-link .icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ========== HEADER ========== */
+        header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 30px 20px 35px;
+            border-bottom: 1px solid var(--border);
+            background: radial-gradient(ellipse at 50% 0%, rgba(124,109,250,0.06), transparent 70%);
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color var(--transition);
+        }
+        .back-home:hover { color: var(--accent); }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--accent2);
+            border: 1px solid rgba(250,109,138,0.4);
+            border-radius: 30px;
+            padding: 5px 18px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            background: rgba(250,109,138,0.08);
+            backdrop-filter: blur(10px);
+        }
+        .tag::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: var(--accent2);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent2);
+        }
+
+        header h1 {
+            font-size: clamp(28px, 5vw, 44px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent2) 60%, var(--accent4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* ========== TABS ========== */
+        .tabs {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            background: rgba(13,13,15,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            padding: 16px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--muted);
+            border-bottom: 3px solid transparent;
+            transition: all var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+        .tab.active { color: #fff; border-bottom-color: var(--accent2); background: rgba(250,109,138,0.05); }
+
+        .tab .dot {
+            display: inline-block;
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            margin-right: 2px;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        /* ========== CONTENT ========== */
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeSlide 0.4s ease; }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .section-title .icon {
+            width: 46px; height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title h2 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title p {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* ========== QUESTION CARD ========== */
+        .q-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 26px;
+            margin-bottom: 20px;
+            transition: all var(--transition);
+            animation: cardAppear 0.45s ease both;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .q-card:nth-child(2) { animation-delay: 0.05s; }
+        .q-card:nth-child(3) { animation-delay: 0.10s; }
+        .q-card:nth-child(4) { animation-delay: 0.15s; }
+        .q-card:nth-child(5) { animation-delay: 0.20s; }
+        .q-card:nth-child(6) { animation-delay: 0.25s; }
+        .q-card:nth-child(7) { animation-delay: 0.30s; }
+
+        .q-card.answered-correct { border-color: var(--correct); box-shadow: 0 0 22px rgba(46,204,113,0.12); }
+        .q-card.answered-wrong { border-color: var(--wrong); box-shadow: 0 0 22px rgba(231,76,60,0.12); }
+
+        .q-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-badge {
+            font-size: 9px;
+            padding: 3px 10px;
+            border-radius: 15px;
+            background: rgba(109,250,188,0.1);
+            border: 1px solid rgba(109,250,188,0.3);
+            color: var(--accent3);
+            font-weight: 600;
+        }
+
+        .q-text {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .q-text .math {
+            font-family: 'Space Mono', monospace;
+            background: rgba(124,109,250,0.12);
+            border: 1px solid rgba(124,109,250,0.25);
+            border-radius: 5px;
+            padding: 1px 7px;
+            font-size: 13px;
+            color: #c3baff;
+            font-weight: 600;
+        }
+
+        /* OPTIONS */
+        .options { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: var(--accent);
+            background: rgba(124,109,250,0.06);
+            transform: translateX(3px);
+        }
+
+        .option.selected {
+            border-color: var(--accent);
+            background: rgba(124,109,250,0.12);
+            box-shadow: 0 0 15px rgba(124,109,250,0.08);
+        }
+
+        .option.correct-answer {
+            border-color: var(--correct);
+            background: rgba(46,204,113,0.1);
+            color: var(--correct);
+        }
+
+        .option.wrong-answer {
+            border-color: var(--wrong);
+            background: rgba(231,76,60,0.1);
+            color: #ff8080;
+        }
+
+        .option.disabled { cursor: default; pointer-events: none; opacity: 0.7; }
+
+        .opt-letter {
+            width: 30px; height: 30px;
+            border-radius: 7px;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: all var(--transition);
+        }
+
+        .option.selected .opt-letter { background: var(--accent); color: #fff; }
+        .option.correct-answer .opt-letter { background: var(--correct); color: #fff; }
+        .option.wrong-answer .opt-letter { background: var(--wrong); color: #fff; }
+
+        /* FEEDBACK */
+        .feedback {
+            display: none;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            animation: fadeSlide 0.3s ease;
+        }
+
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3); color: var(--correct); }
+        .feedback.wrong { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: #ff8080; }
+        .feedback.info { background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.3); color: #b8b0ff; }
+
+        .feedback strong { display: block; margin-bottom: 4px; font-size: 14px; }
+
+        /* BUTTONS */
+        .q-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 9px 20px;
+            border-radius: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 10px rgba(124,109,250,0.25); }
+        .btn-primary:hover:not(:disabled) { background: #8f80ff; transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: default; }
+        .btn-secondary { background: var(--border); color: var(--muted); }
+        .btn-secondary:hover { background: #3a3a48; color: var(--text); }
+        .btn-reveal { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+        .btn-reveal:hover { border-color: var(--accent4); color: var(--accent4); background: rgba(250,220,109,0.05); }
+
+        /* SCORE BAR */
+        .score-bar {
+            position: sticky;
+            top: 0;
+            z-index: 110;
+            background: rgba(13,13,15,0.88);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 25px;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 20px rgba(0,0,0,0.5);
+        }
+
+        .score-info {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .score-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-wrap {
+            flex: 1;
+            min-width: 150px;
+            max-width: 280px;
+            height: 7px;
+            background: var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent2), var(--accent4));
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            width: 0%;
+            box-shadow: 0 0 12px rgba(250,109,138,0.5);
+        }
+
+        .btn-check-all {
+            background: var(--accent2);
+            color: #fff;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 25px;
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 12px rgba(250,109,138,0.3);
+            letter-spacing: 0.5px;
+        }
+        .btn-check-all:hover { background: #ff8099; transform: translateY(-1px); }
+
+        @media (max-width: 600px) {
+            .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; z-index: 200; }
+            .score-bar { padding: 10px 14px; gap: 10px; z-index: 110; }
+            .tab { padding: 12px 14px; font-size: 10px; }
+            .q-card { padding: 18px 14px; }
+            .option { padding: 12px 14px; }
+            .btn { padding: 7px 15px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ========== HAMBURGER BUTTON ========== -->
+<button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+</button>
+
+<!-- ========== SIDEBAR OVERLAY ========== -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">SP</div>
+        <span class="sidebar-title">SiteParaEstudar</span>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="index.html" class="sidebar-link">
+            <span class="icon">🏠</span> Início
+        </a>
+        <a href="matematica.html" class="sidebar-link">
+            <span class="icon">📚</span> Fundamentos Matemáticos
+        </a>
+        <a href="mapa_mental_Adm.html" class="sidebar-link">
+            <span class="icon">📋</span> Mapa Mental de Administração
+        </a>
+        <a href="casos.html" class="sidebar-link active">
+            <span class="icon">📝</span> Casos de Administração
+        </a>
+        <button class="sidebar-link" onclick="showTab('adm-cientifica'); if(window.innerWidth<768)toggleSidebar();">
+            <span class="icon" style="color:#ff9db5">📖</span> Adm. Científica
+        </button>
+        <button class="sidebar-link" onclick="showTab('teoria-classica'); if(window.innerWidth<768)toggleSidebar();">
+            <span class="icon" style="color:#6dfabc">📖</span> Teoria Clássica
+        </button>
+        <button class="sidebar-link" onclick="showTab('relacoes-humanas'); if(window.innerWidth<768)toggleSidebar();">
+            <span class="icon" style="color:#fadc6d">📖</span> Relações Humanas
+        </button>
+    </nav>
+    <div class="sidebar-footer">UFMS · Campus Ponta Porã</div>
+</aside>
+
+<!-- ========== HEADER ========== -->
+<header>
+    <a href="index.html" class="back-home">← Voltar ao Início</a>
+    <div class="tag">Estudos de Caso · Administração</div>
+    <h1>Casos de Administração</h1>
+    <p>Questões e Exercícios de Fixação por Capítulo</p>
+</header>
+
+<!-- ========== SCORE BAR ========== -->
+<div class="score-bar">
+    <div class="score-info">
+        <div class="score-stat">📝 <strong id="answered-count">0</strong>/<span id="total-count">0</span></div>
+        <div class="score-stat" style="color:var(--correct)">✓ <strong id="correct-count">0</strong></div>
+        <div class="score-stat" style="color:var(--wrong)">✗ <strong id="wrong-count">0</strong></div>
+    </div>
+    <div class="progress-wrap">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <button class="btn-check-all" onclick="checkAll()">📊 Progresso</button>
+</div>
+
+<!-- ========== TABS ========== -->
+<div class="tabs">
+    <div class="tab active" onclick="showTab('adm-cientifica')">
+        <span class="dot" style="background:#ff9db5"></span>Adm. Científica
+    </div>
+    <div class="tab" onclick="showTab('teoria-classica')">
+        <span class="dot" style="background:#6dfabc"></span>Teoria Clássica
+    </div>
+    <div class="tab" onclick="showTab('relacoes-humanas')">
+        <span class="dot" style="background:#fadc6d"></span>Relações Humanas
+    </div>
+</div>
+
+<!-- ========== CONTENT ========== -->
+<div class="content">
+
+    <!-- =================== CAPÍTULO 2: ADM. CIENTÍFICA =================== -->
+    <div class="section active" id="adm-cientifica">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(250,109,138,0.15)">📖</div>
+            <div>
+                <h2 style="color:#ff9db5">Capítulo 2 — Administração Científica</h2>
+                <p>5 questões + Quiz 2.2 com 5 exercícios de fixação</p>
+            </div>
+        </div>
+
+        <!-- Q1 Cap2 -->
+        <div class="q-card" id="q2-1">
+            <div class="q-number">Capítulo 2 · Questão 1</div>
+            <div class="q-text">
+                Taylor centrou sua pesquisa na melhoria dos processos produtivos. Analise as afirmativas sobre a ORT e marque V ou F:<br><br>
+                I.( ) O legado da ORT está centrado nas palavras "eficiência" e "padronização".<br>
+                II.( ) Perda de tempo, aumento dos erros e perda da eficiência são efeitos da "fadiga humana", segundo a ORT.<br>
+                III.( ) Taylor procurou conciliar os interesses da empresa com os interesses dos funcionários.<br>
+                IV.( ) O mecanicismo prega que o Homem pensa somente em dinheiro, sendo chamado de <em>homo economicus</em>.<br>
+                V.( ) Taylor propôs hierarquia piramidal com linha de comando definida.<br><br>
+                <strong>Sequência correta:</strong>
+            </div>
+            <div class="options" id="opts-q2-1">
+                <div class="option" onclick="selectOpt('q2-1','A')"><span class="opt-letter">A</span> V, V, V, V, F</div>
+                <div class="option" onclick="selectOpt('q2-1','B')"><span class="opt-letter">B</span> V, V, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-1','C')"><span class="opt-letter">C</span> F, F, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-1','D')"><span class="opt-letter">D</span> V, F, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-1','E')"><span class="opt-letter">E</span> F, V, F, V, V</div>
+            </div>
+            <div class="feedback" id="fb-q2-1"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q2-1','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q2-1','A) V, V, V, V, F — A hierarquia piramidal é proposta de Fayol (Teoria Clássica), não de Taylor.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q2-1')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q2 Cap2 -->
+        <div class="q-card" id="q2-2">
+            <div class="q-number">Capítulo 2 · Questão 2</div>
+            <div class="q-text">
+                Aumentar a capacidade de produção do homem por meio da especialização e da linha de montagem para inserir produtos rapidamente no mercado, com estoques reduzidos e pagos após a venda, são princípios de Ford denominados, respectivamente:
+            </div>
+            <div class="options" id="opts-q2-2">
+                <div class="option" onclick="selectOpt('q2-2','A')"><span class="opt-letter">A</span> Especialização, intensificação, economicidade</div>
+                <div class="option" onclick="selectOpt('q2-2','B')"><span class="opt-letter">B</span> Intensificação, efetividade, produtividade</div>
+                <div class="option" onclick="selectOpt('q2-2','C')"><span class="opt-letter">C</span> Produtividade, intensificação, economicidade</div>
+                <div class="option" onclick="selectOpt('q2-2','D')"><span class="opt-letter">D</span> Intensificação, economicidade, produtividade</div>
+                <div class="option" onclick="selectOpt('q2-2','E')"><span class="opt-letter">E</span> Produtividade, economicidade, intensificação</div>
+            </div>
+            <div class="feedback" id="fb-q2-2"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q2-2','C')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q2-2','C) Produtividade, intensificação, economicidade — Produtividade (especialização/linha), Intensificação (rápida inserção), Economicidade (estoques reduzidos).')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q2-2')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q3 Cap2 -->
+        <div class="q-card" id="q2-3">
+            <div class="q-number">Capítulo 2 · Questão 3</div>
+            <div class="q-text">
+                Assinale V ou F para cada afirmativa:<br><br>
+                ( ) A ORT procura trabalhar com supervisão do tipo linear para ser mais eficiente.<br>
+                ( ) Perda de tempo, aumento dos erros e perda da eficiência são efeitos da "fadiga humana", segundo a ORT.<br>
+                ( ) Taylor procurou conciliar os interesses da empresa com os interesses dos funcionários.<br>
+                ( ) O mecanicismo (Taylorismo) prega que o homem pensa somente em dinheiro — <em>homo economicus</em>.<br>
+                ( ) Ford introduziu a esteira móvel e mecânica, barateando produtos.
+            </div>
+            <div class="options" id="opts-q2-3">
+                <div class="option" onclick="selectOpt('q2-3','A')"><span class="opt-letter">A</span> F, V, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-3','B')"><span class="opt-letter">B</span> V, V, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-3','C')"><span class="opt-letter">C</span> F, F, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-3','D')"><span class="opt-letter">D</span> V, F, V, V, V</div>
+                <div class="option" onclick="selectOpt('q2-3','E')"><span class="opt-letter">E</span> F, V, F, V, V</div>
+            </div>
+            <div class="feedback" id="fb-q2-3"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q2-3','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q2-3','A) F, V, V, V, V — A primeira é FALSA: a ORT trabalha com supervisão FUNCIONAL (múltiplos supervisores especialistas), não linear.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q2-3')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q4 Cap2 -->
+        <div class="q-card" id="q2-4">
+            <div class="q-number">Capítulo 2 · Questão 4</div>
+            <div class="q-text">
+                Assinale a alternativa <strong>incorreta</strong>:
+            </div>
+            <div class="options" id="opts-q2-4">
+                <div class="option" onclick="selectOpt('q2-4','A')"><span class="opt-letter">A</span> Substituição de métodos empíricos por científicos = princípio do planejamento</div>
+                <div class="option" onclick="selectOpt('q2-4','B')"><span class="opt-letter">B</span> Avaliar conformidade com o planejado = princípio do controle</div>
+                <div class="option" onclick="selectOpt('q2-4','C')"><span class="opt-letter">C</span> Uma crítica à Adm. Científica é ter realizado abordagem probabilística</div>
+                <div class="option" onclick="selectOpt('q2-4','D')"><span class="opt-letter">D</span> A Adm. Científica via organizações como sistema fechado</div>
+                <div class="option" onclick="selectOpt('q2-4','E')"><span class="opt-letter">E</span> Princípio da exceção: não perder tempo com o que está normal</div>
+            </div>
+            <div class="feedback" id="fb-q2-4"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q2-4','C')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q2-4','C) INCORRETA — A Administração Científica NÃO fez abordagem probabilística. Esta é característica da Teoria da Contingência. A Adm. Científica é determinística.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q2-4')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 2.2 Q1 -->
+        <div class="q-card" id="qz2-1">
+            <div class="q-number"><span class="quiz-badge">Quiz 2.2</span> · Questão 1</div>
+            <div class="q-text">
+                Filme <em>Tempos Modernos</em> de Charles Chaplin (1936). Cena da máquina de comida que alimenta o trabalhador sem necessidade de parar. Qual alternativa correta?
+            </div>
+            <div class="options" id="opts-qz2-1">
+                <div class="option" onclick="selectOpt('qz2-1','A')"><span class="opt-letter">A</span> Máquina visava proteger o trabalhador (proposta taylorista)</div>
+                <div class="option" onclick="selectOpt('qz2-1','B')"><span class="opt-letter">B</span> Buscou eficácia na gestão para ganhar eficiência na operação</div>
+                <div class="option" onclick="selectOpt('qz2-1','C')"><span class="opt-letter">C</span> Melhoria na produção por novos equipamentos para serem mais eficazes</div>
+                <div class="option" onclick="selectOpt('qz2-1','D')"><span class="opt-letter">D</span> Racionalização do trabalho, otimização do tempo e ganho de eficiência</div>
+                <div class="option" onclick="selectOpt('qz2-1','E')"><span class="opt-letter">E</span> Operários precisavam realizar múltiplas atividades para eficiência</div>
+            </div>
+            <div class="feedback" id="fb-qz2-1"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz2-1','D')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz2-1','D) Racionalização do trabalho, otimização do tempo e ganho de eficiência — típico do modelo taylorista/fordista.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz2-1')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 2.2 Q2 -->
+        <div class="q-card" id="qz2-2">
+            <div class="q-number"><span class="quiz-badge">Quiz 2.2</span> · Questão 2</div>
+            <div class="q-text">
+                Call center: novos atendentes aprendem com antigos, assimilando falhas. Gestor mensurou tempo de discagem. Analise as afirmativas:<br><br>
+                I. "Aprendiam com os mais antigos" → necessidade de uniformizar técnicas (Taylor).<br>
+                II. Trabalho deve ser racional — tempo desperdiçado no movimento de acesso à impressora.<br>
+                III. Mensuração do tempo de discagem NÃO tem ligação com a ORT.
+            </div>
+            <div class="options" id="opts-qz2-2">
+                <div class="option" onclick="selectOpt('qz2-2','A')"><span class="opt-letter">A</span> I e III corretas</div>
+                <div class="option" onclick="selectOpt('qz2-2','B')"><span class="opt-letter">B</span> I e II corretas</div>
+                <div class="option" onclick="selectOpt('qz2-2','C')"><span class="opt-letter">C</span> II e III corretas</div>
+                <div class="option" onclick="selectOpt('qz2-2','D')"><span class="opt-letter">D</span> Apenas III correta</div>
+                <div class="option" onclick="selectOpt('qz2-2','E')"><span class="opt-letter">E</span> Apenas II correta</div>
+            </div>
+            <div class="feedback" id="fb-qz2-2"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz2-2','B')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz2-2','B) I e II corretas — A III é FALSA: a mensuração do tempo TEM ligação direta com a ORT, que atua na otimização de movimentos.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz2-2')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 2.2 Q3 -->
+        <div class="q-card" id="qz2-3">
+            <div class="q-number"><span class="quiz-badge">Quiz 2.2</span> · Questão 3</div>
+            <div class="q-text">
+                Antigo Egito: trabalhadores 12h/dia, múltiplas atividades. Segundo a Administração Científica, analise V ou F:<br><br>
+                ( ) Eliminar movimentos inúteis para reduzir fadiga.<br>
+                ( ) Revisar material de trabalho, promover seriação de movimentos.<br>
+                ( ) Trabalhadores devem realizar atividade específica (especialização).<br>
+                ( ) Melhorar relações sociais e humanas para eficiência.
+            </div>
+            <div class="options" id="opts-qz2-3">
+                <div class="option" onclick="selectOpt('qz2-3','A')"><span class="opt-letter">A</span> F; V; V; F</div>
+                <div class="option" onclick="selectOpt('qz2-3','B')"><span class="opt-letter">B</span> V; V; V; F</div>
+                <div class="option" onclick="selectOpt('qz2-3','C')"><span class="opt-letter">C</span> V; F; V; V</div>
+                <div class="option" onclick="selectOpt('qz2-3','D')"><span class="opt-letter">D</span> V; V; F; F</div>
+                <div class="option" onclick="selectOpt('qz2-3','E')"><span class="opt-letter">E</span> F; F; V; V</div>
+            </div>
+            <div class="feedback" id="fb-qz2-3"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz2-3','B')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz2-3','B) V; V; V; F — A última é FALSA: relações sociais e humanas são foco da Teoria das Relações Humanas, não da Adm. Científica.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz2-3')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 2.2 Q4 -->
+        <div class="q-card" id="qz2-4">
+            <div class="q-number"><span class="quiz-badge">Quiz 2.2</span> · Questão 4</div>
+            <div class="q-text">
+                Associe conceitos da Administração Científica com suas características:<br>
+                1.Homo economicus 2.Supervisão funcional 3.Planejamento 4.Preparo 5.Controle 6.Execução 7.Intensificação 8.Economicidade 9.Produtividade 10.Exceção<br><br>
+                ( ) Diversos supervisores especialistas.<br>
+                ( ) Distribuição correta de responsabilidades.<br>
+                ( ) Não se preocupar com o normal, mas com desvios.<br>
+                ( ) Especialização para aumentar produtividade.<br>
+                ( ) Seleção científica dos trabalhadores.<br>
+                ( ) Motivação exclusivamente por recompensas materiais.<br>
+                ( ) Rápida colocação do produto no mercado.<br>
+                ( ) Substituição de métodos improvisados por científicos.<br>
+                ( ) Certificar-se da conformidade com o planejado.<br>
+                ( ) Mínimo de estoque em transformação.
+            </div>
+            <div class="options" id="opts-qz2-4">
+                <div class="option" onclick="selectOpt('qz2-4','A')"><span class="opt-letter">A</span> 8; 6; 3; 4; 9; 2; 1; 5; 7; 10</div>
+                <div class="option" onclick="selectOpt('qz2-4','B')"><span class="opt-letter">B</span> 2; 6; 1; 9; 10; 7; 3; 5; 8; 4</div>
+                <div class="option" onclick="selectOpt('qz2-4','C')"><span class="opt-letter">C</span> 2; 6; 10; 9; 4; 1; 7; 3; 5; 8</div>
+                <div class="option" onclick="selectOpt('qz2-4','D')"><span class="opt-letter">D</span> 6; 3; 4; 1; 5; 7; 2; 10; 9; 8</div>
+                <div class="option" onclick="selectOpt('qz2-4','E')"><span class="opt-letter">E</span> 6; 2; 8; 1; 4; 9; 7; 3; 5; 10</div>
+            </div>
+            <div class="feedback" id="fb-qz2-4"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz2-4','C')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz2-4','C) 2; 6; 10; 9; 4; 1; 7; 3; 5; 8 — Supervisão funcional(2), Execução(6), Exceção(10), Produtividade(9), Preparo(4), Homo economicus(1), Intensificação(7), Planejamento(3), Controle(5), Economicidade(8).')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz2-4')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 2.2 Q5 -->
+        <div class="q-card" id="qz2-5">
+            <div class="q-number"><span class="quiz-badge">Quiz 2.2</span> · Questão 5</div>
+            <div class="q-text">
+                Cena de <em>Tempos Modernos</em>: Chaplin passando por engrenagens, repetindo atividade de apertar parafusos. Analise as críticas:<br><br>
+                I. Crítica à superespecialização — operário vira apêndice da máquina.<br>
+                II. Visão humanista só para gestão; operário visto como <em>homo economicus</em>.<br>
+                III. Pouquíssimas pesquisas e experimentação científica — concentrou-se no como.<br>
+                IV. Concentrou-se nos aspectos formais e produção, ignorando aspectos humanos e sociais.
+            </div>
+            <div class="options" id="opts-qz2-5">
+                <div class="option" onclick="selectOpt('qz2-5','A')"><span class="opt-letter">A</span> III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz2-5','B')"><span class="opt-letter">B</span> I, II e III corretas</div>
+                <div class="option" onclick="selectOpt('qz2-5','C')"><span class="opt-letter">C</span> I e II corretas</div>
+                <div class="option" onclick="selectOpt('qz2-5','D')"><span class="opt-letter">D</span> II, III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz2-5','E')"><span class="opt-letter">E</span> I, III e IV corretas</div>
+            </div>
+            <div class="feedback" id="fb-qz2-5"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz2-5','E')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz2-5','E) I, III e IV corretas — A II é FALSA: a Adm. Científica foi criticada por ter visão de homo economicus para TODOS os níveis.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz2-5')">↺ Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================== CAPÍTULO 3: TEORIA CLÁSSICA =================== -->
+    <div class="section" id="teoria-classica">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(109,250,188,0.15)">📖</div>
+            <div>
+                <h2 style="color:#6dfabc">Capítulo 3 — Teoria Clássica</h2>
+                <p>3 questões + Quiz 3.1 com 3 exercícios de fixação</p>
+            </div>
+        </div>
+
+        <!-- Q1 Cap3 -->
+        <div class="q-card" id="q3-1">
+            <div class="q-number">Capítulo 3 · Questão 1</div>
+            <div class="q-text">
+                <strong>AtendeCall:</strong> Estrutura com CEO, consultoria interna, hierarquia rígida, unidade de comando, centralização. Reclamações aumentam pois operadores seguem script rigoroso e não têm autonomia.<br><br>
+                <strong>Asserção:</strong> Uma causa do aumento das reclamações pode estar na rigidez dos princípios da divisão do trabalho, unidade de comando e centralização.<br>
+                <strong>Razão:</strong> O aumento de níveis hierárquicos, agregado à unidade de comando e centralização, retira autonomia e aumenta ineficiência.
+            </div>
+            <div class="options" id="opts-q3-1">
+                <div class="option" onclick="selectOpt('q3-1','A')"><span class="opt-letter">A</span> Ambas verdadeiras, e a II justifica a I</div>
+                <div class="option" onclick="selectOpt('q3-1','B')"><span class="opt-letter">B</span> I verdadeira, II falsa</div>
+                <div class="option" onclick="selectOpt('q3-1','C')"><span class="opt-letter">C</span> Ambas verdadeiras, mas II não justifica I</div>
+                <div class="option" onclick="selectOpt('q3-1','D')"><span class="opt-letter">D</span> Ambas falsas</div>
+                <div class="option" onclick="selectOpt('q3-1','E')"><span class="opt-letter">E</span> I falsa, II verdadeira</div>
+            </div>
+            <div class="feedback" id="fb-q3-1"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q3-1','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q3-1','A) Ambas verdadeiras e a razão justifica a asserção. A rigidez hierárquica e centralização retiram autonomia e geram ineficiência.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q3-1')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q2 Cap3 -->
+        <div class="q-card" id="q3-2">
+            <div class="q-number">Capítulo 3 · Questão 2</div>
+            <div class="q-text">
+                Sobre benefícios e críticas da Administração Científica e Teoria Clássica:<br><br>
+                I. Ambas veem organizações como sistema fechado.<br>
+                II. Teoria Clássica foca eficiência nas inter-relações; Adm. Científica foca eficácia operacional.<br>
+                III. Adm. Científica considerou só organização formal; Clássica já observava relações informais.<br>
+                IV. Autoridade de linha = poder formal; autoridade de staff = aconselhamento.
+            </div>
+            <div class="options" id="opts-q3-2">
+                <div class="option" onclick="selectOpt('q3-2','A')"><span class="opt-letter">A</span> Apenas I e IV corretas</div>
+                <div class="option" onclick="selectOpt('q3-2','B')"><span class="opt-letter">B</span> Apenas II e III corretas</div>
+                <div class="option" onclick="selectOpt('q3-2','C')"><span class="opt-letter">C</span> Apenas I, II e III corretas</div>
+                <div class="option" onclick="selectOpt('q3-2','D')"><span class="opt-letter">D</span> Apenas III e IV corretas</div>
+                <div class="option" onclick="selectOpt('q3-2','E')"><span class="opt-letter">E</span> Todas corretas</div>
+            </div>
+            <div class="feedback" id="fb-q3-2"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q3-2','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q3-2','A) Apenas I e IV corretas — II é FALSA: inverte conceitos. III é FALSA: ambas consideraram apenas organização formal.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q3-2')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q3 Cap3 -->
+        <div class="q-card" id="q3-3">
+            <div class="q-number">Capítulo 3 · Questão 3</div>
+            <div class="q-text">
+                Hammer propôs redução da pirâmide hierárquica para agilizar comunicação.<br><br>
+                <strong>Asserção:</strong> O "achatamento" da pirâmide agilizou a comunicação entre base e topo.<br>
+                <strong>Razão:</strong> Com redução de pessoas, o poder de comando de staff aumentou, agilizando o assessoramento.
+            </div>
+            <div class="options" id="opts-q3-3">
+                <div class="option" onclick="selectOpt('q3-3','A')"><span class="opt-letter">A</span> I verdadeira, II falsa</div>
+                <div class="option" onclick="selectOpt('q3-3','B')"><span class="opt-letter">B</span> Ambas verdadeiras, II justifica I</div>
+                <div class="option" onclick="selectOpt('q3-3','C')"><span class="opt-letter">C</span> Ambas verdadeiras, mas II não justifica I</div>
+                <div class="option" onclick="selectOpt('q3-3','D')"><span class="opt-letter">D</span> Ambas falsas</div>
+                <div class="option" onclick="selectOpt('q3-3','E')"><span class="opt-letter">E</span> I falsa, II verdadeira</div>
+            </div>
+            <div class="feedback" id="fb-q3-3"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q3-3','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q3-3','A) Asserção verdadeira, Razão FALSA — O achatamento reduz níveis hierárquicos. A comunicação melhora pela redução de intermediários, não pelo aumento de staff.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q3-3')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 3.1 Q1 -->
+        <div class="q-card" id="qz3-1">
+            <div class="q-number"><span class="quiz-badge">Quiz 3.1</span> · Questão 1</div>
+            <div class="q-text">
+                Diferenças e semelhanças entre Taylor e Fayol. Assinale a correta:
+            </div>
+            <div class="options" id="opts-qz3-1">
+                <div class="option" onclick="selectOpt('qz3-1','A')"><span class="opt-letter">A</span> Semelhança: funções contábeis (Taylor foi contador)</div>
+                <div class="option" onclick="selectOpt('qz3-1','B')"><span class="opt-letter">B</span> Científica: relações humanas só na gestão; Clássica: todos os níveis</div>
+                <div class="option" onclick="selectOpt('qz3-1','C')"><span class="opt-letter">C</span> Diferença: Clássica busca efetividade; Científica busca eficiência</div>
+                <div class="option" onclick="selectOpt('qz3-1','D')"><span class="opt-letter">D</span> Ambas têm visão hierárquica e funcional com comando cruzado</div>
+                <div class="option" onclick="selectOpt('qz3-1','E')"><span class="opt-letter">E</span> Ambas convergem na busca pela eficiência organizacional</div>
+            </div>
+            <div class="feedback" id="fb-qz3-1"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz3-1','E')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz3-1','E) Ambas convergem na busca pela melhor eficiência organizacional. Apesar de ênfases diferentes, ambas buscam fazer corretamente o trabalho.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz3-1')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 3.1 Q2 -->
+        <div class="q-card" id="qz3-2">
+            <div class="q-number"><span class="quiz-badge">Quiz 3.1</span> · Questão 2</div>
+            <div class="q-text">
+                Funções básicas de Fayol:<br><br>
+                I. Funções técnicas = atuais áreas de produção/manufatura/operações.<br>
+                II. Hoje, funções contábeis se subordinam às financeiras.<br>
+                III. Função de segurança e funções administrativas foram as únicas que prevaleceram sem alterações.<br>
+                IV. Marketing e Vendas = funções comerciais (antes focadas em vendas, compras, permutação).
+            </div>
+            <div class="options" id="opts-qz3-2">
+                <div class="option" onclick="selectOpt('qz3-2','A')"><span class="opt-letter">A</span> I, II e III corretas</div>
+                <div class="option" onclick="selectOpt('qz3-2','B')"><span class="opt-letter">B</span> III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz3-2','C')"><span class="opt-letter">C</span> I, III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz3-2','D')"><span class="opt-letter">D</span> II, III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz3-2','E')"><span class="opt-letter">E</span> I, II e IV corretas</div>
+            </div>
+            <div class="feedback" id="fb-qz3-2"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz3-2','E')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz3-2','E) I, II e IV corretas — III é FALSA: nenhuma função prevaleceu sem alterações. Todas foram adaptadas.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz3-2')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 3.1 Q3 -->
+        <div class="q-card" id="qz3-3">
+            <div class="q-number"><span class="quiz-badge">Quiz 3.1</span> · Questão 3</div>
+            <div class="q-text">
+                Associe críticas à Teoria Clássica com suas características:<br>
+                1. Abordagem prescritiva e normativa. 2. Racionalismo extremo. 3. Visão mecanicista. 4. Abordagem de sistema fechado.<br><br>
+                ( ) Abordagem lógica e determinística, como engrenagem.<br>
+                ( ) Não consideram fatores psicológicos e sociais; determinam o que fazer.<br>
+                ( ) Organizações como composto de variáveis previsíveis, olhar endógeno.<br>
+                ( ) Administração como conjunto de princípios pragmáticos e universais.
+            </div>
+            <div class="options" id="opts-qz3-3">
+                <div class="option" onclick="selectOpt('qz3-3','A')"><span class="opt-letter">A</span> 4; 1; 3; 2</div>
+                <div class="option" onclick="selectOpt('qz3-3','B')"><span class="opt-letter">B</span> 4; 3; 3; 1</div>
+                <div class="option" onclick="selectOpt('qz3-3','C')"><span class="opt-letter">C</span> 3; 2; 1; 4</div>
+                <div class="option" onclick="selectOpt('qz3-3','D')"><span class="opt-letter">D</span> 3; 1; 4; 2</div>
+                <div class="option" onclick="selectOpt('qz3-3','E')"><span class="opt-letter">E</span> 1; 3; 2; 4</div>
+            </div>
+            <div class="feedback" id="fb-qz3-3"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz3-3','D')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz3-3','D) 3; 1; 4; 2 — Visão mecanicista(3), Abordagem prescritiva(1), Sistema fechado(4), Racionalismo extremo(2).')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz3-3')">↺ Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================== CAPÍTULO 3.3: RELAÇÕES HUMANAS =================== -->
+    <div class="section" id="relacoes-humanas">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(250,220,109,0.15)">📖</div>
+            <div>
+                <h2 style="color:#fadc6d">Capítulo 3.3 — Teoria das Relações Humanas</h2>
+                <p>3 questões + Quiz 4.2 com 5 exercícios de fixação</p>
+            </div>
+        </div>
+
+        <!-- Q1 Cap3.3 -->
+        <div class="q-card" id="q33-1">
+            <div class="q-number">Capítulo 3.3 · Questão 1</div>
+            <div class="q-text">
+                Conclusões das experiências de Hawthorne (V ou F):<br><br>
+                ( ) Pessoas priorizam remuneração em relação à participação em grupos.<br>
+                ( ) Grupos informais são formados por comportamentos, crenças e valores compartilhados.<br>
+                ( ) Indivíduos resistem às mudanças para não se afastarem dos padrões dos grupos.<br>
+                ( ) Existe relação entre iluminação e produtividade.<br>
+                ( ) Fatores humanos e sociais influenciam o rendimento dos operários.
+            </div>
+            <div class="options" id="opts-q33-1">
+                <div class="option" onclick="selectOpt('q33-1','A')"><span class="opt-letter">A</span> F, V, V, F, V</div>
+                <div class="option" onclick="selectOpt('q33-1','B')"><span class="opt-letter">B</span> F, V, F, F, V</div>
+                <div class="option" onclick="selectOpt('q33-1','C')"><span class="opt-letter">C</span> V, V, V, V, F</div>
+                <div class="option" onclick="selectOpt('q33-1','D')"><span class="opt-letter">D</span> F, V, V, F, F</div>
+                <div class="option" onclick="selectOpt('q33-1','E')"><span class="opt-letter">E</span> V, F, V, F, F</div>
+            </div>
+            <div class="feedback" id="fb-q33-1"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q33-1','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q33-1','A) F, V, V, F, V — 1ª FALSA (pessoas priorizam grupos). 4ª FALSA (NÃO há correlação iluminação-produtividade).')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q33-1')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q2 Cap3.3 -->
+        <div class="q-card" id="q33-2">
+            <div class="q-number">Capítulo 3.3 · Questão 2</div>
+            <div class="q-text">
+                Sobre a Teoria das Relações Humanas:<br><br>
+                I. Desenvolver programas para evitar grupos informais e perda de produtividade.<br>
+                II. Crítica: TRH é manipulativa — enganar operários para trabalharem mais e exigirem menos.<br>
+                III. Pesquisas posteriores mostraram existência de trabalhadores felizes e improdutivos, e infelizes e produtivos.<br>
+                IV. Comportamento funcional não é padronizável, pois pessoas são singulares.
+            </div>
+            <div class="options" id="opts-q33-2">
+                <div class="option" onclick="selectOpt('q33-2','A')"><span class="opt-letter">A</span> I, II e III corretas</div>
+                <div class="option" onclick="selectOpt('q33-2','B')"><span class="opt-letter">B</span> II, III e IV corretas</div>
+                <div class="option" onclick="selectOpt('q33-2','C')"><span class="opt-letter">C</span> I, III e IV corretas</div>
+                <div class="option" onclick="selectOpt('q33-2','D')"><span class="opt-letter">D</span> III e IV corretas</div>
+                <div class="option" onclick="selectOpt('q33-2','E')"><span class="opt-letter">E</span> Todas corretas</div>
+            </div>
+            <div class="feedback" id="fb-q33-2"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q33-2','B')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q33-2','B) II, III e IV corretas — I é FALSA: a TRH reconhece os grupos informais como NATURAIS e não recomenda eliminá-los.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q33-2')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Q3 Cap3.3 -->
+        <div class="q-card" id="q33-3">
+            <div class="q-number">Capítulo 3.3 · Questão 3</div>
+            <div class="q-text">
+                <strong>Asserção:</strong> De acordo com a TRH, a produtividade é principalmente influenciada pela remuneração e incentivos financeiros.<br>
+                <strong>Razão:</strong> A TRH enfatiza que fatores como ambiente de trabalho, reconhecimento social e interação entre colegas são mais determinantes que compensação financeira.
+            </div>
+            <div class="options" id="opts-q33-3">
+                <div class="option" onclick="selectOpt('q33-3','A')"><span class="opt-letter">A</span> I verdadeira, II falsa</div>
+                <div class="option" onclick="selectOpt('q33-3','B')"><span class="opt-letter">B</span> Ambas verdadeiras, II justifica I</div>
+                <div class="option" onclick="selectOpt('q33-3','C')"><span class="opt-letter">C</span> Ambas verdadeiras, mas II não justifica I</div>
+                <div class="option" onclick="selectOpt('q33-3','D')"><span class="opt-letter">D</span> Ambas falsas</div>
+                <div class="option" onclick="selectOpt('q33-3','E')"><span class="opt-letter">E</span> I falsa, II verdadeira</div>
+            </div>
+            <div class="feedback" id="fb-q33-3"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('q33-3','E')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('q33-3','E) Asserção FALSA, Razão VERDADEIRA — A TRH CONTRAPÕE a ideia de que remuneração é o principal fator motivacional.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('q33-3')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 4.2 Q1 -->
+        <div class="q-card" id="qz33-1">
+            <div class="q-number"><span class="quiz-badge">Quiz 4.2</span> · Questão 1</div>
+            <div class="q-text">
+                Experimento de Hawthorne (Elton Mayo, 1927):<br><br>
+                I. 1ª fase: correlação entre iluminação e produtividade no grupo experimental.<br>
+                II. 2ª fase (12 períodos): produtividade determinada por normas sociais e expectativas grupais.<br>
+                III. 3ª fase (1928): existência de grupos informais que se unem contra ameaças da administração.<br>
+                IV. Recompensas e sanções sociais e simbólicas = conceito de homem social.
+            </div>
+            <div class="options" id="opts-qz33-1">
+                <div class="option" onclick="selectOpt('qz33-1','A')"><span class="opt-letter">A</span> II, III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz33-1','B')"><span class="opt-letter">B</span> I, II e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz33-1','C')"><span class="opt-letter">C</span> III e IV corretas</div>
+                <div class="option" onclick="selectOpt('qz33-1','D')"><span class="opt-letter">D</span> II e III corretas</div>
+                <div class="option" onclick="selectOpt('qz33-1','E')"><span class="opt-letter">E</span> I, III e IV corretas</div>
+            </div>
+            <div class="feedback" id="fb-qz33-1"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz33-1','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz33-1','A) II, III e IV corretas — I é FALSA: na 1ª fase NÃO foi identificada correlação entre iluminação e produtividade.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz33-1')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 4.2 Q2 -->
+        <div class="q-card" id="qz33-2">
+            <div class="q-number"><span class="quiz-badge">Quiz 4.2</span> · Questão 2</div>
+            <div class="q-text">
+                Gestor com problemas: aumentou recompensas financeiras, mas produtividade não aumentou e perdeu talentos (turnover). Segundo a TRH:
+            </div>
+            <div class="options" id="opts-qz33-2">
+                <div class="option" onclick="selectOpt('qz33-2','A')"><span class="opt-letter">A</span> Remunerando menos que o mercado — fazer pesquisa salarial</div>
+                <div class="option" onclick="selectOpt('qz33-2','B')"><span class="opt-letter">B</span> Erro em aumentar recompensas sem avaliar meritocracia</div>
+                <div class="option" onclick="selectOpt('qz33-2','C')"><span class="opt-letter">C</span> Não bastam recompensas financeiras; avaliar relações grupais e interpessoais</div>
+                <div class="option" onclick="selectOpt('qz33-2','D')"><span class="opt-letter">D</span> Ênfase na especialização e competências técnicas</div>
+                <div class="option" onclick="selectOpt('qz33-2','E')"><span class="opt-letter">E</span> Saber autoridades de linha e staff para evitar confusão</div>
+            </div>
+            <div class="feedback" id="fb-qz33-2"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz33-2','C')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz33-2','C) Segundo a TRH, não bastam recompensas financeiras para motivar. É preciso avaliar as relações grupais e interpessoais.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz33-2')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 4.2 Q3 -->
+        <div class="q-card" id="qz33-3">
+            <div class="q-number"><span class="quiz-badge">Quiz 4.2</span> · Questão 3</div>
+            <div class="q-text">
+                Programa "Feito": funcionário trabalhou por reconhecimento, mas outra pessoa foi indicada. Ciclo motivacional — Figura 1 (Equilíbrio → Estímulo → Tensão → Ação → Satisfação/Frustração).
+            </div>
+            <div class="options" id="opts-qz33-3">
+                <div class="option" onclick="selectOpt('qz33-3','A')"><span class="opt-letter">A</span> Passou de equilíbrio para frustração; desempenho poderá cair</div>
+                <div class="option" onclick="selectOpt('qz33-3','B')"><span class="opt-letter">B</span> Estímulo foi a mudança de estrutura e gerência</div>
+                <div class="option" onclick="selectOpt('qz33-3','C')"><span class="opt-letter">C</span> Funcionário já estava em desequilíbrio (necessidade de renda extra)</div>
+                <div class="option" onclick="selectOpt('qz33-3','D')"><span class="opt-letter">D</span> Quando necessidade não é atendida, pessoa volta diretamente ao equilíbrio</div>
+                <div class="option" onclick="selectOpt('qz33-3','E')"><span class="opt-letter">E</span> Tensão refere-se ao momento que soube que não seria indicado</div>
+            </div>
+            <div class="feedback" id="fb-qz33-3"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz33-3','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz33-3','A) O funcionário passou de uma situação de equilíbrio para frustração, e seu desempenho poderá cair caso não seja restabelecido o equilíbrio.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz33-3')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 4.2 Q4 -->
+        <div class="q-card" id="qz33-4">
+            <div class="q-number"><span class="quiz-badge">Quiz 4.2</span> · Questão 4</div>
+            <div class="q-text">
+                Figura 2 — Estilos de liderança (Democrática, Autocrática, Liberal).<br><br>
+                <strong>I.</strong> Quanto maior o nível, maior o estilo participativo, atingindo ápice no nível 7.<br>
+                <strong>PORQUE</strong><br>
+                <strong>II.</strong> A área de autoridade do líder é inversamente proporcional à área de liberdade dos subordinados.
+            </div>
+            <div class="options" id="opts-qz33-4">
+                <div class="option" onclick="selectOpt('qz33-4','A')"><span class="opt-letter">A</span> Ambas verdadeiras, II justifica I</div>
+                <div class="option" onclick="selectOpt('qz33-4','B')"><span class="opt-letter">B</span> I falsa, II verdadeira</div>
+                <div class="option" onclick="selectOpt('qz33-4','C')"><span class="opt-letter">C</span> Ambas falsas</div>
+                <div class="option" onclick="selectOpt('qz33-4','D')"><span class="opt-letter">D</span> Ambas verdadeiras, mas II não justifica I</div>
+                <div class="option" onclick="selectOpt('qz33-4','E')"><span class="opt-letter">E</span> I verdadeira, II falsa</div>
+            </div>
+            <div class="feedback" id="fb-qz33-4"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz33-4','A')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz33-4','A) Ambas verdadeiras e a II justifica a I — Nos níveis mais altos, a autoridade do líder diminui e a liberdade dos subordinados aumenta.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz33-4')">↺ Limpar</button>
+            </div>
+        </div>
+
+        <!-- Quiz 4.2 Q5 -->
+        <div class="q-card" id="qz33-5">
+            <div class="q-number"><span class="quiz-badge">Quiz 4.2</span> · Questão 5</div>
+            <div class="q-text">
+                Críticas à Teoria das Relações Humanas (após declínio no final dos anos 1950):<br><br>
+                I. TRH surgiu contrapondo com veemência a Adm. Científica, podendo ser vista como complementar.<br>
+                II. Concepção de "homem feliz = produtivo" foi questionada (felizes improdutivos e infelizes produtivos).<br>
+                III. Ênfase excessiva nos grupos, não se atentando às singularidades do indivíduo.
+            </div>
+            <div class="options" id="opts-qz33-5">
+                <div class="option" onclick="selectOpt('qz33-5','A')"><span class="opt-letter">A</span> Apenas I correta</div>
+                <div class="option" onclick="selectOpt('qz33-5','B')"><span class="opt-letter">B</span> I e II corretas</div>
+                <div class="option" onclick="selectOpt('qz33-5','C')"><span class="opt-letter">C</span> Apenas III correta</div>
+                <div class="option" onclick="selectOpt('qz33-5','D')"><span class="opt-letter">D</span> II e III corretas</div>
+                <div class="option" onclick="selectOpt('qz33-5','E')"><span class="opt-letter">E</span> I e III corretas</div>
+            </div>
+            <div class="feedback" id="fb-qz33-5"></div>
+            <div class="q-actions">
+                <button class="btn btn-primary" onclick="checkSingle('qz33-5','B')">✓ Verificar</button>
+                <button class="btn btn-reveal" onclick="revealAnswer('qz33-5','B) I e II corretas — III é FALSA: a TRH foi criticada por ênfase nos grupos INFORMAIS com pouca atenção aos FORMAIS.')">📖 Gabarito</button>
+                <button class="btn btn-secondary" onclick="resetQ('qz33-5')">↺ Limpar</button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end content -->
+
+<script>
+    (function() {
+        // ========== SIDEBAR ==========
+        let sidebarOpen = false;
+
+        window.toggleSidebar = function() {
+            sidebarOpen = !sidebarOpen;
+            document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+            document.getElementById('sidebar-overlay').classList.toggle('show', sidebarOpen);
+            document.getElementById('hamburger-btn').classList.toggle('open', sidebarOpen);
+        };
+
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768 && sidebarOpen) toggleSidebar();
+            });
+        });
+
+        // ========== TABS & SECTIONS ==========
+        window.showTab = function(name) {
+            const sections = document.querySelectorAll('.section');
+            const tabs = document.querySelectorAll('.tab');
+            sections.forEach(s => s.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            const section = document.getElementById(name);
+            if (section) section.classList.add('active');
+            tabs.forEach(t => {
+                if (t.textContent.trim().toLowerCase().includes(name.toLowerCase().replace('-',' '))) {
+                    t.classList.add('active');
+                }
+            });
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.location.hash !== '#' + name) {
+                history.replaceState(null, null, '#' + name);
+            }
+        };
+
+        // Check hash on load
+        function checkHash() {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['adm-cientifica','teoria-classica','relacoes-humanas'].includes(hash)) {
+                showTab(hash);
+            }
+        }
+        window.addEventListener('hashchange', checkHash);
+        checkHash();
+
+        // ========== QUESTION LOGIC ==========
+        const state = {};
+        let totalAnswered = 0;
+        let totalCorrect = 0;
+        let totalWrong = 0;
+
+        const allCards = document.querySelectorAll('.q-card');
+        const totalQuestions = allCards.length;
+        document.getElementById('total-count').textContent = totalQuestions;
+
+        window.selectOpt = function(id, letter) {
+            if (state[id + '_checked']) return;
+            const card = document.getElementById(id);
+            if (!card) return;
+            const opts = card.querySelectorAll('.option');
+            const letters = ['A','B','C','D','E'];
+            opts.forEach(o => o.classList.remove('selected'));
+            state[id] = letter;
+            const idx = letters.indexOf(letter);
+            if (idx !== -1) opts[idx].classList.add('selected');
+        };
+
+        function disableOpts(card) {
+            card.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
+        }
+
+        window.checkSingle = function(id, correctLetter) {
+            if (state[id + '_checked']) return;
+            const card = document.getElementById(id);
+            if (!card) return;
+            const fb = card.querySelector('.feedback');
+            const opts = card.querySelectorAll('.option');
+            const letters = ['A','B','C','D','E'];
+            const sel = state[id];
+
+            disableOpts(card);
+            state[id + '_checked'] = true;
+
+            const correctIdx = letters.indexOf(correctLetter);
+            if (correctIdx !== -1) opts[correctIdx].classList.add('correct-answer');
+
+            if (sel === correctLetter) {
+                if (fb) { fb.className = 'feedback correct show'; fb.innerHTML = '<strong>✓ Correto!</strong> Ótimo raciocínio!'; }
+                card.classList.add('answered-correct');
+                totalCorrect++;
+            } else {
+                if (sel && letters.indexOf(sel) !== -1) opts[letters.indexOf(sel)].classList.add('wrong-answer');
+                if (fb) { fb.className = 'feedback wrong show'; fb.innerHTML = '<strong>✗ Incorreto.</strong> Resposta correta: ' + correctLetter; }
+                card.classList.add('answered-wrong');
+                totalWrong++;
+            }
+            if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; }
+            updateScore();
+        };
+
+        window.revealAnswer = function(id, answer) {
+            const card = document.getElementById(id);
+            if (!card) return;
+            const fb = card.querySelector('.feedback');
+            if (fb) { fb.className = 'feedback info show'; fb.innerHTML = '<strong>📖 Gabarito:</strong> ' + answer; }
+            if (!state[id + '_checked']) {
+                state[id + '_checked'] = true;
+                disableOpts(card);
+            }
+            if (!state[id + '_counted']) { state[id + '_counted'] = true; totalAnswered++; updateScore(); }
+        };
+
+        window.resetQ = function(id) {
+            const card = document.getElementById(id);
+            if (!card) return;
+            card.querySelectorAll('.option').forEach(o => {
+                o.classList.remove('selected','correct-answer','wrong-answer','disabled');
+            });
+            const fb = card.querySelector('.feedback');
+            if (fb) fb.className = 'feedback';
+            card.classList.remove('answered-correct','answered-wrong');
+
+            if (state[id + '_checked']) {
+                if (card.classList.contains('answered-correct')) totalCorrect--;
+                else if (card.classList.contains('answered-wrong')) totalWrong--;
+                if (totalAnswered > 0) totalAnswered--;
+                state[id + '_counted'] = false;
+                updateScore();
+            }
+            state[id] = null;
+            state[id + '_checked'] = false;
+            state[id + '_counted'] = false;
+        };
+
+        window.checkAll = function() {
+            const pct = totalQuestions > 0 ? Math.round((totalAnswered / totalQuestions) * 100) : 0;
+            alert(`📊 Progresso: ${totalAnswered}/${totalQuestions} (${pct}%)\n✓ Acertos: ${totalCorrect}\n✗ Erros: ${totalWrong}`);
+        };
+
+        function updateScore() {
+            document.getElementById('answered-count').textContent = totalAnswered;
+            document.getElementById('correct-count').textContent = totalCorrect;
+            document.getElementById('wrong-count').textContent = totalWrong;
+            const pct = totalQuestions > 0 ? Math.round((totalAnswered / totalQuestions) * 100) : 0;
+            document.getElementById('progress-fill').style.width = pct + '%';
+        }
+
+        updateScore();
+    })();
+</script>
+</body>
+</html>
