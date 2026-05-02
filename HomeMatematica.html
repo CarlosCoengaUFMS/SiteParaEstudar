@@ -395,54 +395,6 @@
 <div class="glow glow-2"></div>
 <div class="glow glow-3"></div>
 
-<!-- ========== HAMBURGER BUTTON ========== -->
-<button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-</button>
-
-<!-- ========== SIDEBAR OVERLAY ========== -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-
-<!-- ========== SIDEBAR ========== -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="sidebar-logo">SP</div>
-        <span class="sidebar-title">SiteParaEstudar</span>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="index.html" class="sidebar-link">
-            <span class="icon">🏠</span> Início
-        </a>
-        <a href="HomeMatematica.html" class="sidebar-link active">
-            <span class="icon">📚</span> Matemática
-        </a>
-        <a href="mapa_mental_Adm.html" class="sidebar-link">
-            <span class="icon">📋</span> Mapa Mental de Administração
-        </a>
-        <a href="casos.html" class="sidebar-link">
-            <span class="icon">📝</span> Casos de Administração
-        </a>
-        <a href="matematica.html" class="sidebar-link">
-            <span class="icon" style="color:#a89fff">📖</span> Prova Completa
-        </a>
-        <a href="matematica.html#conjuntos" class="sidebar-link">
-            <span class="icon" style="color:#7c6dfa">∩</span> Conjuntos
-        </a>
-        <a href="matematica.html#relacoes" class="sidebar-link">
-            <span class="icon" style="color:#ff9db5">↔</span> Relações
-        </a>
-        <a href="matematica.html#funcoes" class="sidebar-link">
-            <span class="icon" style="color:#6dfabc">f(x)</span> Funções
-        </a>
-        <a href="matematica.html#combinatoria" class="sidebar-link">
-            <span class="icon" style="color:#fadc6d">C(n,k)</span> Combinatória
-        </a>
-    </nav>
-    <div class="sidebar-footer">UFMS · Campus Ponta Porã</div>
-</aside>
-
 <!-- ========== HOME PAGE ========== -->
 <div class="home-page">
     <a href="index.html" class="back-home-btn">← Voltar ao Início</a>
@@ -450,101 +402,81 @@
     <h1 class="home-title">Fundamentos Matemáticos</h1>
     <p class="home-subtitle">Explore os conteúdos de matemática discreta com provas interativas, exercícios por tema e gabaritos comentados.</p>
 
-    <div class="cards-grid">
-        <!-- Card: Prova Completa -->
-        <a href="matematica.html" class="math-card" style="--card-accent: #7c6dfa;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #5a4fd6);">📖</div>
-            <h3>Prova Completa</h3>
-            <p>24 questões abrangendo todos os temas: Conjuntos, Relações, Funções e Combinatória. Com dicas e gabaritos.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">24 questões</span>
-                <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Gabaritos</span>
-                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dicas</span>
-            </div>
-        </a>
-
-        <!-- Card: Exercícios de Relações -->
-        <a href="matematica.html#relacoes" class="math-card" style="--card-accent: #ff9db5;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #fa6d8a, #ff9db5);">↔</div>
-            <h3>Relações Binárias</h3>
-            <p>Exercícios focados em propriedades (reflexiva, simétrica, transitiva), classificação e partições.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">6 questões</span>
-                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dissertativas</span>
-            </div>
-        </a>
-
-        <!-- Card: Exercícios de Conjuntos -->
-        <a href="matematica.html#conjuntos" class="math-card" style="--card-accent: #7c6dfa;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #a89fff);">∩</div>
-            <h3>Teoria dos Conjuntos</h3>
-            <p>Pertinência, subconjuntos, operações (união, interseção, diferença) e conjunto das partes.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">6 questões</span>
-                <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Importantes</span>
-            </div>
-        </a>
-
-        <!-- Card: Exercícios de Funções -->
-        <a href="matematica.html#funcoes" class="math-card" style="--card-accent: #6dfabc;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #6dfabc, #3dd68c);">f(x)</div>
-            <h3>Funções</h3>
-            <p>Classificação (injetora, sobrejetora, bijetora), composição de funções e análise de domínio/imagem.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">6 questões</span>
-                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dissertativas</span>
-            </div>
-        </a>
-
-        <!-- Card: Exercícios de Combinatória -->
-        <a href="matematica.html#combinatoria" class="math-card" style="--card-accent: #fadc6d;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #fadc6d, #e6b800);">C(n,k)</div>
-            <h3>Combinatória</h3>
-            <p>Princípio multiplicativo, permutações, combinações e princípio da inclusão-exclusão.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">6 questões</span>
-                <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">P. Gavetas</span>
-            </div>
-        </a>
-        <!-- Card: Prova Avaliativa 1 -->
-        <a href="prova1Avaliativa.html" class="math-card" style="--card-accent: #6dfabc;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #6dfabc, #3dd68c);">📝</div>
-            <h3>Prova Avaliativa 1</h3>
-            <p>7 questões de múltipla escolha: Conjuntos, Diagrama de Venn, Relações, Funções e Combinatória. Com verificação automática.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">7 questões</span>
-                <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
-                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Gabaritos</span>
-            </div>
-        </a>
-        <!-- Card: Espaço Reservado para Futuros Exercícios -->
-        <div class="math-card" style="opacity: 0.6; border-style: dashed; cursor: default;">
-            <div class="math-card-icon" style="background: linear-gradient(135deg, #2a2a38, #3a3a48);">📝</div>
-            <h3>Mais Exercícios</h3>
-            <p>Novas listas de exercícios específicos serão adicionadas aqui em breve.</p>
-            <div class="math-card-tags">
-                <span class="math-tag" style="border-color: #7878a0; color: #7878a0; background: rgba(120,120,160,0.1);">Em breve</span>
-            </div>
+   <div class="cards-grid">
+    <!-- Card: Prova Completa -->
+    <a href="matematica.html" class="math-card" style="--card-accent: #7c6dfa;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #5a4fd6);">📖</div>
+        <h3>Prova Completa</h3>
+        <p>24 questões abrangendo todos os temas: Conjuntos, Relações, Funções e Combinatória. Com dicas e gabaritos.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">24 questões</span>
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Gabaritos</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dicas</span>
         </div>
-    </div>
+    </a>
+
+    <!-- Card: Prova Avaliativa 1 -->
+    <a href="prova1Avaliativa.html" class="math-card" style="--card-accent: #6dfabc;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #6dfabc, #3dd68c);">📝</div>
+        <h3>Prova Avaliativa 1</h3>
+        <p>7 questões de múltipla escolha: Conjuntos, Relações, Funções e Combinatória. Com verificação automática e gabaritos detalhados.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">7 questões</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Gabaritos</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Conjuntos -->
+    <a href="ListaConjuntos.html" class="math-card" style="--card-accent: #7c6dfa;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #a89fff);">∩</div>
+        <h3>Lista de Conjuntos</h3>
+        <p>21 exercícios de múltipla escolha sobre pertinência, subconjuntos, operações e conjunto das partes.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">21 questões</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Relações -->
+    <a href="exercicios-relacoes.html" class="math-card" style="--card-accent: #ff9db5;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #fa6d8a, #ff9db5);">↔</div>
+        <h3>Lista de Relações</h3>
+        <p>11 exercícios focados em propriedades (reflexiva, simétrica, transitiva), classificação e partições.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">11 questões</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Ordem parcial</span>
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Equivalência</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Funções -->
+    <a href="exercicios-funcoes.html" class="math-card" style="--card-accent: #6dfabc;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #6dfabc, #3dd68c);">f(x)</div>
+        <h3>Lista de Funções</h3>
+        <p>10 exercícios sobre classificação (injetora, sobrejetora, bijetora), composição e inversa.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">10 questões</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Composição</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Combinatória -->
+    <a href="exercicios-combinatoria.html" class="math-card" style="--card-accent: #fadc6d;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #fadc6d, #e6b800);">C(n,k)</div>
+        <h3>Lista de Combinatória</h3>
+        <p>15 exercícios sobre princípio multiplicativo, permutações, combinações e princípio da inclusão-exclusão.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">15 questões</span>
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">P. Gavetas</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Inclusão-Exclusão</span>
+        </div>
+    </a>
 </div>
 
-<script>
-    let sidebarOpen = false;
+<script src="footer.js"></script>
+<script src="sidebar.js"></script>
 
-    function toggleSidebar() {
-        sidebarOpen = !sidebarOpen;
-        document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
-        document.getElementById('sidebar-overlay').classList.toggle('show', sidebarOpen);
-        document.getElementById('hamburger-btn').classList.toggle('open', sidebarOpen);
-    }
-
-    // Fechar sidebar ao clicar em um link (para mobile)
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth < 768 && sidebarOpen) toggleSidebar();
-        });
-    });
-</script>
 </body>
 </html>
