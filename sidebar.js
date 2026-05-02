@@ -90,11 +90,32 @@
         });
     });
 
-    // ========== MARCAR LINK ATIVO ==========
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    // ========== MARCAR LINK ATIVO (Corrigido para GitHub Pages) ==========
+    // Obtém o nome do arquivo atual de forma compatível com localhost e GitHub Pages
+    const path = window.location.pathname;
+    // Remove barra final se existir
+    const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
+    // Pega o último segmento (nome do arquivo)
+    const segments = cleanPath.split('/');
+    let currentPage = segments[segments.length - 1];
+    // Se estiver vazio (página raiz), assume index.html
+    if (!currentPage || currentPage === '') {
+        currentPage = 'index.html';
+    }
+    
+    // Remove query strings e hash
+    currentPage = currentPage.split('?')[0].split('#')[0];
+
+    console.log('📄 Página atual detectada:', currentPage); // Debug
+
     document.querySelectorAll('.sidebar-link').forEach(link => {
         const href = link.getAttribute('href');
-        if (href === currentPage) {
+        if (!href) return;
+
+        // Extrai apenas o nome do arquivo do href
+        const hrefFile = href.split('/').pop().split('?')[0].split('#')[0];
+
+        if (hrefFile === currentPage) {
             link.classList.add('active');
             // Dar um destaque extra no ícone ativo
             const icon = link.querySelector('.icon');
