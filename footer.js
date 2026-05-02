@@ -143,6 +143,15 @@
                         <li><a href="prova1Avaliativa.html">Prova Avaliativa 1</a></li>
                     </ul>
                 </div>
+
+                <div class="footer-col">
+                    <h4>📚 Programação em C</h4>
+                    <ul>
+                        <li><a href="compilador-c.html">Copilador C</a></li>
+                        
+                    </ul>
+                </div>
+
                 <div class="footer-col">
                     <h4>📋 Administração</h4>
                     <ul>
@@ -153,14 +162,17 @@
                         <li><a href="casos.html#relacoes-humanas">Relações Humanas</a></li>
                     </ul>
                 </div>
+
                 <div class="footer-col">
                     <h4>🔗 Links Rápidos</h4>
                     <ul>
                         <li><a href="index.html">🏠 Início</a></li>
                         <li><a href="HomeMatematica.html">∑ Home Matemática</a></li>
+                        <li><a href="HomeProgramacao.html">PC Home Programação em C</a></li>
                         <li><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">⬆ Voltar ao Topo</a></li>
                     </ul>
                 </div>
+                
             </div>
             
             <hr class="footer-divider">
