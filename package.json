@@ -1,9 +1,11 @@
 {
-  "name": "compilador-c",
+  "name": "compilador-c-backend",
   "version": "1.0.0",
+  "description": "Compilador C com GCC para SiteParaEstudar",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "postinstall": "apt-get update && apt-get install -y gcc"
   },
   "dependencies": {
     "cors": "^2.8.5",
