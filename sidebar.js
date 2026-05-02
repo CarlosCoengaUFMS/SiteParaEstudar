@@ -43,17 +43,17 @@
                 </a>
                 <hr style="border-color:#2a2a38;margin:8px 0;">
                 <a href="matematica.html" class="sidebar-link">
-                    <span class="icon" style="background:linear-gradient(135deg,rgba(124,109,250,0.2),rgba(109,250,188,0.2));color:#fff;">📖</span> Prova Completa (24Q)
+                    <span class="icon" style="background:linear-gradient(135deg,rgba(124,109,250,0.2),rgba(109,250,188,0.2));color:#fff;">📋</span> Prova Completa (24Q)
                 </a>
                 <a href="prova1Avaliativa.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(109,250,188,0.2);color:#6dfabc;">📝</span> Prova Avaliativa 1 (7Q)
+                    <span class="icon" style="background:rgba(109,250,188,0.2);color:#6dfabc;">📋</span> Prova Avaliativa 1 (7Q)
                 </a>
                 <hr style="border-color:#2a2a38;margin:8px 0;">
                 <a href="mapa_mental_Adm.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(250,109,138,0.15);color:#fa6d8a;">📋</span> Mapa Mental ADM
+                    <span class="icon" style="background:rgba(250,109,138,0.15);color:#fa6d8a;">✏️</span> Mapa Mental ADM
                 </a>
                 <a href="casos.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(250,220,109,0.15);color:#fadc6d;">📝</span> Casos ADM
+                    <span class="icon" style="background:rgba(250,220,109,0.15);color:#fadc6d;">⚖</span> Casos ADM
                 </a>
             </nav>
             <div class="sidebar-footer">UFMS · Campus Ponta Porã</div>
