@@ -3,151 +3,104 @@ const cors = require('cors');
 const { execSync, execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
-// Rota de compilação
+// ROTA RAIZ - teste básico
+app.get('/', (req, res) => {
+    res.send('🚀 Compilador C Online - OK');
+});
+
+// ROTA PING - health check
+app.get('/ping', (req, res) => {
+    res.json({ 
+        status: 'online', 
+        gcc: true,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ROTA COMPILAR
 app.post('/compilar', (req, res) => {
     const { code, input } = req.body;
     
-    if (!code || typeof code !== 'string') {
+    if (!code) {
         return res.json({ 
-            error: 'Código fonte não fornecido', 
+            error: 'Código não fornecido', 
             output: '', 
             success: false 
         });
     }
     
-    // Cria diretório temporário
-    const id = Math.random().toString(36).substring(7);
+    const id = Math.random().toString(36).substr(2, 9);
     const tmpDir = path.join('/tmp', `c_${id}`);
     
     try {
-        // Cria diretório
-        fs.mkdirSync(tmpDir, { recursive: true });
+        fs.mkdirSync(tmpDir);
+        const src = path.join(tmpDir, 'code.c');
+        const out = path.join(tmpDir, 'run');
+        fs.writeFileSync(src, code);
         
-        // Arquivos
-        const sourceFile = path.join(tmpDir, 'program.c');
-        const outputFile = path.join(tmpDir, 'program');
-        
-        // Salva código
-        fs.writeFileSync(sourceFile, code, 'utf8');
-        
-        // ========== COMPILAÇÃO ==========
+        // Compilar
         try {
-            execSync(`gcc "${sourceFile}" -o "${outputFile}" -Wall -lm`, {
-                encoding: 'utf8',
+            execSync(`gcc -o "${out}" "${src}" -lm -Wall`, { 
                 timeout: 10000,
-                stdio: 'pipe'
+                stdio: 'pipe',
+                encoding: 'utf8'
             });
-        } catch (compileError) {
-            // Limpa e retorna erro
+        } catch (e) {
             fs.rmSync(tmpDir, { recursive: true, force: true });
-            return res.json({
-                error: compileError.stderr || compileError.message || 'Erro de compilação',
+            return res.json({ 
+                error: e.stderr || 'Erro de compilação',
                 output: '',
                 success: false
             });
         }
         
-        // ========== EXECUÇÃO ==========
-        let programOutput = '';
-        let programError = '';
-        
+        // Executar
+        let output = '', error = '';
         try {
-            const options = {
-                encoding: 'utf8',
+            output = execFileSync(out, [], {
                 timeout: 5000,
                 maxBuffer: 1024 * 1024,
-                cwd: tmpDir
-            };
-            
-            // Se tem input, passa via stdin
-            if (input && input.trim()) {
-                options.input = input;
-            }
-            
-            programOutput = execFileSync(outputFile, [], options);
-            
-        } catch (execError) {
-            programOutput = execError.stdout || '';
-            programError = execError.stderr || '';
-            
-            if (execError.killed || execError.signal === 'SIGTERM') {
-                programError = 'Erro: Tempo limite excedido (5 segundos)';
-            }
+                encoding: 'utf8',
+                input: input || undefined
+            });
+        } catch (e) {
+            output = e.stdout || '';
+            error = e.stderr || (e.killed ? 'Timeout (5s)' : '');
         }
         
-        // Limpa diretório temporário
         fs.rmSync(tmpDir, { recursive: true, force: true });
         
-        // Retorna resultado
-        res.json({
-            error: programError.replace(/\/tmp\/[^\s]+/g, '[arquivo]'),
-            output: programOutput,
-            success: !programError
-        });
+        res.json({ error, output, success: !error });
         
-    } catch (error) {
-        // Limpa em caso de erro
-        try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (e) {}
-        
-        res.status(500).json({
-            error: 'Erro interno: ' + error.message,
-            output: '',
-            success: false
-        });
-    }
-});
-
-// Health check
-app.get('/ping', (req, res) => {
-    try {
-        execSync('gcc --version', { encoding: 'utf8', timeout: 3000 });
-        res.json({ 
-            status: 'online', 
-            gcc: true, 
-            timestamp: new Date().toISOString(),
-            message: 'Compilador C Online - SiteParaEstudar'
-        });
     } catch (e) {
-        res.json({ status: 'error', gcc: false, error: e.message });
+        try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
+        res.status(500).json({ error: 'Erro interno', output: '', success: false });
     }
 });
 
-// Rota raiz
-app.get('/', (req, res) => {
-    res.send(`
-        <h1>🚀 Compilador C - API</h1>
-        <p>Endpoints:</p>
-        <ul>
-            <li>POST /compilar - Compila código C</li>
-            <li>GET /ping - Verifica status</li>
-        </ul>
-        <p>Use o frontend em: <a href="https://SEU-USER.github.io/SiteParaEstudar/compilador-c.html">SiteParaEstudar</a></p>
-    `);
+// Tratar erros 404
+app.use((req, res) => {
+    res.status(404).json({ error: 'Rota não encontrada', path: req.path });
 });
 
-// Inicia servidor
-app.listen(PORT, () => {
-    console.log('═══════════════════════════');
-    console.log('🚀 Compilador C - Railway');
-    console.log('📡 Porta:', PORT);
-    console.log('📝 POST /compilar');
-    console.log('💚 GET  /ping');
-    console.log('═══════════════════════════');
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`📡 http://0.0.0.0:${PORT}`);
+    console.log(`💚 http://0.0.0.0:${PORT}/ping`);
+    console.log(`📝 http://0.0.0.0:${PORT}/compilar`);
     
-    // Testa GCC
+    // Testar GCC
     try {
         const v = execSync('gcc --version', { encoding: 'utf8' });
-        console.log('✅ GCC:', v.split('\n')[0]);
+        console.log('✅ GCC encontrado:', v.split('\n')[0]);
     } catch (e) {
-        console.log('❌ GCC não encontrado');
+        console.log('❌ GCC NÃO encontrado:', e.message);
     }
 });
