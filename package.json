@@ -4,8 +4,7 @@
   "description": "Compilador C com GCC para SiteParaEstudar",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "postinstall": "apt-get update && apt-get install -y gcc"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
