@@ -1,13 +1,11 @@
-// compiler-c.js - Compilador C Online (Backend Railway + Frontend GitHub Pages)
-// Substitua RAILWAY_URL pela sua URL do Railway
+// compiler-c.js - Compilador C Online (Frontend GitHub Pages + Backend Railway)
+// Backend: https://siteparaestudar-production.up.railway.app
 
 (function() {
     'use strict';
 
-    // ⚠️ SUBSTITUA PELA SUA URL DO RAILWAY
-    const BACKEND_URL = 'siteparaestudar-production.up.railway.app';
-    
-    console.log('🔗 Backend:', BACKEND_URL);
+    // ✅ URL CORRETA DO BACKEND
+    const BACKEND_URL = 'https://siteparaestudar-production.up.railway.app';
 
     const examples = {
         hello: `#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    printf("SiteParaEstudar © 2026\\n");\n    return 0;\n}`,
@@ -18,9 +16,7 @@
         
         fatorial: `#include <stdio.h>\n\nint main() {\n    int num, i;\n    long long fat = 1;\n    \n    printf("Digite um numero: ");\n    scanf("%d", &num);\n    \n    for(i = 1; i <= num; i++) fat *= i;\n    \n    printf("%d! = %lld\\n", num, fat);\n    return 0;\n}`,
         
-        tabuada: `#include <stdio.h>\n\nint main() {\n    int num, i;\n    printf("Digite um numero: ");\n    scanf("%d", &num);\n    printf("\\nTabuada do %d:\\n", num);\n    for(i = 1; i <= 10; i++)\n        printf("%d x %2d = %3d\\n", num, i, num * i);\n    return 0;\n}`,
-        
-        primos: `#include <stdio.h>\n\nint main() {\n    int n, i, j, ehPrimo;\n    printf("Quantos numeros primos? ");\n    scanf("%d", &n);\n    \n    printf("Primos: ");\n    for(i = 2, j = 0; j < n; i++) {\n        ehPrimo = 1;\n        for(int k = 2; k <= i/2; k++) {\n            if(i % k == 0) { ehPrimo = 0; break; }\n        }\n        if(ehPrimo) { printf("%d ", i); j++; }\n    }\n    printf("\\n");\n    return 0;\n}`
+        tabuada: `#include <stdio.h>\n\nint main() {\n    int num, i;\n    printf("Digite um numero: ");\n    scanf("%d", &num);\n    printf("\\nTabuada do %d:\\n", num);\n    for(i = 1; i <= 10; i++)\n        printf("%d x %2d = %3d\\n", num, i, num * i);\n    return 0;\n}`
     };
 
     async function compileAndRun() {
@@ -43,7 +39,7 @@
 
         if (runBtn) runBtn.disabled = true;
         if (spinner) spinner.style.display = 'inline-block';
-        outputArea.textContent = '🔄 Compilando com GCC...\n⏳ Enviando para o servidor...';
+        outputArea.textContent = '🔄 Compilando com GCC...\n⏳ Enviando para ' + BACKEND_URL;
         if (statusText) {
             statusText.textContent = '⏳ Compilando...';
             statusText.style.color = '#fadc6d';
@@ -56,7 +52,12 @@
                 body: JSON.stringify({ code, input })
             });
 
-            if (!response.ok) throw new Error(`Erro ${response.status}`);
+            if (response.status === 405) {
+                throw new Error('Método não permitido (405). O backend pode estar reiniciando.');
+            }
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}`);
+            }
 
             const result = await response.json();
 
@@ -94,13 +95,12 @@
                 '📋 Verifique:\n' +
                 '━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
                 '1. Railway está online?\n' +
-                '   URL: ' + BACKEND_URL + '\n\n' +
-                '2. Teste a conexão:\n' +
-                '   ' + BACKEND_URL + '/ping\n\n' +
+                '   ✅ ' + BACKEND_URL + '/ping\n\n' +
+                '2. Tente novamente em alguns segundos\n\n' +
                 'Erro: ' + error.message;
 
             if (statusText) {
-                statusText.textContent = '❌ Servidor offline';
+                statusText.textContent = '❌ Erro de conexão';
                 statusText.style.color = '#e74c3c';
             }
         } finally {
@@ -125,8 +125,7 @@
                     menorNumero: '45\n23\n67\n12\n89\n34\n56\n78\n90\n15',
                     fatorial: '5',
                     calculadora: '5+3',
-                    tabuada: '7',
-                    primos: '10'
+                    tabuada: '7'
                 };
                 inputArea.value = inputs[name] || '';
             }
@@ -193,5 +192,6 @@
     window.compilerExamples = examples;
 
     console.log('✅ Compilador C carregado!');
+    console.log('🔗 Backend:', BACKEND_URL);
     console.log('⌨️  Ctrl+Enter para executar');
 })();
