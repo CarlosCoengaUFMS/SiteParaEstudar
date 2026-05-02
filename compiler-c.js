@@ -5,7 +5,7 @@
     'use strict';
 
     // ⚠️ SUBSTITUA PELA SUA URL DO RAILWAY
-    const BACKEND_URL = 'https://SEU-APP.up.railway.app';
+    const BACKEND_URL = 'siteparaestudar-production.up.railway.app';
     
     console.log('🔗 Backend:', BACKEND_URL);
 
