@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Fundamentos Matemáticos · SiteParaEstudar</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #15151a;
+    --card: #1c1c24;
+    --border: #2a2a38;
+    --accent: #7c6dfa;
+    --accent2: #fa6d8a;
+    --accent3: #6dfabc;
+    --accent4: #fadc6d;
+    --text: #e8e8f0;
+    --muted: #7878a0;
+    --correct: #2ecc71;
+    --wrong: #e74c3c;
+    --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
+    --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.4);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,109,250,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,109,250,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%);
+  }
+
+  .glow {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+    animation: floatGlow 15s infinite alternate ease-in-out;
+  }
+  .glow-1 { background: var(--accent); top: -150px; left: -150px; animation-delay: 0s; }
+  .glow-2 { background: var(--accent2); bottom: -150px; right: -150px; animation-delay: -5s; }
+  .glow-3 { background: var(--accent3); top: 40%; left: 50%; width: 400px; height: 400px; opacity: 0.08; animation-delay: -10s; }
+
+  @keyframes floatGlow {
+    0% { transform: translate(0,0) scale(1); }
+    100% { transform: translate(20px, -20px) scale(1.08); }
+  }
+
+  /* ========== HAMBURGER MENU ========== */
+  .hamburger-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 200;
+    width: 44px;
+    height: 44px;
+    background: rgba(21, 21, 26, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .hamburger-btn:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(124,109,250,0.2);
+  }
+  .hamburger-line {
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+  .hamburger-btn.open .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .hamburger-btn.open .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .hamburger-btn.open .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* SIDEBAR OVERLAY */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 250;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .sidebar-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(21, 21, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
+    z-index: 260;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sidebar-logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+  }
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all var(--transition);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .sidebar-link:hover {
+    background: rgba(124,109,250,0.1);
+    color: var(--text);
+  }
+  .sidebar-link.active {
+    background: rgba(124,109,250,0.15);
+    border: 1px solid rgba(124,109,250,0.3);
+    color: #fff;
+  }
+  .sidebar-link .icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ========== EXAM PAGE ========== */
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 30px 20px 40px;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse at 50% 0%, rgba(124,109,250,0.06), transparent 70%);
+  }
+
+  .back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+  }
+  .back-home:hover { color: var(--accent); }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid rgba(124,109,250,0.4);
+    border-radius: 30px;
+    padding: 5px 18px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    background: rgba(124,109,250,0.08);
+    backdrop-filter: blur(10px);
+  }
+  .tag::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  header h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    background: linear-gradient(135deg, #ffffff 20%, var(--accent) 60%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .exam-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .exam-meta-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .timer {
+    background: rgba(124,109,250,0.1);
+    border-color: rgba(124,109,250,0.3);
+    color: var(--accent);
+  }
+  #timer-display { font-weight: 700; color: var(--text); }
+
+  /* SCORE BAR */
+  .score-bar {
+    position: sticky;
+    top: 0;
+    z-index: 110;
+    background: rgba(13,13,15,0.88);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 25px;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 20px rgba(0,0,0,0.5);
+  }
+
+  .score-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .score-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .progress-wrap {
+    flex: 1;
+    min-width: 150px;
+    max-width: 280px;
+    height: 7px;
+    background: var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent4));
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    width: 0%;
+    box-shadow: 0 0 12px rgba(124,109,250,0.5);
+  }
+
+  .btn-check-all {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 22px;
+    border-radius: 25px;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 12px rgba(124,109,250,0.3);
+    letter-spacing: 0.5px;
+  }
+  .btn-check-all:hover { background: #8f80ff; transform: translateY(-1px); }
+
+  /* TABS */
+  .tabs {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    background: rgba(13,13,15,0.5);
+    backdrop-filter: blur(10px);
+  }
+
+  .tab {
+    padding: 16px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    transition: all var(--transition);
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tab:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .tab.active { color: #fff; border-bottom-color: var(--accent); background: rgba(124,109,250,0.05); }
+
+  .tab .dot {
+    display: inline-block;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    margin-right: 2px;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  /* CONTENT */
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeSlide 0.4s ease; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  .section-title .icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .section-title h2 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .section-title p {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    margin-bottom: 20px;
+    transition: all var(--transition);
+    animation: cardAppear 0.45s ease both;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  @keyframes cardAppear {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-card:nth-child(2) { animation-delay: 0.05s; }
+  .q-card:nth-child(3) { animation-delay: 0.10s; }
+  .q-card:nth-child(4) { animation-delay: 0.15s; }
+  .q-card:nth-child(5) { animation-delay: 0.20s; }
+  .q-card:nth-child(6) { animation-delay: 0.25s; }
+
+  .q-card.answered-correct { border-color: var(--correct); box-shadow: 0 0 22px rgba(46,204,113,0.12); }
+  .q-card.answered-wrong { border-color: var(--wrong); box-shadow: 0 0 22px rgba(231,76,60,0.12); }
+
+  .q-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .difficulty-tag {
+    font-size: 9px;
+    padding: 2px 9px;
+    border-radius: 15px;
+    background: rgba(250,220,109,0.1);
+    border: 1px solid rgba(250,220,109,0.25);
+    color: var(--accent4);
+  }
+
+  .q-text {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .q-text .math {
+    font-family: 'Space Mono', monospace;
+    background: rgba(124,109,250,0.12);
+    border: 1px solid rgba(124,109,250,0.25);
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-size: 13px;
+    color: #c3baff;
+    font-weight: 600;
+  }
+
+  /* OPTIONS */
+  .options { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .option:hover:not(.disabled) {
+    border-color: var(--accent);
+    background: rgba(124,109,250,0.06);
+    transform: translateX(3px);
+  }
+
+  .option.selected {
+    border-color: var(--accent);
+    background: rgba(124,109,250,0.12);
+    box-shadow: 0 0 15px rgba(124,109,250,0.08);
+  }
+
+  .option.correct-answer {
+    border-color: var(--correct);
+    background: rgba(46,204,113,0.1);
+    color: var(--correct);
+  }
+
+  .option.wrong-answer {
+    border-color: var(--wrong);
+    background: rgba(231,76,60,0.1);
+    color: #ff8080;
+  }
+
+  .option.disabled { cursor: default; pointer-events: none; opacity: 0.7; }
+
+  .opt-letter {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+
+  .option.selected .opt-letter { background: var(--accent); color: #fff; }
+  .option.correct-answer .opt-letter { background: var(--correct); color: #fff; }
+  .option.wrong-answer .opt-letter { background: var(--wrong); color: #fff; }
+
+  /* TEXT ANSWERS */
+  .text-answer {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: all var(--transition);
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  .text-answer:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(124,109,250,0.1); }
+
+  /* FEEDBACK */
+  .feedback {
+    display: none;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    animation: fadeSlide 0.3s ease;
+  }
+
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.3); color: var(--correct); }
+  .feedback.wrong { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: #ff8080; }
+  .feedback.info { background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.3); color: #b8b0ff; }
+
+  .feedback strong { display: block; margin-bottom: 4px; font-size: 14px; }
+
+  /* BUTTONS */
+  .q-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 9px 20px;
+    border-radius: 20px;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 10px rgba(124,109,250,0.25); }
+  .btn-primary:hover:not(:disabled) { background: #8f80ff; transform: translateY(-2px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .btn-secondary { background: var(--border); color: var(--muted); }
+  .btn-secondary:hover { background: #3a3a48; color: var(--text); }
+  .btn-reveal { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-reveal:hover { border-color: var(--accent4); color: var(--accent4); background: rgba(250,220,109,0.05); }
+
+  /* HINT */
+  .hint {
+    display: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--accent4);
+    border-left: 3px solid var(--accent4);
+    padding: 12px 16px;
+    background: rgba(250,220,109,0.05);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .hint.show { display: block; animation: fadeSlide 0.3s ease; }
+
+  /* FINAL SCORE */
+  .final-score {
+    display: none;
+    text-align: center;
+    padding: 50px 20px;
+    animation: fadeSlide 0.6s ease;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  .final-score.show { display: block; }
+
+  .score-ring {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    border: 7px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    background: radial-gradient(circle at 30% 20%, rgba(124,109,250,0.08), transparent);
+  }
+
+  .score-pct { font-size: 44px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .score-label { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  .restart-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 44px;
+    border-radius: 25px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-top: 15px;
+    box-shadow: 0 6px 18px rgba(124,109,250,0.3);
+  }
+  .restart-btn:hover { background: #8f80ff; transform: translateY(-2px); }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 3px 10px;
+    border-radius: 15px;
+    border: 1px solid;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge-important { border-color: var(--accent2); color: var(--accent2); background: rgba(250,109,138,0.08); }
+
+  @media (max-width: 600px) {
+    .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; z-index: 200; }
+    .score-bar { padding: 10px 14px; gap: 10px; z-index: 110; }
+    .tab { padding: 12px 14px; font-size: 10px; }
+    .q-card { padding: 18px 14px; }
+    .option { padding: 12px 14px; }
+    .btn { padding: 7px 15px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ========== EXAM PAGE ========== -->
+<header>
+  <a href="index.html" class="back-home">← Voltar ao Início</a>
+  <div class="tag">UFMS · Campus Ponta Porã</div>
+  <h1>Prova de Estudo<br>Fundamentos Matemáticos</h1>
+  <p>Conjuntos · Relações · Funções · Combinatória</p>
+  <div class="exam-meta">
+    <div class="exam-meta-item">📋 24 questões</div>
+    <div class="exam-meta-item timer">⏱️ <span id="timer-display">00:00</span></div>
+    <div class="exam-meta-item">📅 2026</div>
+  </div>
+</header>
+
+<div class="score-bar">
+  <div class="score-info">
+    <div class="score-stat">📝 <strong id="answered-count">0</strong>/<span id="total-count">0</span></div>
+    <div class="score-stat" style="color:var(--correct)">✓ <strong id="correct-count">0</strong></div>
+    <div class="score-stat" style="color:var(--wrong)">✗ <strong id="wrong-count">0</strong></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <button class="btn-check-all" onclick="checkAll()">📊 Progresso</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('conjuntos')">
+    <span class="dot" style="background:#7c6dfa"></span>Conjuntos
+  </div>
+  <div class="tab" onclick="showTab('relacoes')">
+    <span class="dot" style="background:#fa6d8a"></span>Relações
+  </div>
+  <div class="tab" onclick="showTab('funcoes')">
+    <span class="dot" style="background:#6dfabc"></span>Funções
+  </div>
+  <div class="tab" onclick="showTab('combinatoria')">
+    <span class="dot" style="background:#fadc6d"></span>Combinatória
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- =================== CONJUNTOS =================== -->
+  <div class="section active" id="conjuntos">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(124,109,250,0.15)">∩</div>
+      <div>
+        <h2 style="color:#a89fff">Teoria dos Conjuntos</h2>
+        <p>6 questões — inclui tópicos de maior incidência em prova</p>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="q-card" id="qc1">
+      <div class="q-number"><span>Conjuntos · Questão 1</span> <span class="badge badge-important">★ Importante</span> <span class="difficulty-tag">Médio</span></div>
+      <div class="q-text">
+        Seja <span class="math">A = {x ∈ ℝ | 0 &lt; x &lt; ¾}</span>. Quais das afirmativas abaixo são <strong>VERDADEIRAS</strong>?
+      </div>
+      <div class="options" id="opts-qc1">
+        <div class="option" onclick="toggleMC('qc1','A')"><span class="opt-letter">A</span> 1 ∈ A, pois 1 é positivo</div>
+        <div class="option" onclick="toggleMC('qc1','B')"><span class="opt-letter">B</span> ½ ∈ A, pois 0 &lt; ½ &lt; ¾</div>
+        <div class="option" onclick="toggleMC('qc1','C')"><span class="opt-letter">C</span> ¾ ∈ A, pois está no limite do intervalo</div>
+        <div class="option" onclick="toggleMC('qc1','D')"><span class="opt-letter">D</span> 2/3 ∈ A, pois 0 &lt; 2/3 &lt; ¾</div>
+        <div class="option" onclick="toggleMC('qc1','E')"><span class="opt-letter">E</span> 2 ∉ A, pois 2 &gt; ¾</div>
+      </div>
+      <div class="hint" id="hint-qc1">💡 O conjunto A usa intervalo <strong>aberto</strong> em ¾, ou seja, ¾ não pertence ao conjunto.</div>
+      <div class="feedback" id="fb-qc1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkMC('qc1',['B','D','E'])">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc1')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc1')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card" id="qc2">
+      <div class="q-number">Conjuntos · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Seja <span class="math">K = {1, 4, 7, 9, 10, 11}</span>. Qual é o conjunto <span class="math">B = {x ∈ K | x é primo}</span>?
+      </div>
+      <div class="options" id="opts-qc2">
+        <div class="option" onclick="selectOpt('qc2','A')"><span class="opt-letter">A</span> B = {1, 7, 11}</div>
+        <div class="option" onclick="selectOpt('qc2','B')"><span class="opt-letter">B</span> B = {7, 11}</div>
+        <div class="option" onclick="selectOpt('qc2','C')"><span class="opt-letter">C</span> B = {1, 7, 9, 11}</div>
+        <div class="option" onclick="selectOpt('qc2','D')"><span class="opt-letter">D</span> B = {7, 9, 11}</div>
+      </div>
+      <div class="hint" id="hint-qc2">💡 Lembre: 1 <strong>não é primo</strong>. 9 = 3×3, então também não é primo. Verifique 7 e 11.</div>
+      <div class="feedback" id="fb-qc2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc2','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc2')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc2')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-card" id="qc3">
+      <div class="q-number">Conjuntos · Questão 3</div>
+      <div class="q-text">
+        Considerando <span class="math">A = {2, {4,5}, 4}</span>, qual alternativa contém <strong>APENAS</strong> sentenças verdadeiras?
+      </div>
+      <div class="options" id="opts-qc3">
+        <div class="option" onclick="selectOpt('qc3','A')"><span class="opt-letter">A</span> 5 ∈ A &nbsp;|&nbsp; {4,5} ⊂ A &nbsp;|&nbsp; {2} ⊂ A</div>
+        <div class="option" onclick="selectOpt('qc3','B')"><span class="opt-letter">B</span> {4,5} ∈ A &nbsp;|&nbsp; {{4,5}} ⊂ A &nbsp;|&nbsp; {2} ⊂ A</div>
+        <div class="option" onclick="selectOpt('qc3','C')"><span class="opt-letter">C</span> 5 ∈ A &nbsp;|&nbsp; {4,5} ∈ A &nbsp;|&nbsp; {2} ⊂ A</div>
+        <div class="option" onclick="selectOpt('qc3','D')"><span class="opt-letter">D</span> 5 ∉ A &nbsp;|&nbsp; {4,5} ∈ A &nbsp;|&nbsp; {{4,5}} ⊂ A</div>
+      </div>
+      <div class="hint" id="hint-qc3">💡 5 é elemento de {4,5}, mas não é elemento direto de A. {4,5} como um todo SIM é elemento de A. {2} ⊂ A pois 2 ∈ A.</div>
+      <div class="feedback" id="fb-qc3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc3','D')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc3')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc3')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-card" id="qc4">
+      <div class="q-number">Conjuntos · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Considere <span class="math">A = {2,4,5,6,8}</span>, <span class="math">B = {1,4,5,9}</span> e <span class="math">S = {0,1,...,9}</span>. Qual é o resultado de <span class="math">A − B</span>?
+      </div>
+      <div class="options" id="opts-qc4">
+        <div class="option" onclick="selectOpt('qc4','A')"><span class="opt-letter">A</span> {2, 6, 8}</div>
+        <div class="option" onclick="selectOpt('qc4','B')"><span class="opt-letter">B</span> {4, 5}</div>
+        <div class="option" onclick="selectOpt('qc4','C')"><span class="opt-letter">C</span> {1, 9}</div>
+        <div class="option" onclick="selectOpt('qc4','D')"><span class="opt-letter">D</span> {2, 4, 5, 6, 8, 1, 9}</div>
+      </div>
+      <div class="hint" id="hint-qc4">💡 A − B = elementos que estão em A mas NÃO estão em B. Remova de A tudo que aparece em B.</div>
+      <div class="feedback" id="fb-qc4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc4','A')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc4')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc4')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-card" id="qc5">
+      <div class="q-number">Conjuntos · Questão 5 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Quantos subconjuntos tem o conjunto <span class="math">{a, b, c}</span>? E qual é o conjunto das partes <span class="math">P({a,b,c})</span>?
+      </div>
+      <div class="options" id="opts-qc5">
+        <div class="option" onclick="selectOpt('qc5','A')"><span class="opt-letter">A</span> 6 subconjuntos; P = { {a}, {b}, {c}, {a,b}, {a,c}, {b,c} }</div>
+        <div class="option" onclick="selectOpt('qc5','B')"><span class="opt-letter">B</span> 8 subconjuntos; P = { ∅, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c} }</div>
+        <div class="option" onclick="selectOpt('qc5','C')"><span class="opt-letter">C</span> 8 subconjuntos; P = { {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c}, ∅ }</div>
+        <div class="option" onclick="selectOpt('qc5','D')"><span class="opt-letter">D</span> 7 subconjuntos; fórmula 2ⁿ − 1 (excluindo ∅)</div>
+      </div>
+      <div class="hint" id="hint-qc5">💡 Um conjunto com n elementos tem 2ⁿ subconjuntos, incluindo ∅ e o próprio conjunto. Para n=3: 2³ = 8.</div>
+      <div class="feedback" id="fb-qc5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qc5','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc5')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc5')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- Q6 – aberta -->
+    <div class="q-card" id="qc6">
+      <div class="q-number">Conjuntos · Questão 6 — Dissertativa <span class="difficulty-tag">Difícil</span></div>
+      <div class="q-text">
+        Quais das proposições abaixo são verdadeiras para todos os conjuntos A, B e C?<br>
+        <span class="math">i)</span> A ∪ A = A &nbsp;&nbsp; <span class="math">ii)</span> A − B = (B̄ − Ā) &nbsp;&nbsp; <span class="math">iii)</span> (A − B) ∩ (B − A) = ∅ &nbsp;&nbsp; <span class="math">iv)</span> ∅ × A = ∅<br><br>
+        Escreva as letras das verdadeiras separadas por vírgula (ex: i, iii):
+      </div>
+      <textarea class="text-answer" id="ans-qc6" placeholder="Sua resposta aqui..."></textarea>
+      <div class="hint" id="hint-qc6">💡 Pense: a diferença entre A e B é disjunta da diferença entre B e A por definição. O produto cartesiano de ∅ com qualquer conjunto é ∅.</div>
+      <div class="feedback" id="fb-qc6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkOpen('qc6', ['i, iii, iv','i,iii,iv','i iii iv','i, iv, iii','iii, i, iv'])">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qc6')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qc6')">↺ Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== RELAÇÕES =================== -->
+  <div class="section" id="relacoes">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(250,109,138,0.15)">↔</div>
+      <div>
+        <h2 style="color:#ff9db5">Relações Binárias</h2>
+        <p>6 questões — foco em propriedades e classificação</p>
+      </div>
+    </div>
+
+    <!-- QR1 -->
+    <div class="q-card" id="qr1">
+      <div class="q-number">Relações · Questão 1 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Sejam <span class="math">E = {0,1,2}</span> e <span class="math">F = {1,2,3,4,5}</span>. A relação <span class="math">x R y ↔ x = y − 2</span> (x ∈ E, y ∈ F) resulta em qual conjunto de pares ordenados?
+      </div>
+      <div class="options" id="opts-qr1">
+        <div class="option" onclick="selectOpt('qr1','A')"><span class="opt-letter">A</span> R = {(0,2), (1,3), (2,4)}</div>
+        <div class="option" onclick="selectOpt('qr1','B')"><span class="opt-letter">B</span> R = {(1,3), (2,4)}</div>
+        <div class="option" onclick="selectOpt('qr1','C')"><span class="opt-letter">C</span> R = {(0,2), (1,3), (2,4), (0,1)}</div>
+        <div class="option" onclick="selectOpt('qr1','D')"><span class="opt-letter">D</span> R = {(2,4), (1,3), (0,3)}</div>
+      </div>
+      <div class="hint" id="hint-qr1">💡 Substitua cada x ∈ E: y = x + 2. Verifique se y ∈ F. Para x=0: y=2 ✓; x=1: y=3 ✓; x=2: y=4 ✓.</div>
+      <div class="feedback" id="fb-qr1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr1','A')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr1')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr1')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR2 -->
+    <div class="q-card" id="qr2">
+      <div class="q-number">Relações · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Classifique a relação <span class="math">R = {(1,1), (2,3), (3,2)}</span> sobre <span class="math">X = {1,2,3}</span>. Ela é:
+      </div>
+      <div class="options" id="opts-qr2">
+        <div class="option" onclick="selectOpt('qr2','A')"><span class="opt-letter">A</span> Reflexiva, simétrica e transitiva</div>
+        <div class="option" onclick="selectOpt('qr2','B')"><span class="opt-letter">B</span> Reflexiva e simétrica, mas NÃO transitiva</div>
+        <div class="option" onclick="selectOpt('qr2','C')"><span class="opt-letter">C</span> Simétrica, mas NÃO reflexiva e NÃO transitiva</div>
+        <div class="option" onclick="selectOpt('qr2','D')"><span class="opt-letter">D</span> NÃO é reflexiva, NÃO simétrica, mas é transitiva</div>
+      </div>
+      <div class="hint" id="hint-qr2">💡 Reflexiva: (1,1),(2,2),(3,3) ∈ R? Simétrica: (2,3) ∈ R implica (3,2) ∈ R? Transitiva: (2,3) e (3,2) ∈ R implica (2,2) ∈ R?</div>
+      <div class="feedback" id="fb-qr2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr2','C')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr2')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr2')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR3 -->
+    <div class="q-card" id="qr3">
+      <div class="q-number">Relações · Questão 3</div>
+      <div class="q-text">
+        Classifique como um-para-um, um-para-muitos, muitos-para-um ou muitos-para-muitos:<br>
+        <span class="math">R = {(1,2), (1,4), (1,6), (2,3), (4,3)}</span>
+      </div>
+      <div class="options" id="opts-qr3">
+        <div class="option" onclick="selectOpt('qr3','A')"><span class="opt-letter">A</span> Um-para-um</div>
+        <div class="option" onclick="selectOpt('qr3','B')"><span class="opt-letter">B</span> Um-para-muitos</div>
+        <div class="option" onclick="selectOpt('qr3','C')"><span class="opt-letter">C</span> Muitos-para-um</div>
+        <div class="option" onclick="selectOpt('qr3','D')"><span class="opt-letter">D</span> Muitos-para-muitos</div>
+      </div>
+      <div class="hint" id="hint-qr3">💡 O elemento 1 aparece 3 vezes à esquerda (1→2, 1→4, 1→6) = um-para-muitos. Mas 3 aparece à direita de dois elementos (2→3 e 4→3) = muitos-para-um. Ambos juntos = muitos-para-muitos.</div>
+      <div class="feedback" id="fb-qr3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr3','D')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr3')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr3')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR4 -->
+    <div class="q-card" id="qr4">
+      <div class="q-number">Relações · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Seja R a relação &lt; de <span class="math">A = {1,2,3,4}</span> em <span class="math">B = {1,3,5}</span> ("x é menor que y"). Qual é R como conjunto de pares ordenados?
+      </div>
+      <div class="options" id="opts-qr4">
+        <div class="option" onclick="selectOpt('qr4','A')"><span class="opt-letter">A</span> R = {(1,3),(1,5),(2,3),(2,5),(3,5),(4,5)}</div>
+        <div class="option" onclick="selectOpt('qr4','B')"><span class="opt-letter">B</span> R = {(1,3),(1,5),(2,3),(2,5),(3,5)}</div>
+        <div class="option" onclick="selectOpt('qr4','C')"><span class="opt-letter">C</span> R = {(1,1),(1,3),(1,5),(2,3),(2,5),(3,5),(4,5)}</div>
+        <div class="option" onclick="selectOpt('qr4','D')"><span class="opt-letter">D</span> R = {(2,3),(2,5),(3,5),(4,5)}</div>
+      </div>
+      <div class="hint" id="hint-qr4">💡 Para cada x ∈ A, liste os y ∈ B tais que x &lt; y. Ex: x=1 → y pode ser 3 ou 5. x=4 → y pode ser 5.</div>
+      <div class="feedback" id="fb-qr4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr4','A')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr4')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr4')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR5 -->
+    <div class="q-card" id="qr5">
+      <div class="q-number">Relações · Questão 5 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Qual das coleções a seguir é uma partição de <span class="math">X = {a,b,c,d,e,f,g}</span>?
+      </div>
+      <div class="options" id="opts-qr5">
+        <div class="option" onclick="selectOpt('qr5','A')"><span class="opt-letter">A</span> A1={a,c,e}, A2={b}, A3={d,g} — faltam f</div>
+        <div class="option" onclick="selectOpt('qr5','B')"><span class="opt-letter">B</span> B1={a,c,g}, B2={c,d}, B3={b,e,f} — c aparece em B1 e B2</div>
+        <div class="option" onclick="selectOpt('qr5','C')"><span class="opt-letter">C</span> C1={a,b,e,g}, C2={c}, C3={d,f} — cobrindo todos sem interseção</div>
+        <div class="option" onclick="selectOpt('qr5','D')"><span class="opt-letter">D</span> D1={a,b,c,d,e,f,g} — apenas um bloco</div>
+      </div>
+      <div class="hint" id="hint-qr5">💡 Uma partição exige: 1) todos os subconjuntos não-vazios, 2) disjuntos entre si, 3) a união é o conjunto inteiro X.</div>
+      <div class="feedback" id="fb-qr5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qr5','C')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr5')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr5')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QR6 dissertativa -->
+    <div class="q-card" id="qr6">
+      <div class="q-number">Relações · Questão 6 — Dissertativa <span class="difficulty-tag">Difícil</span></div>
+      <div class="q-text">
+        Construa uma relação T em <span class="math">S = {1,2,3,4}</span> que seja <strong>reflexiva e transitiva, mas NÃO simétrica e NÃO antissimétrica</strong>. Escreva os pares ordenados:
+      </div>
+      <textarea class="text-answer" id="ans-qr6" placeholder="Ex: {(1,1),(2,2),...}"></textarea>
+      <div class="hint" id="hint-qr6">💡 Comece com todos os pares (x,x) para reflexividade. Adicione (1,2) e (2,1) para quebrar a antissimetria, mas certifique-se de incluir os pares transitivos necessários.</div>
+      <div class="feedback" id="fb-qr6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="revealAnswer('qr6', 'Uma possível resposta: T = {(1,1),(2,2),(3,3),(4,4),(1,2),(2,1),(1,3),(2,3),(1,4),(2,4)} — reflexiva (todos (x,x)), transitiva (verifique), não simétrica (ex: (1,3) ∈ T mas (3,1) ∉ T), não antissimétrica (1R2 e 2R1 com 1≠2).')">📖 Gabarito</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qr6')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qr6')">↺ Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== FUNÇÕES =================== -->
+  <div class="section" id="funcoes">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(109,250,188,0.15)">f(x)</div>
+      <div>
+        <h2 style="color:#6dfabc">Funções</h2>
+        <p>6 questões — injetora, sobrejetora, bijetora, composição</p>
+      </div>
+    </div>
+
+    <!-- QF1 -->
+    <div class="q-card" id="qf1">
+      <div class="q-number">Funções · Questão 1 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Sendo <span class="math">E = {a,b,c,d}</span> e <span class="math">F = {1,2,3}</span>, qual das relações abaixo <strong>É uma função</strong> de E em F?
+      </div>
+      <div class="options" id="opts-qf1">
+        <div class="option" onclick="selectOpt('qf1','A')"><span class="opt-letter">A</span> R1 = {(a,1),(b,2),(c,3)} — falta d no domínio</div>
+        <div class="option" onclick="selectOpt('qf1','B')"><span class="opt-letter">B</span> R2 = {(a,1),(b,1),(c,2),(d,3)} — função; Im={1,2,3}</div>
+        <div class="option" onclick="selectOpt('qf1','C')"><span class="opt-letter">C</span> R3 = {(a,1),(a,2),(b,1),(c,2),(d,3)} — a tem duas imagens</div>
+        <div class="option" onclick="selectOpt('qf1','D')"><span class="opt-letter">D</span> R1 e R2 são ambas funções</div>
+      </div>
+      <div class="hint" id="hint-qf1">💡 Uma função exige que CADA elemento do domínio tenha EXATAMENTE UMA imagem.</div>
+      <div class="feedback" id="fb-qf1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf1','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf1')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf1')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF2 -->
+    <div class="q-card" id="qf2">
+      <div class="q-number">Funções · Questão 2 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Quais das funções de <span class="math">E = {a,b,c,d}</span> em <span class="math">F = {0,1,2,3,4}</span> são <strong>INJETORAS</strong>?<br>
+        f1={(a,0),(b,1),(c,2),(d,4)} | f2={(a,1),(b,2),(c,3),(d,1)} | f3={(a,2),(b,4),(c,3),(d,0)}
+      </div>
+      <div class="options" id="opts-qf2">
+        <div class="option" onclick="selectOpt('qf2','A')"><span class="opt-letter">A</span> Apenas f1</div>
+        <div class="option" onclick="selectOpt('qf2','B')"><span class="opt-letter">B</span> f1 e f3</div>
+        <div class="option" onclick="selectOpt('qf2','C')"><span class="opt-letter">C</span> f1, f2 e f3</div>
+        <div class="option" onclick="selectOpt('qf2','D')"><span class="opt-letter">D</span> Nenhuma</div>
+      </div>
+      <div class="hint" id="hint-qf2">💡 Injetora = sem dois elementos do domínio com a mesma imagem. f2: a→1 e d→1 = não injetora.</div>
+      <div class="feedback" id="fb-qf2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf2','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf2')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf2')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF3 -->
+    <div class="q-card" id="qf3">
+      <div class="q-number">Funções · Questão 3 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Quais das funções de <span class="math">E = {r,s,t}</span> em <span class="math">F = {1,2,3}</span> são <strong>BIJETORAS</strong>?<br>
+        f1={(r,1),(s,1),(t,2)} | f2={(r,3),(s,1),(t,2)} | f3={(r,3),(s,2),(t,3)} | f4={(r,1),(s,2),(t,3)}
+      </div>
+      <div class="options" id="opts-qf3">
+        <div class="option" onclick="selectOpt('qf3','A')"><span class="opt-letter">A</span> f1 e f4</div>
+        <div class="option" onclick="selectOpt('qf3','B')"><span class="opt-letter">B</span> f2 e f4</div>
+        <div class="option" onclick="selectOpt('qf3','C')"><span class="opt-letter">C</span> Apenas f4</div>
+        <div class="option" onclick="selectOpt('qf3','D')"><span class="opt-letter">D</span> f2, f3 e f4</div>
+      </div>
+      <div class="hint" id="hint-qf3">💡 Bijetora = injetora E sobrejetora. f2: cobre 1,2,3 sem repetição ✓. f4: cobre 1,2,3 sem repetição ✓.</div>
+      <div class="feedback" id="fb-qf3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf3','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf3')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf3')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF4 -->
+    <div class="q-card" id="qf4">
+      <div class="q-number">Funções · Questão 4 <span class="badge badge-important">★ Importante</span></div>
+      <div class="q-text">
+        Sejam <span class="math">f(x) = x + 1</span> e <span class="math">g(x) = 3x</span>. Calcule <span class="math">(g ∘ f)(5)</span> e <span class="math">(f ∘ g)(5)</span>.
+      </div>
+      <div class="options" id="opts-qf4">
+        <div class="option" onclick="selectOpt('qf4','A')"><span class="opt-letter">A</span> (g∘f)(5)=18 | (f∘g)(5)=16</div>
+        <div class="option" onclick="selectOpt('qf4','B')"><span class="opt-letter">B</span> (g∘f)(5)=16 | (f∘g)(5)=18</div>
+        <div class="option" onclick="selectOpt('qf4','C')"><span class="opt-letter">C</span> (g∘f)(5)=15 | (f∘g)(5)=18</div>
+        <div class="option" onclick="selectOpt('qf4','D')"><span class="opt-letter">D</span> (g∘f)(5)=18 | (f∘g)(5)=15</div>
+      </div>
+      <div class="hint" id="hint-qf4">💡 g∘f: f(5)=6, g(6)=18. f∘g: g(5)=15, f(15)=16.</div>
+      <div class="feedback" id="fb-qf4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf4','A')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf4')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf4')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF5 -->
+    <div class="q-card" id="qf5">
+      <div class="q-number">Funções · Questão 5</div>
+      <div class="q-text">
+        Sejam <span class="math">f(x) = 2x + 1</span> e <span class="math">g(x) = x² − 2</span>. Qual é a fórmula de <span class="math">(g ∘ f)(x)</span>?
+      </div>
+      <div class="options" id="opts-qf5">
+        <div class="option" onclick="selectOpt('qf5','A')"><span class="opt-letter">A</span> 4x² + 4x − 1</div>
+        <div class="option" onclick="selectOpt('qf5','B')"><span class="opt-letter">B</span> 4x² + 4x + 1</div>
+        <div class="option" onclick="selectOpt('qf5','C')"><span class="opt-letter">C</span> 2x² − 3</div>
+        <div class="option" onclick="selectOpt('qf5','D')"><span class="opt-letter">D</span> 4x² − 1</div>
+      </div>
+      <div class="hint" id="hint-qf5">💡 (g∘f)(x) = (2x+1)² − 2 = 4x² + 4x + 1 − 2 = 4x² + 4x − 1.</div>
+      <div class="feedback" id="fb-qf5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qf5','A')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf5')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf5')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QF6 dissertativa -->
+    <div class="q-card" id="qf6">
+      <div class="q-number">Funções · Questão 6 — Dissertativa</div>
+      <div class="q-text">
+        Sejam <span class="math">S={1,2,3,4}</span>, <span class="math">T={1,...,6}</span>, <span class="math">f={(1,2),(2,4),(3,3),(4,6)}</span> e <span class="math">g={(1,7),(2,6),(3,9),(4,7),(5,8),(6,9)}</span>. Escreva <span class="math">g ∘ f</span>:
+      </div>
+      <textarea class="text-answer" id="ans-qf6" placeholder="Ex: {(1,?),(2,?),(3,?),(4,?)}"></textarea>
+      <div class="hint" id="hint-qf6">💡 (g∘f)(1)=g(f(1))=g(2)=6 → (1,6). (g∘f)(2)=g(4)=7 → (2,7).</div>
+      <div class="feedback" id="fb-qf6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="revealAnswer('qf6', 'g∘f = {(1,6),(2,7),(3,9),(4,9)}')">📖 Gabarito</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qf6')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qf6')">↺ Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== COMBINATÓRIA =================== -->
+  <div class="section" id="combinatoria">
+    <div class="section-title">
+      <div class="icon" style="background:rgba(250,220,109,0.15)">C(n,k)</div>
+      <div>
+        <h2 style="color:#fadc6d">Contagem e Combinatória</h2>
+        <p>6 questões — princípio multiplicativo, permutação, combinação, inclusão-exclusão</p>
+      </div>
+    </div>
+
+    <!-- QCO1 -->
+    <div class="q-card" id="qco1">
+      <div class="q-number">Combinatória · Questão 1</div>
+      <div class="q-text">
+        Uma loja de iogurte tem 5 sabores, 3 acompanhamentos e 2 coberturas. Quantas sobremesas diferentes?
+      </div>
+      <div class="options" id="opts-qco1">
+        <div class="option" onclick="selectOpt('qco1','A')"><span class="opt-letter">A</span> 10</div>
+        <div class="option" onclick="selectOpt('qco1','B')"><span class="opt-letter">B</span> 25</div>
+        <div class="option" onclick="selectOpt('qco1','C')"><span class="opt-letter">C</span> 30</div>
+        <div class="option" onclick="selectOpt('qco1','D')"><span class="opt-letter">D</span> 60</div>
+      </div>
+      <div class="hint" id="hint-qco1">💡 5 × 3 × 2 = 30.</div>
+      <div class="feedback" id="fb-qco1"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco1','C')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco1')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco1')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO2 -->
+    <div class="q-card" id="qco2">
+      <div class="q-number">Combinatória · Questão 2</div>
+      <div class="q-text">
+        1°, 2° e 3° prêmio em competição com 15 participantes. Quantas maneiras?
+      </div>
+      <div class="options" id="opts-qco2">
+        <div class="option" onclick="selectOpt('qco2','A')"><span class="opt-letter">A</span> C(15,3)=455</div>
+        <div class="option" onclick="selectOpt('qco2','B')"><span class="opt-letter">B</span> P(15,3)=2.730</div>
+        <div class="option" onclick="selectOpt('qco2','C')"><span class="opt-letter">C</span> 15³=3.375</div>
+        <div class="option" onclick="selectOpt('qco2','D')"><span class="opt-letter">D</span> 15!</div>
+      </div>
+      <div class="hint" id="hint-qco2">💡 Ordem importa: 15×14×13 = 2.730.</div>
+      <div class="feedback" id="fb-qco2"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco2','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco2')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco2')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO3 -->
+    <div class="q-card" id="qco3">
+      <div class="q-number">Combinatória · Questão 3</div>
+      <div class="q-text">
+        Júri: 5 homens (de 17) e 7 mulheres (de 23). Quantas maneiras?
+      </div>
+      <div class="options" id="opts-qco3">
+        <div class="option" onclick="selectOpt('qco3','A')"><span class="opt-letter">A</span> C(17,5) × C(23,7)</div>
+        <div class="option" onclick="selectOpt('qco3','B')"><span class="opt-letter">B</span> C(40,12)</div>
+        <div class="option" onclick="selectOpt('qco3','C')"><span class="opt-letter">C</span> P(17,5) × P(23,7)</div>
+        <div class="option" onclick="selectOpt('qco3','D')"><span class="opt-letter">D</span> C(17,5) + C(23,7)</div>
+      </div>
+      <div class="hint" id="hint-qco3">💡 Combinações independentes: multiplique.</div>
+      <div class="feedback" id="fb-qco3"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco3','A')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco3')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco3')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO4 -->
+    <div class="q-card" id="qco4">
+      <div class="q-number">Combinatória · Questão 4</div>
+      <div class="q-text">
+        42 turistas, 35 falam inglês, 18 falam francês. Quantos falam os dois?
+      </div>
+      <div class="options" id="opts-qco4">
+        <div class="option" onclick="selectOpt('qco4','A')"><span class="opt-letter">A</span> 7</div>
+        <div class="option" onclick="selectOpt('qco4','B')"><span class="opt-letter">B</span> 11</div>
+        <div class="option" onclick="selectOpt('qco4','C')"><span class="opt-letter">C</span> 17</div>
+        <div class="option" onclick="selectOpt('qco4','D')"><span class="opt-letter">D</span> 53</div>
+      </div>
+      <div class="hint" id="hint-qco4">💡 |A∩B| = 35 + 18 − 42 = 11.</div>
+      <div class="feedback" id="fb-qco4"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco4','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco4')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco4')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO5 -->
+    <div class="q-card" id="qco5">
+      <div class="q-number">Combinatória · Questão 5</div>
+      <div class="q-text">
+        Permutações da palavra <span class="math">ERRO</span>.
+      </div>
+      <div class="options" id="opts-qco5">
+        <div class="option" onclick="selectOpt('qco5','A')"><span class="opt-letter">A</span> 24</div>
+        <div class="option" onclick="selectOpt('qco5','B')"><span class="opt-letter">B</span> 12</div>
+        <div class="option" onclick="selectOpt('qco5','C')"><span class="opt-letter">C</span> 6</div>
+        <div class="option" onclick="selectOpt('qco5','D')"><span class="opt-letter">D</span> 4</div>
+      </div>
+      <div class="hint" id="hint-qco5">💡 4! / 2! = 12.</div>
+      <div class="feedback" id="fb-qco5"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="checkSingle('qco5','B')">✓ Verificar</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco5')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco5')">↺ Limpar</button>
+      </div>
+    </div>
+
+    <!-- QCO6 -->
+    <div class="q-card" id="qco6">
+      <div class="q-number">Combinatória · Questão 6 — Dissertativa</div>
+      <div class="q-text">
+        Quantas pessoas para <strong>garantir</strong> 2 no mesmo mês? Explique o princípio.
+      </div>
+      <textarea class="text-answer" id="ans-qco6" placeholder="Sua resposta..."></textarea>
+      <div class="hint" id="hint-qco6">💡 Princípio das Gavetas: 12 meses (gavetas) → 13 pessoas.</div>
+      <div class="feedback" id="fb-qco6"></div>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="revealAnswer('qco6', '13 pessoas. Princípio das Gavetas (Pigeonhole): com 12 meses, 13 pessoas garantem 2 no mesmo mês.')">📖 Gabarito</button>
+        <button class="btn btn-reveal" onclick="toggleHint('qco6')">💡 Dica</button>
+        <button class="btn btn-secondary" onclick="resetQ('qco6')">↺ Limpar</button>
+      </div>
+    </div>
+  </div><!-- end combinatoria -->
+
+  <!-- Final Score Display -->
+  <div class="final-score" id="final-score-section">
+    <h2 style="margin-bottom:20px;color:var(--accent)">Resultado Final</h2>
+    <div class="score-ring">
+      <span class="score-pct" id="final-pct">0%</span>
+      <span class="score-label">de acerto</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:20px;">Você respondeu <strong id="final-answered">0</strong> de <strong>24</strong> questões.</p>
+    <button class="restart-btn" onclick="location.reload()">↻ Refazer Prova</button>
+  </div>
+
+</div><!-- end content -->
+
+<script src="footer.js"></script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>

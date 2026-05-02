@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Mental Avançado: Germinal, Taylorismo e Fordismo</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 py-10 px-4 sm:px-6 lg:px-8">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Cabeçalho Central -->
+        <div class="text-center mb-16 relative">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Mapa Mental: Administração</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto font-medium">
+                Da brutalidade da Primeira Revolução Industrial (Germinal) à sistematização do trabalho na Segunda Revolução Industrial (Taylor e Ford).
+            </p>
+            <div class="mt-8 inline-flex items-center justify-center bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl text-xl font-bold gap-3 z-10 relative border-4 border-slate-200">
+                <i data-lucide="brain-circuit" class="w-8 h-8"></i>
+                Germinal × Taylorismo × Fordismo
+            </div>
+            <!-- Linha decorativa descendo do título -->
+            <div class="absolute left-1/2 -bottom-16 w-1 h-16 bg-slate-300 -translate-x-1/2 hidden md:block"></div>
+        </div>
+
+        <!-- Grelha de 8 Tópicos (Estilo Infográfico Moderno) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+
+            <!-- 01. Contexto Histórico -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-red-500 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">01</div>
+                <div class="text-red-500 mb-3"><i data-lucide="factory" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Contexto Histórico</h3>
+                <span class="text-xs font-bold text-red-500 uppercase tracking-widest block mb-3">O Cenário de Germinal</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Século XIX (França):</strong> Capitalismo selvagem nas minas de carvão.</li>
+                    <li>• <strong>Trabalho Empírico:</strong> Não havia planejamento científico. A gestão era feita na base da tentativa, erro e força bruta.</li>
+                    <li>• <strong>Luta de Classes:</strong> Evidencia o abismo entre a burguesia dona dos meios de produção e o proletariado miserável.</li>
+                </ul>
+            </div>
+
+            <!-- 02. Gestão por Coerção -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-orange-500 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">02</div>
+                <div class="text-orange-500 mb-3"><i data-lucide="shield-alert" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Gestão Primitiva</h3>
+                <span class="text-xs font-bold text-orange-500 uppercase tracking-widest block mb-3">Ausência de Teoria</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Pagamento por Peça:</strong> No filme, recebiam por vagoneta de carvão, forçando-os a ignorar a segurança (escoramento) para produzir mais.</li>
+                    <li>• <strong>Controle pelo Medo:</strong> O controle gerencial era puramente focado em punições, multas e coerção física/moral.</li>
+                    <li>• <strong>Surgimento dos Sindicatos:</strong> A resposta à exploração extrema foi a greve e a união dos trabalhadores.</li>
+                </ul>
+            </div>
+
+            <!-- 03. Taylorismo: Princípios -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-blue-500 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">03</div>
+                <div class="text-blue-500 mb-3"><i data-lucide="microscope" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Taylorismo</h3>
+                <span class="text-xs font-bold text-blue-500 uppercase tracking-widest block mb-3">A Ciência no Trabalho</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Fim do Achismo:</strong> Frederick Taylor substitui a improvisação (visto em Germinal) pela <strong>Administração Científica</strong>.</li>
+                    <li>• <strong>Estudo de Tempos e Movimentos:</strong> Cronometrar cada ação para encontrar a maneira mais eficiente (<i>The One Best Way</i>).</li>
+                    <li>• <strong>Combate ao Desperdício:</strong> Foco em eliminar movimentos inúteis para maximizar a produtividade individual.</li>
+                </ul>
+            </div>
+
+            <!-- 04. Taylorismo: O Trabalhador -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-cyan-500 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">04</div>
+                <div class="text-cyan-500 mb-3"><i data-lucide="user-cog" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Separação de Tarefas</h3>
+                <span class="text-xs font-bold text-cyan-500 uppercase tracking-widest block mb-3">Pensar vs. Executar</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Divisão do Trabalho:</strong> A gerência pensa, planeja e controla. O operário apenas executa tarefas simples.</li>
+                    <li>• <strong>Homo Economicus:</strong> Visão de que o homem é motivado apenas por recompensas salariais e materiais.</li>
+                    <li>• <strong>Seleção Científica:</strong> Treinar e alocar o trabalhador na função onde ele é mais apto fisicamente.</li>
+                </ul>
+            </div>
+
+            <!-- 05. Fordismo: Inovação -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-emerald-500 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">05</div>
+                <div class="text-emerald-500 mb-3"><i data-lucide="settings-2" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Fordismo</h3>
+                <span class="text-xs font-bold text-emerald-500 uppercase tracking-widest block mb-3">A Linha de Montagem</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Esteira Rolante:</strong> Henry Ford muda o paradigma: em vez do homem ir até a peça, <strong>a peça vai até o homem</strong>.</li>
+                    <li>• <strong>Ritmo Mecânico:</strong> O tempo do trabalho deixa de ser do operário e passa a ser ditado pela velocidade da máquina.</li>
+                    <li>• <strong>Integração Vertical:</strong> Controle de todas as fases de produção, desde a extração da matéria-prima até a venda.</li>
+                </ul>
+            </div>
+
+            <!-- 06. Fordismo: Economia -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-green-600 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">06</div>
+                <div class="text-green-600 mb-3"><i data-lucide="shopping-cart" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Produção em Massa</h3>
+                <span class="text-xs font-bold text-green-600 uppercase tracking-widest block mb-3">Consumo em Massa</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Padronização:</strong> Produtos exatamente iguais (Ex: Ford Modelo T preto) reduzem drasticamente os custos.</li>
+                    <li>• <strong>Salários Altos:</strong> Ford pagava US$ 5/dia (alto para a época) para que os próprios operários pudessem comprar os carros.</li>
+                    <li>• <strong>Ganhos de Escala:</strong> Produzir muito, rápido e barato para atingir o maior número de consumidores.</li>
+                </ul>
+            </div>
+
+            <!-- 07. A Evolução da Exploração -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-purple-500 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">07</div>
+                <div class="text-purple-500 mb-3"><i data-lucide="activity" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Da Força à Máquina</h3>
+                <span class="text-xs font-bold text-purple-500 uppercase tracking-widest block mb-3">Comparativo Crítico</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>No Filme (Germinal):</strong> O operário era destruído pelo esforço físico brutal e falta de segurança.</li>
+                    <li>• <strong>No Taylorismo:</strong> O esforço físico inútil é eliminado, mas o operário vira uma "peça da engrenagem".</li>
+                    <li>• <strong>No Fordismo:</strong> As condições materiais melhoram, mas o trabalho atinge o pico da monotonia e estresse psicológico.</li>
+                </ul>
+            </div>
+
+            <!-- 08. Consequência Principal -->
+            <div class="bg-white rounded-2xl p-6 border-t-8 border-indigo-600 card-hover relative shadow-md">
+                <div class="absolute -top-5 right-6 w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">08</div>
+                <div class="text-indigo-600 mb-3"><i data-lucide="unlink" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">A Alienação</h3>
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest block mb-3">O Fio Condutor</span>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li>• <strong>Perda de Identidade:</strong> Em nenhum dos 3 cenários o trabalhador é dono do que produz.</li>
+                    <li>• <strong>Fragmentação:</strong> Com a divisão de tarefas (Taylor/Ford), o operário aperta um parafuso o dia todo sem saber como é o produto final.</li>
+                    <li>• <strong>Conclusão:</strong> A administração evoluiu tecnicamente, mas a relação de subordinação e alienação do trabalhador apenas mudou de formato.</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Inicializar Ícones -->
+     <script src="footer.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Matemática · SiteParaEstudar</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --accent3: #6dfabc;
+            --accent4: #fadc6d;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.4);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(124,109,250,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,109,250,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+            mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%);
+        }
+
+        .glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatGlow 15s infinite alternate ease-in-out;
+        }
+        .glow-1 { background: var(--accent); top: -150px; left: -150px; animation-delay: 0s; }
+        .glow-2 { background: var(--accent3); bottom: -150px; right: -150px; animation-delay: -5s; }
+        .glow-3 { background: var(--accent2); top: 40%; left: 50%; width: 400px; height: 400px; opacity: 0.08; animation-delay: -10s; }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(20px, -20px) scale(1.08); }
+        }
+
+        /* ========== HAMBURGER MENU ========== */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            background: rgba(21, 21, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hamburger-btn:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(124,109,250,0.2);
+        }
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* SIDEBAR OVERLAY */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(21, 21, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            z-index: 260;
+            transform: translateX(-100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #fff;
+        }
+        .sidebar-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar-link:hover {
+            background: rgba(124,109,250,0.1);
+            color: var(--text);
+        }
+        .sidebar-link.active {
+            background: rgba(124,109,250,0.15);
+            border: 1px solid rgba(124,109,250,0.3);
+            color: #fff;
+        }
+        .sidebar-link .icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ========== HOME PAGE ========== */
+        .home-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-logo {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(124,109,250,0.3);
+            animation: pulse 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(124,109,250,0.3); }
+            50% { box-shadow: 0 0 70px rgba(124,109,250,0.5); }
+        }
+
+        .home-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(38px, 7vw, 64px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent) 50%, var(--accent3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 4px 20px rgba(124,109,250,0.2));
+        }
+
+        .home-subtitle {
+            color: var(--muted);
+            font-size: 17px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            margin-bottom: 50px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 50px;
+        }
+
+        .math-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            text-align: left;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .math-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .math-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: var(--accent);
+        }
+
+        .math-card-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .math-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .math-card p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .math-card-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .math-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 15px;
+            border: 1px solid;
+            font-weight: 600;
+        }
+
+        .back-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 30px;
+            transition: color var(--transition);
+        }
+        .back-home-btn:hover { color: var(--accent); }
+
+        @media (max-width: 600px) {
+            .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; z-index: 200; }
+            .home-title { font-size: 32px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .math-card { padding: 22px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ========== HOME PAGE ========== -->
+<div class="home-page">
+    <a href="index.html" class="back-home-btn">← Voltar ao Início</a>
+    <div class="home-logo">∑</div>
+    <h1 class="home-title">Fundamentos Matemáticos</h1>
+    <p class="home-subtitle">Explore os conteúdos de matemática discreta com provas interativas, exercícios por tema e gabaritos comentados.</p>
+
+   <div class="cards-grid">
+    <!-- Card: Prova Completa -->
+    <a href="matematica.html" class="math-card" style="--card-accent: #7c6dfa;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #5a4fd6);">📋</div>
+        <h3>Prova Completa</h3>
+        <p>24 questões abrangendo todos os temas: Conjuntos, Relações, Funções e Combinatória. Com dicas e gabaritos.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">24 questões</span>
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Gabaritos</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dicas</span>
+        </div>
+    </a>
+
+    <!-- Card: Prova Avaliativa 1 -->
+    <a href="prova1Avaliativa.html" class="math-card" style="--card-accent: #6dfabc;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #6dfabc, #3dd68c);">📋</div>
+        <h3>Prova Avaliativa 1</h3>
+        <p>7 questões de múltipla escolha: Conjuntos, Relações, Funções e Combinatória. Com verificação automática e gabaritos detalhados.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">7 questões</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Gabaritos</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Conjuntos -->
+    <a href="ListaConjuntos.html" class="math-card" style="--card-accent: #7c6dfa;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #a89fff);">∩</div>
+        <h3>Lista de Conjuntos</h3>
+        <p>21 exercícios de múltipla escolha sobre pertinência, subconjuntos, operações e conjunto das partes.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">21 questões</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Relações -->
+    <a href="exercicios-relacoes.html" class="math-card" style="--card-accent: #ff9db5;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #fa6d8a, #ff9db5);">↔</div>
+        <h3>Lista de Relações</h3>
+        <p>11 exercícios focados em propriedades (reflexiva, simétrica, transitiva), classificação e partições.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">11 questões</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Ordem parcial</span>
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Equivalência</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Funções -->
+    <a href="exercicios-funcoes.html" class="math-card" style="--card-accent: #6dfabc;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #6dfabc, #3dd68c);">f(x)</div>
+        <h3>Lista de Funções</h3>
+        <p>10 exercícios sobre classificação (injetora, sobrejetora, bijetora), composição e inversa.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">10 questões</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Múltipla escolha</span>
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Composição</span>
+        </div>
+    </a>
+
+    <!-- Card: Lista de Combinatória -->
+    <a href="exercicios-combinatoria.html" class="math-card" style="--card-accent: #fadc6d;">
+        <div class="math-card-icon" style="background: linear-gradient(135deg, #fadc6d, #e6b800);">C(n,k)</div>
+        <h3>Lista de Combinatória</h3>
+        <p>15 exercícios sobre princípio multiplicativo, permutações, combinações e princípio da inclusão-exclusão.</p>
+        <div class="math-card-tags">
+            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">15 questões</span>
+            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">P. Gavetas</span>
+            <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Inclusão-Exclusão</span>
+        </div>
+    </a>
+</div>
+
+<script src="footer.js"></script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>
