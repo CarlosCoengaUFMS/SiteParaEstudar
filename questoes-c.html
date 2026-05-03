@@ -87,7 +87,6 @@
         .code-section { display: grid; grid-template-columns: 1fr 320px; gap: 18px; margin-bottom: 10px; }
         @media (max-width: 1000px) { .code-section { grid-template-columns: 1fr; } }
 
-        /* ========== EDITOR ========== */
         .code-editor-wrapper {
             background: #1E1E1E; border: 1px solid #3C3C3C;
             border-radius: 10px; overflow: hidden;
@@ -149,7 +148,6 @@
             -webkit-text-fill-color: transparent !important;
         }
 
-        /* Cores */
         .code-highlight .preprocessor { color: #C586C0; }
         .code-highlight .header-file { color: #CE9178; }
         .code-highlight .keyword { color: #569CD6; font-weight: 600; }
@@ -161,7 +159,6 @@
         .code-highlight .comment { color: #6A9955; font-style: italic; }
         .code-highlight .brace { color: #FFD700; }
 
-        /* Expandir */
         .btn-expand {
             background: transparent; border: 1px solid #555;
             color: #CCCCCC; cursor: pointer;
@@ -172,7 +169,6 @@
         }
         .btn-expand:hover { background: #3C3C3C; border-color: #888; color: #fff; }
 
-        /* Overlay escuro */
         .code-overlay {
             display: none;
             position: fixed;
@@ -181,11 +177,8 @@
             z-index: 9998;
             cursor: pointer;
         }
-        .code-overlay.show {
-            display: block;
-        }
+        .code-overlay.show { display: block; }
 
-        /* Expansão do editor */
         .code-editor-wrapper.expanded {
             position: fixed;
             top: 20px;
@@ -223,13 +216,28 @@
         .btn-submit:disabled { background: #555; cursor: not-allowed; transform: none; }
         .btn-hint { background: transparent; border: 2px solid var(--border); color: var(--muted); font-size: 14px; }
         .btn-hint:hover { border-color: var(--warning); color: var(--warning); }
+        .btn-reset { background: transparent; border: 2px solid #e74c3c; color: #e74c3c; font-size: 14px; }
+        .btn-reset:hover { background: rgba(231,76,60,0.1); }
 
         .result-box { display: none; padding: 16px; border-radius: 12px; margin-top: 15px; font-size: 15px; line-height: 1.7; }
         .result-box.show { display: block; }
         .result-box.success { background: rgba(46,204,113,0.1); border: 2px solid rgba(46,204,113,0.3); color: var(--correct); }
         .result-box.fail { background: rgba(231,76,60,0.1); border: 2px solid rgba(231,76,60,0.3); color: #ff8080; }
 
-        .score-bar { background: rgba(13,13,15,0.92); backdrop-filter: blur(12px); border: 1px solid var(--border); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px; font-size: 15px; margin-bottom: 12px; }
+        .score-bar { 
+            background: rgba(13,13,15,0.92); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--border); 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
         .spinner { display: none; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         .spinner.show { display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -306,6 +314,22 @@
             font-family: 'Space Mono', monospace;
         }
 
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
         @media (max-width: 600px) {
             body { padding: 10px; }
             .code-highlight, .code-textarea, .line-numbers { font-size: 13px; padding: 14px; }
@@ -320,10 +344,15 @@
 <div class="container">
     <h1>📝 Questões de Programação em C</h1>
     
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+    </div>
+
     <div class="score-bar">
-        <span style="font-weight:700;">✅ <span id="correct-count">0</span> / <span id="total-quest">5</span></span>
+        <span style="font-weight:700;">✅ <span id="correct-count">0</span> / <span id="total-quest">15</span></span>
         <span style="font-weight:700;">⭐ <span id="total-score">0</span> pontos</span>
         <span style="color: var(--accent2); font-weight: 700;">🟢 GCC Online</span>
+        <button class="btn-hint" onclick="resetProgress()" style="font-size: 13px; padding: 6px 14px;">🔄 Resetar Progresso</button>
     </div>
     
     <div class="quest-nav" id="quest-nav"></div>
@@ -336,7 +365,7 @@ const QUESTOES = [
         id: 1, titulo: "Soma de Dois Números", pontos: 10,
         enunciado: `<p>Escreva um programa que <strong>leia dois números</strong> e <strong>imprima a soma</strong>.</p>`,
         exemplo: `📥 Entrada:  5 8\n📤 Saída:    13`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
         testCases: [{input:"5 8",expected:"13"},{input:"-3 10",expected:"7"},{input:"0 0",expected:"0"}],
         dica: "Use <code>printf(\"%d\", a + b);</code>"
     },
@@ -344,15 +373,15 @@ const QUESTOES = [
         id: 2, titulo: "Maior de Três", pontos: 15,
         enunciado: `<p>Leia <strong>três números</strong> e imprima o <strong>maior</strong>.</p>`,
         exemplo: `📥 5 8 3\n📤 8`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
         testCases: [{input:"5 8 3",expected:"8"},{input:"10 10 5",expected:"10"},{input:"-1 -5 -3",expected:"-1"}],
         dica: "<code>if</code> para comparar. Use variável <code>maior</code>."
     },
     {
         id: 3, titulo: "Tabuada", pontos: 15,
         enunciado: `<p>Leia um número e imprima a <strong>tabuada</strong> (1 a 10).</p>`,
-        exemplo: `📥 7\n📤 7 x 1 = 7\n...\n7 x 10 = 70`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
+        exemplo: `📥 7\n📤 7 x 1 = 7\n7 x 2 = 14\n...\n7 x 10 = 70`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
         testCases: [{input:"7",expected:"7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70"}],
         dica: "<code>for(i=1;i<=10;i++)</code>"
     },
@@ -360,7 +389,7 @@ const QUESTOES = [
         id: 4, titulo: "Fatorial", pontos: 20,
         enunciado: `<p>Leia um número e calcule o <strong>fatorial</strong>.</p>`,
         exemplo: `📥 5\n📤 120`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
         testCases: [{input:"5",expected:"120"},{input:"0",expected:"1"}],
         dica: "<code>long long</code> para números grandes."
     },
@@ -368,12 +397,134 @@ const QUESTOES = [
         id: 5, titulo: "Pares e Ímpares", pontos: 20,
         enunciado: `<p>Leia <strong>5 números</strong> e imprima quantos são pares e ímpares.</p>`,
         exemplo: `📥 2 4 7 9 10\n📤 Pares: 3\nImpares: 2`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
         testCases: [{input:"2 4 7 9 10",expected:"Pares: 3\nImpares: 2"},{input:"1 3 5 7 9",expected:"Pares: 0\nImpares: 5"}],
         dica: "<code>num % 2 == 0</code> verifica se é par."
+    },
+    {
+        id: 6, titulo: "Média Aritmética", pontos: 15,
+        enunciado: `<p>Leia <strong>4 notas</strong> e calcule a <strong>média aritmética</strong>.</p>`,
+        exemplo: `📥 7.5 8.0 6.5 9.0\n📤 Media: 7.75`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"7.5 8.0 6.5 9.0",expected:"Media: 7.75"},{input:"10 10 10 10",expected:"Media: 10.00"}],
+        dica: "Use <code>float</code> e <code>%.2f</code> para formatar."
+    },
+    {
+        id: 7, titulo: "Conversor Celsius-Fahrenheit", pontos: 20,
+        enunciado: `<p>Leia uma temperatura em <strong>Celsius</strong> e converta para <strong>Fahrenheit</strong>.</p><p>Fórmula: F = (C × 9/5) + 32</p>`,
+        exemplo: `📥 0\n📤 32.0`,
+       codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"0",expected:"32.0"},{input:"100",expected:"212.0"}],
+        dica: "Use <code>float</code> para temperatura."
+    },
+    {
+        id: 8, titulo: "Números Primos", pontos: 25,
+        enunciado: `<p>Leia um número e verifique se é <strong>primo</strong>.</p>`,
+        exemplo: `📥 7\n📤 Primo\n📥 10\n📤 Nao primo`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"7",expected:"Primo"},{input:"10",expected:"Nao primo"},{input:"2",expected:"Primo"}],
+        dica: "Verifique divisores de 2 até √n."
+    },
+    {
+        id: 9, titulo: "Soma de 1 a N", pontos: 15,
+        enunciado: `<p>Leia N e calcule a <strong>soma de 1 até N</strong>.</p>`,
+        exemplo: `📥 5\n📤 15`,
+       codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"5",expected:"15"},{input:"100",expected:"5050"}],
+        dica: "Use <code>for</code> ou fórmula: n*(n+1)/2."
+    },
+    {
+        id: 10, titulo: "Inverter Número", pontos: 25,
+        enunciado: `<p>Leia um número inteiro e <strong>inverta seus dígitos</strong>.</p>`,
+        exemplo: `📥 1234\n📤 4321`,
+       codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"1234",expected:"4321"},{input:"100",expected:"1"}],
+        dica: "Use <code>while</code> com <code>% 10</code> e <code>/ 10</code>."
+    },
+    {
+        id: 11, titulo: "Calculadora Simples", pontos: 20,
+        enunciado: `<p>Leia dois números e um operador (+, -, *, /) e imprima o <strong>resultado</strong>.</p>`,
+        exemplo: `📥 10 + 5\n📤 15`,
+       codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"10 + 5",expected:"15"},{input:"20 / 4",expected:"5"}],
+        dica: "Use <code>switch</code> para o operador."
+    },
+    {
+        id: 12, titulo: "Fibonacci", pontos: 25,
+        enunciado: `<p>Leia N e imprima os <strong>primeiros N termos</strong> da sequência de Fibonacci.</p>`,
+        exemplo: `📥 5\n📤 0 1 1 2 3`,
+      codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"5",expected:"0 1 1 2 3"},{input:"7",expected:"0 1 1 2 3 5 8"}],
+        dica: "Comece com a=0, b=1 e atualize."
+    },
+    {
+        id: 13, titulo: "Contar Dígitos", pontos: 20,
+        enunciado: `<p>Leia um número e <strong>conte quantos dígitos</strong> ele tem.</p>`,
+        exemplo: `📥 12345\n📤 5 digitos`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"12345",expected:"5 digitos"},{input:"0",expected:"1 digitos"}],
+        dica: "Divida por 10 até chegar a 0."
+    },
+    {
+        id: 14, titulo: "Palíndromo", pontos: 30,
+        enunciado: `<p>Leia um número e verifique se é <strong>palíndromo</strong> (igual de trás pra frente).</p>`,
+        exemplo: `📥 1221\n📤 Palindromo\n📥 123\n📤 Nao palindromo`,
+      codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"1221",expected:"Palindromo"},{input:"123",expected:"Nao palindromo"}],
+        dica: "Inverta o número e compare com o original."
+    },
+    {
+        id: 15, titulo: "MDC (Euclides)", pontos: 30,
+        enunciado: `<p>Leia dois números e calcule o <strong>MDC</strong> usando o algoritmo de Euclides.</p>`,
+        exemplo: `📥 48 18\n📤 MDC: 6`,
+       codeTemplate: `#include <stdio.h>\n\nint main() {\n}`,
+        testCases: [{input:"48 18",expected:"MDC: 6"},{input:"100 25",expected:"MDC: 25"}],
+        dica: "Enquanto b != 0: temp = b; b = a % b; a = temp;"
     }
 ];
 
+// ========== LOCALSTORAGE ==========
+const STORAGE_KEY = 'questoes_c_progress';
+
+function loadProgress() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch(e) {
+        return {};
+    }
+}
+
+function saveProgress(questionId, result, score) {
+    try {
+        const progress = loadProgress();
+        progress[questionId] = {
+            result: result,
+            score: score,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    } catch(e) {
+        console.warn('Não foi possível salvar no localStorage:', e);
+    }
+}
+
+function resetProgress() {
+    if (confirm('Tem certeza que deseja resetar TODO o progresso? Esta ação não pode ser desfeita.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        questResults = {};
+        totalScore = 0;
+        correctCount = 0;
+        document.getElementById('total-score').textContent = '0';
+        document.getElementById('correct-count').textContent = '0';
+        document.getElementById('progress-bar').style.width = '0%';
+        renderNav();
+        goToQuest(0);
+        alert('✅ Progresso resetado com sucesso!');
+    }
+}
+
+// ========== FUNÇÕES ==========
 function highlightC(code) {
     return code
         .replace(/^(#include)\s+(<.*?>)/gm, '<span class="preprocessor">$1</span> <span class="header-file">$2</span>')
@@ -393,7 +544,6 @@ function syncHighlight() {
     const lineNumbers = document.getElementById('line-numbers');
     
     if (ta && hl) {
-        // Sanitiza o código para evitar injeção HTML
         const sanitized = ta.value
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -401,7 +551,6 @@ function syncHighlight() {
         
         hl.innerHTML = highlightC(sanitized);
         
-        // Atualizar números de linha
         if (lineNumbers) {
             const lines = ta.value.split('\n');
             const lineCount = lines.length || 1;
@@ -429,29 +578,64 @@ function syncScroll() {
     }
 }
 
-let currentQuest = 0, questResults = {}, totalScore = 0, correctCount = 0;
+// Estado global
+let questResults = {};
+let totalScore = 0;
+let correctCount = 0;
+let currentQuest = 0;
 
 function init() {
+    // Carregar progresso salvo
+    const savedProgress = loadProgress();
+    questResults = {};
+    totalScore = 0;
+    correctCount = 0;
+    
+    for (const [id, data] of Object.entries(savedProgress)) {
+        if (data.result === 'correct') {
+            questResults[id] = 'correct';
+            totalScore += data.score || 0;
+            correctCount++;
+        } else {
+            questResults[id] = 'wrong';
+        }
+    }
+    
     document.getElementById('total-quest').textContent = QUESTOES.length;
-    renderNav(); renderQuest(0);
+    document.getElementById('correct-count').textContent = correctCount;
+    document.getElementById('total-score').textContent = totalScore;
+    
+    // Atualizar barra de progresso
+    const progressPercent = (correctCount / QUESTOES.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+    
+    renderNav();
+    renderQuest(0);
 }
 
 function renderNav() {
-    document.getElementById('quest-nav').innerHTML = QUESTOES.map((q,i) => {
-        let c = ''; if(i===currentQuest)c='active';
-        else if(questResults[q.id]==='correct')c='correct';
-        else if(questResults[q.id]==='wrong')c='wrong';
-        return `<button class="${c}" onclick="goToQuest(${i})">${q.id}</button>`;
+    document.getElementById('quest-nav').innerHTML = QUESTOES.map((q, i) => {
+        let c = '';
+        if (i === currentQuest) c = 'active';
+        else if (questResults[q.id] === 'correct') c = 'correct';
+        else if (questResults[q.id] === 'wrong') c = 'wrong';
+        return `<button class="${c}" onclick="goToQuest(${i})" title="Questão ${q.id}">${q.id}</button>`;
     }).join('');
 }
 
-function goToQuest(i) { currentQuest=i; renderNav(); renderQuest(i); }
+function goToQuest(i) {
+    currentQuest = i;
+    renderNav();
+    renderQuest(i);
+}
 
 function renderQuest(i) {
     const q = QUESTOES[i];
+    const isCompleted = questResults[q.id] === 'correct';
+    
     document.getElementById('quest-card').innerHTML = `
         <div class="quest-header">
-            <span class="quest-number">Questão ${q.id}</span>
+            <span class="quest-number">Questão ${q.id} ${isCompleted ? '✅' : ''}</span>
             <span class="quest-points">⭐ ${q.pontos} pontos</span>
         </div>
         <div class="quest-title">${q.titulo}</div>
@@ -476,96 +660,231 @@ function renderQuest(i) {
             </div>
             <div class="test-panel">
                 <h3>🧪 Testes (${q.testCases.length})</h3>
-                ${q.testCases.map((t,i)=>`<div class="test-case"><div class="label">Teste ${i+1}</div><div class="value">📥 ${t.input}</div><div class="value">📤 ${t.expected}</div></div>`).join('')}
+                ${q.testCases.map((t, i) => `<div class="test-case"><div class="label">Teste ${i+1}</div><div class="value">📥 ${t.input}</div><div class="value">📤 ${t.expected}</div></div>`).join('')}
             </div>
         </div>
         <div style="text-align:center;margin-top:20px;">
-            <button class="btn btn-submit" id="submit-btn" onclick="submitCode(${q.id})">✅ Enviar e Validar</button>
-            <span class="spinner" id="spinner"></span>
-            <button class="btn btn-hint" onclick="showHint(${q.id})">💡 Dica</button>
+            ${!isCompleted ? `
+                <button class="btn btn-submit" id="submit-btn" onclick="submitCode(${q.id})">✅ Enviar e Validar</button>
+                <span class="spinner" id="spinner"></span>
+                <button class="btn btn-hint" onclick="showHint(${q.id})">💡 Dica</button>
+            ` : `
+                <p style="color: var(--correct); font-weight: 700; font-size: 18px;">✅ Questão já resolvida! +${q.pontos} pontos</p>
+                <button class="btn btn-reset" onclick="retryQuest(${q.id})" style="margin-top: 10px;">🔄 Tentar Novamente</button>
+            `}
         </div>
         <div class="result-box" id="result-box-${q.id}"></div>
         <div class="hint-box" id="hint-box-${q.id}">${q.dica}</div>`;
+    
     document.getElementById('code-textarea').value = q.codeTemplate;
     syncHighlight();
 }
 
-function getCode() { const t=document.getElementById('code-textarea'); return t?t.value.trim():''; }
+function retryQuest(id) {
+    const q = QUESTOES.find(x => x.id === id);
+    if (!q) return;
+    
+    // Remove do progresso
+    delete questResults[id];
+    
+    // Atualiza localStorage
+    const progress = loadProgress();
+    delete progress[id];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    
+    // Atualiza pontuação
+    totalScore -= q.pontos;
+    correctCount--;
+    
+    document.getElementById('total-score').textContent = totalScore;
+    document.getElementById('correct-count').textContent = correctCount;
+    
+    const progressPercent = (correctCount / QUESTOES.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+    
+    renderNav();
+    renderQuest(QUESTOES.indexOf(q));
+}
+
+function getCode() {
+    const t = document.getElementById('code-textarea');
+    return t ? t.value.trim() : '';
+}
 
 async function submitCode(id) {
-    const code=getCode(), q=QUESTOES.find(x=>x.id===id);
-    const rb=document.getElementById(`result-box-${id}`), btn=document.getElementById('submit-btn'), sp=document.getElementById('spinner');
-    if(!code){rb.className='result-box fail show';rb.innerHTML='<h3>❌ Erro</h3>Digite seu código!';return;}
-    btn.disabled=true; sp.classList.add('show'); rb.className='result-box show'; rb.innerHTML='<h3>🔄 Compilando...</h3>';
-    let ok=true, results=[];
-    for(let i=0;i<q.testCases.length;i++){
-        const tc=q.testCases[i];
-        try{
-            const r=await fetch('https://siteparaestudar-production.up.railway.app/compilar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,input:tc.input})});
-            if(!r.ok)throw new Error('Erro servidor');
-            const d=await r.json(), exp=tc.expected.trim(), got=(d.output||'').trim(), pass=got===exp&&!d.error;
-            results.push({test:i+1,input:tc.input,expected:exp,got,error:d.error||'',passed:pass});
-            if(!pass)ok=false;
-        }catch(e){results.push({test:i+1,input:tc.input,expected:tc.expected,got:'ERRO',error:e.message,passed:false});ok=false;}
+    const code = getCode();
+    const q = QUESTOES.find(x => x.id === id);
+    const rb = document.getElementById(`result-box-${id}`);
+    const btn = document.getElementById('submit-btn');
+    const sp = document.getElementById('spinner');
+    
+    if (!code) {
+        rb.className = 'result-box fail show';
+        rb.innerHTML = '<h3>❌ Erro</h3>Digite seu código!';
+        return;
     }
-    let h=ok?`<h3>🎉 Todos passaram! +${q.pontos} pts</h3>`:'<h3>❌ Falhou</h3>';
-    results.forEach(r=>{h+=`<div style="margin:10px 0;padding:12px;background:rgba(0,0,0,0.3);border-radius:10px;"><strong>${r.passed?'✅':'❌'} Teste ${r.test}:</strong> 📥 <code>${r.input}</code> → 📤 Esperado: <code style="color:#6dfabc;">${r.expected}</code> | Obtido: <code style="color:${r.passed?'#6dfabc':'#e74c3c'};">${r.got||'(vazio)'}</code>${r.error?`<br>⚠️ ${r.error}`:''}</div>`;});
-    rb.className=`result-box show ${ok?'success':'fail'}`; rb.innerHTML=h;
-    if(ok){questResults[id]='correct';totalScore+=q.pontos;correctCount++;}else{questResults[id]='wrong';}
-    document.getElementById('total-score').textContent=totalScore;
-    document.getElementById('correct-count').textContent=correctCount; renderNav();
-    if(ok&&currentQuest<QUESTOES.length-1)setTimeout(()=>{if(confirm('🎉 Próxima?'))goToQuest(currentQuest+1);},1000);
-    btn.disabled=false; sp.classList.remove('show');
+    
+    btn.disabled = true;
+    sp.classList.add('show');
+    rb.className = 'result-box show';
+    rb.innerHTML = '<h3>🔄 Compilando...</h3>';
+    
+    let ok = true;
+    let results = [];
+    
+    for (let i = 0; i < q.testCases.length; i++) {
+        const tc = q.testCases[i];
+        try {
+            const r = await fetch('https://siteparaestudar-production.up.railway.app/compilar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({code, input: tc.input})
+            });
+            
+            if (!r.ok) throw new Error('Erro servidor');
+            
+            const d = await r.json();
+            const exp = tc.expected.trim();
+            const got = (d.output || '').trim();
+            const pass = got === exp && !d.error;
+            
+            results.push({
+                test: i + 1,
+                input: tc.input,
+                expected: exp,
+                got,
+                error: d.error || '',
+                passed: pass
+            });
+            
+            if (!pass) ok = false;
+        } catch(e) {
+            results.push({
+                test: i + 1,
+                input: tc.input,
+                expected: tc.expected,
+                got: 'ERRO',
+                error: e.message,
+                passed: false
+            });
+            ok = false;
+        }
+    }
+    
+    let h = ok ? `<h3>🎉 Todos passaram! +${q.pontos} pts</h3>` : '<h3>❌ Falhou</h3>';
+    results.forEach(r => {
+        h += `<div style="margin:10px 0;padding:12px;background:rgba(0,0,0,0.3);border-radius:10px;">
+            <strong>${r.passed ? '✅' : '❌'} Teste ${r.test}:</strong> 
+            📥 <code>${r.input}</code> → 
+            📤 Esperado: <code style="color:#6dfabc;">${r.expected}</code> | 
+            Obtido: <code style="color:${r.passed ? '#6dfabc' : '#e74c3c'};">${r.got || '(vazio)'}</code>
+            ${r.error ? `<br>⚠️ ${r.error}` : ''}
+        </div>`;
+    });
+    
+    rb.className = `result-box show ${ok ? 'success' : 'fail'}`;
+    rb.innerHTML = h;
+    
+    if (ok) {
+        questResults[id] = 'correct';
+        totalScore += q.pontos;
+        correctCount++;
+        
+        // Salvar no localStorage
+        saveProgress(id, 'correct', q.pontos);
+        
+        document.getElementById('total-score').textContent = totalScore;
+        document.getElementById('correct-count').textContent = correctCount;
+        
+        const progressPercent = (correctCount / QUESTOES.length) * 100;
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+        
+        renderNav();
+        
+        // Oferecer próxima questão
+        const nextIndex = QUESTOES.findIndex(x => x.id === id) + 1;
+        if (nextIndex < QUESTOES.length) {
+            setTimeout(() => {
+                if (confirm('🎉 Parabéns! Deseja ir para a próxima questão?')) {
+                    goToQuest(nextIndex);
+                } else {
+                    renderQuest(QUESTOES.findIndex(x => x.id === id));
+                }
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                alert('🏆 PARABÉNS! Você completou todas as questões!');
+            }, 1000);
+        }
+    } else {
+        questResults[id] = 'wrong';
+        saveProgress(id, 'wrong', 0);
+        renderNav();
+    }
+    
+    btn.disabled = false;
+    sp.classList.remove('show');
 }
 
-function showHint(id){document.getElementById(`hint-box-${id}`)?.classList.toggle('show');}
-
-function handleKeyDown(e){
-    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();submitCode(QUESTOES[currentQuest].id);}
-    if(e.key==='Tab'){e.preventDefault();const s=e.target.selectionStart;e.target.value=e.target.value.substring(0,s)+'    '+e.target.value.substring(e.target.selectionEnd);e.target.selectionStart=e.target.selectionEnd=s+4;syncHighlight();}
+function showHint(id) {
+    document.getElementById(`hint-box-${id}`)?.classList.toggle('show');
 }
 
-// ========== EXPANDIR - IGUAL AO COMPILADOR ==========
+function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        const q = QUESTOES[currentQuest];
+        if (!questResults[q.id] || questResults[q.id] !== 'correct') {
+            submitCode(q.id);
+        }
+    }
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = e.target.selectionStart;
+        e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd);
+        e.target.selectionStart = e.target.selectionEnd = s + 4;
+        syncHighlight();
+    }
+}
+
+// ========== EXPANDIR ==========
 function toggleExpand(e) {
     if (e) e.stopPropagation();
-
+    
     const wrapper = document.getElementById('code-editor-wrapper');
     const overlay = document.getElementById('code-overlay');
     const btn = document.querySelector('.btn-expand');
-
+    
     if (!wrapper || !overlay) return;
-
+    
     const isExpanded = wrapper.classList.contains('expanded');
-
+    
     if (!isExpanded) {
-        // ABRIR
         wrapper.classList.add('expanded');
         overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
         if (btn) btn.innerHTML = '⛶ Recolher';
     } else {
-        // FECHAR
         wrapper.classList.remove('expanded');
         overlay.classList.remove('show');
         document.body.style.overflow = '';
         if (btn) btn.innerHTML = '⛶ Expandir';
     }
-
+    
     setTimeout(syncHighlight, 50);
 }
 
+// Inicializar
 init();
 
-// Fechar overlay ao clicar
+// Event listeners
 document.getElementById('code-overlay').addEventListener('click', (e) => {
     const wrapper = document.getElementById('code-editor-wrapper');
-    // Só fecha se clicou EXATAMENTE no overlay
     if (e.target.id === 'code-overlay' && wrapper && wrapper.classList.contains('expanded')) {
         toggleExpand();
     }
 });
 
-// Fechar com ESC
 document.addEventListener('keydown', function(e) {
     if (e.key === "Escape") {
         const wrapper = document.getElementById('code-editor-wrapper');
@@ -575,7 +894,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Evitar propagação de clique no editor
 document.addEventListener('click', function(e) {
     const wrapper = document.getElementById('code-editor-wrapper');
     if (wrapper && wrapper.contains(e.target) && wrapper.classList.contains('expanded')) {
@@ -584,6 +902,7 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
+<script src="questoes.js"></script>
 <script src="footer.js"></script>
 <script src="sidebar.js"></script>
 

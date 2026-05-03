@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Matemática · SiteParaEstudar</title>
+    <title>Programação em C · SiteParaEstudar</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -322,6 +322,7 @@
             left: 0;
             right: 0;
             height: 3px;
+            background: var(--accent);
         }
 
         .math-card:hover {
@@ -399,39 +400,40 @@
 <!-- ========== HOME PAGE ========== -->
 <div class="home-page">
     <a href="index.html" class="back-home-btn">← Voltar ao Início</a>
-    <div class="home-logo">PC</div>
+    <div class="home-logo">💻</div>
     <h1 class="home-title">Programação em C</h1>
-    <p class="home-subtitle"></p>
+    <p class="home-subtitle">Ferramentas e exercícios para aprender e praticar Linguagem C</p>
 
-   <div class="cards-grid">
-    <!-- Card: Copilador -->
-    <a href="compilador-c.html" class="math-card" style="--card-accent: #7c6dfa;">
-        <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #5a4fd6);">📋</div>
-        <h3>Copilador C</h3>
-        <p>É um copilador online para a linguagem C.</p>
-        <div class="math-card-tags">
-            <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">24 questões</span>
-            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Gabaritos</span>
-            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dicas</span>
-        </div>
-    </a>
+    <div class="cards-grid">
+        <!-- Card: Compilador -->
+        <a href="compilador-c.html" class="math-card">
+            <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #5a4fd6);">⚙️</div>
+            <h3>Compilador Online</h3>
+            <p>Compilador online para testar e executar código em Linguagem C diretamente do navegador.</p>
+            <div class="math-card-tags">
+                <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">Compilador</span>
+                <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Online</span>
+                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Gratuito</span>
+            </div>
+        </a>
 
-     <!-- Card: questões em C -->
-    <a href="questoes-c.html" class="math-card" style="--card-accent: #7c6dfa;">
-        <div class="math-card-icon" style="background: linear-gradient(135deg, #7c6dfa, #5a4fd6);">📋</div>
-        <h3>Questões em C</h3>
-        <p>Exercicios em para fazer em Linguagem C.</p>
-        <div class="math-card-tags">
-            <span class="math-tag" style="border-color: #7c6dfa; color: #7c6dfa; background: rgba(124,109,250,0.1);">24 questões</span>
-            <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Gabaritos</span>
-            <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Dicas</span>
-        </div>
-    </a>
-
+        <!-- Card: Questões em C -->
+        <a href="questoes-c.html" class="math-card">
+            <div class="math-card-icon" style="background: linear-gradient(135deg, #fa6d8a, #e74c3c);">📋</div>
+            <h3>Questões em C</h3>
+            <p>Exercícios práticos para resolver em Linguagem C com enunciados e desafios de programação.</p>
+            <div class="math-card-tags">
+                <span class="math-tag" style="border-color: #fa6d8a; color: #fa6d8a; background: rgba(250,109,138,0.1);">Exercícios</span>
+                <span class="math-tag" style="border-color: #6dfabc; color: #6dfabc; background: rgba(109,250,188,0.1);">Prática</span>
+                <span class="math-tag" style="border-color: #fadc6d; color: #fadc6d; background: rgba(250,220,109,0.1);">Desafios</span>
+            </div>
+        </a>
+    </div>
 </div>
 
-<script src="footer.js"></script>
+<script src="questoes.js"></script>
 <script src="sidebar.js"></script>
+<script src="footer.js"></script>
 
 </body>
 </html>
