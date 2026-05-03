@@ -250,3 +250,37 @@
     console.log('⌨️  Ctrl+Enter para executar');
     console.log('💡 Cold start pode levar até 50 segundos');
 })();
+function toggleExpand(e) {
+    if (e) {
+        e.stopPropagation(); // impede fechar imediatamente
+    }
+
+    const wrapper = document.getElementById('code-editor-wrapper');
+    const overlay = document.getElementById('code-overlay');
+    const btn = document.querySelector('.btn-expand');
+
+    const isExpanded = wrapper.classList.contains('expanded');
+
+    if (!isExpanded) {
+        wrapper.classList.add('expanded');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        if (btn) btn.innerHTML = '⛶ Recolher';
+    } else {
+        wrapper.classList.remove('expanded');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        if (btn) btn.innerHTML = '⛶ Expandir';
+    }
+}
+document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('code-editor-wrapper');
+    const overlay = document.getElementById('code-overlay');
+
+    if (!wrapper.classList.contains('expanded')) return;
+
+    // Só fecha se clicar no overlay
+    if (e.target === overlay) {
+        toggleExpand();
+    }
+});

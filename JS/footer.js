@@ -135,7 +135,7 @@
                 <div class="footer-col">
                     <h4>📚 Matemática</h4>
                     <ul>
-                        <li><a href="exercicios-conjuntos.html">Teoria dos Conjuntos</a></li>
+                        <li><a href="ListaConjuntos.html">Teoria dos Conjuntos</a></li>
                         <li><a href="exercicios-relacoes.html">Relações Binárias</a></li>
                         <li><a href="exercicios-funcoes.html">Funções</a></li>
                         <li><a href="exercicios-combinatoria.html">Combinatória</a></li>
