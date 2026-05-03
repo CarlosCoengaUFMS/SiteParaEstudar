@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compilador C · SiteParaEstudar</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0d0d0f;
@@ -12,8 +13,12 @@
             --card: #1c1c24;
             --border: #2a2a38;
             --accent: #7c6dfa;
+            --accent2: #6dfabc;
+            --accent3: #fa6d8a;
             --text: #e8e8f0;
             --muted: #7878a0;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,21 +26,51 @@
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Fira Code', 'Courier New', monospace;
+            font-family: 'Inter', 'Syne', sans-serif;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
         }
         
         .compiler-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
         
         h1 {
             text-align: center;
-            color: var(--accent);
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
             margin-bottom: 30px;
-            font-size: 2em;
         }
         
         .editor-panel {
@@ -47,120 +82,155 @@
         
         @media (max-width: 768px) {
             .editor-panel { grid-template-columns: 1fr; }
+            h1 { font-size: 24px; }
         }
         
         .panel {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
         }
         
         .panel h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
             color: var(--accent);
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
         
         textarea {
             width: 100%;
-            min-height: 400px;
+            flex: 1;
             background: #0a0a0d;
             color: #e8e8f0;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 18px;
             font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.8;
             resize: vertical;
             outline: none;
             tab-size: 4;
+            transition: all 0.3s;
+            min-height: 450px;
         }
         
         textarea:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(124,109,250,0.2);
-        }
-        
-        #input-area {
-            min-height: 100px;
+            box-shadow: 0 0 20px rgba(124,109,250,0.15);
         }
         
         #output-area {
             width: 100%;
-            min-height: 200px;
+            min-height: 250px;
+            max-height: 500px;
             background: #0a0a0d;
-            color: #6dfabc;
+            color: var(--accent2);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 18px;
             font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.7;
             white-space: pre-wrap;
             overflow-y: auto;
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            letter-spacing: 0.5px;
         }
         
         .btn-run {
-            background: #2ecc71;
-            color: white;
-            font-size: 16px;
-            padding: 14px 32px;
+            background: var(--correct);
+            color: #fff;
+            font-size: 18px;
+            padding: 16px 40px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(46,204,113,0.3);
         }
-        .btn-run:hover { background: #27ae60; transform: translateY(-1px); }
-        .btn-run:disabled { background: #555; cursor: not-allowed; }
+        .btn-run:hover { 
+            background: #27ae60; 
+            transform: translateY(-2px); 
+            box-shadow: 0 12px 35px rgba(46,204,113,0.4);
+        }
+        .btn-run:disabled { 
+            background: #555; 
+            cursor: not-allowed; 
+            box-shadow: none;
+            transform: none;
+        }
         
         .btn-clear {
             background: var(--border);
             color: var(--muted);
+            font-size: 12px;
         }
-        .btn-clear:hover { background: #3a3a48; }
+        .btn-clear:hover { background: #3a3a48; color: var(--text); }
         
         .btn-example {
-            background: rgba(124,109,250,0.15);
+            background: rgba(124,109,250,0.1);
             color: var(--accent);
-            border: 1px solid rgba(124,109,250,0.3);
+            border: 1px solid rgba(124,109,250,0.25);
             font-size: 12px;
-            padding: 8px 16px;
+            padding: 8px 18px;
+            flex-shrink: 0;
         }
-        .btn-example:hover { background: rgba(124,109,250,0.25); }
+        .btn-example:hover { 
+            background: rgba(124,109,250,0.2); 
+            border-color: var(--accent);
+        }
         
         .button-group {
             display: flex;
             gap: 10px;
-            margin: 15px 0;
+            margin-top: 14px;
             flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .run-section {
+            text-align: center;
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         
         .status-bar {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 10px 0;
-            font-size: 12px;
+            margin-top: 12px;
+            font-size: 13px;
             color: var(--muted);
+            font-weight: 500;
         }
         
         .spinner {
             display: none;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border: 3px solid var(--border);
             border-top-color: var(--accent);
             border-radius: 50%;
@@ -170,9 +240,9 @@
         
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        .error { color: #e74c3c; }
-        .success { color: #2ecc71; }
-        
+        .error { color: var(--wrong) !important; font-weight: 600; }
+        .success { color: var(--correct) !important; font-weight: 600; }
+
         /* ========== SIDEBAR ========== */
         .hamburger-btn {
             position: fixed; top: 20px; left: 20px; z-index: 200;
@@ -181,13 +251,15 @@
             border: 1px solid var(--border); border-radius: 12px;
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; gap: 5px; cursor: pointer;
+            transition: all 0.3s;
         }
-        .hamburger-btn:hover { border-color: var(--accent); }
+        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(124,109,250,0.2); }
         .hamburger-line {
             width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            transition: all 0.3s;
         }
         .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
         .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
         
         .sidebar-overlay {
@@ -212,21 +284,26 @@
         }
         .sidebar-logo {
             width: 36px; height: 36px;
-            background: linear-gradient(135deg, #7c6dfa, #6dfabc);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
             border-radius: 10px; display: flex; align-items: center;
             justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
         }
-        .sidebar-title { font-weight: 700; font-size: 16px; }
+        .sidebar-title { 
+            font-family: 'Syne', sans-serif;
+            font-weight: 700; 
+            font-size: 16px; 
+        }
         
         .sidebar-nav {
             flex: 1; padding: 16px 12px; display: flex;
-            flex-direction: column; gap: 4px;
+            flex-direction: column; gap: 4px; overflow-y: auto;
         }
         .sidebar-link {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px; border-radius: 10px;
             color: var(--muted); text-decoration: none;
             font-size: 14px; transition: all 0.3s;
+            font-weight: 500;
         }
         .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
         .sidebar-link.active { background: rgba(124,109,250,0.15); color: #fff; }
@@ -238,23 +315,32 @@
         .sidebar-footer {
             padding: 16px 20px; border-top: 1px solid var(--border);
             font-size: 11px; color: var(--muted); text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .panel { padding: 16px; }
+            textarea { font-size: 13px; padding: 14px; min-height: 300px; }
+            .btn-run { font-size: 16px; padding: 14px 30px; }
         }
     </style>
 </head>
 <body>
 
-
 <div class="compiler-container">
     <h1>💻 Compilador C Online</h1>
+    <p class="subtitle">Escreva, compile e execute código C diretamente no navegador · GCC no backend</p>
     
     <div class="editor-panel">
+        <!-- COLUNA ESQUERDA: Código -->
         <div class="panel">
             <h3>📝 Código Fonte</h3>
             <textarea id="code-area" placeholder="// Digite seu código C aqui...
 #include <stdio.h>
 
 int main() {
-    printf(&quot;Hello, World!\\n&quot;);
+    printf(&quot;Hello, World!\n&quot;);
     return 0;
 }">#include <stdio.h>
 
@@ -265,21 +351,38 @@ int main() {
             
             <div class="button-group">
                 <button class="btn btn-example" onclick="loadExample('hello')">👋 Hello World</button>
-                <button class="btn btn-example" onclick="loadExample('loop')">🔄 Loop For</button>
-                <button class="btn btn-example" onclick="loadExample('array')">📊 Array</button>
-                <button class="btn btn-example" onclick="loadExample('function')">🔧 Função</button>
-                <button class="btn btn-example" onclick="loadExample('pointer')">👉 Ponteiros</button>
+                <button class="btn btn-example" onclick="loadExample('menorNumero')">🔢 Menor Número</button>
+                <button class="btn btn-example" onclick="loadExample('fatorial')">📐 Fatorial</button>
+                <button class="btn btn-example" onclick="loadExample('calculadora')">🧮 Calculadora</button>
+                <button class="btn btn-example" onclick="loadExample('tabuada')">📊 Tabuada</button>
                 <button class="btn btn-clear" onclick="clearCode()">🗑 Limpar</button>
             </div>
         </div>
         
+        <!-- COLUNA DIREITA: Entrada -->
         <div class="panel">
             <h3>📥 Entrada (stdin)</h3>
-            <textarea id="input-area" placeholder="Dados de entrada (scanf)..."></textarea>
+            <textarea id="input-area" placeholder="Digite aqui os dados de entrada para scanf()...
+Exemplo:
+45
+23
+67
+12
+89
+34
+56
+78
+90
+15
+42
+31
+68
+55
+21"></textarea>
         </div>
     </div>
     
-    <div style="text-align: center; margin: 20px 0;">
+    <div class="run-section">
         <button class="btn btn-run" id="run-btn" onclick="compileAndRun()">
             ▶ Executar Código
         </button>
@@ -287,10 +390,11 @@ int main() {
     </div>
     
     <div class="panel">
-        <h3>📤 Saída</h3>
-        <div id="output-area">// O resultado aparecerá aqui...</div>
+        <h3>📤 Saída do Programa</h3>
+        <div id="output-area">// O resultado da compilação aparecerá aqui...
+// Pressione Ctrl+Enter para executar rapidamente</div>
         <div class="status-bar">
-            <span id="status-text">Pronto para compilar</span>
+            <span id="status-text">🟢 Pronto para compilar</span>
         </div>
     </div>
 </div>
