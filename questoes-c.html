@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Questões de Programação C · SiteParaEstudar</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js para syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    
     <style>
         :root {
             --bg: #0d0d0f;
@@ -20,6 +26,13 @@
             --correct: #2ecc71;
             --wrong: #e74c3c;
             --warning: #fadc6d;
+            --keyword: #569CD6;
+            --string: #CE9178;
+            --function: #DCDCAA;
+            --number: #B5CEA8;
+            --comment: #6A9955;
+            --preprocessor: #9B9B9B;
+            --type: #4EC9B0;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,16 +44,17 @@
             min-height: 100vh;
             padding: 20px;
             line-height: 1.6;
+            font-size: 18px;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
         h1 {
             font-family: 'Syne', sans-serif;
-            font-size: 2.2em;
+            font-size: 2.8em;
             font-weight: 800;
             text-align: center;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -49,270 +63,287 @@
             margin-bottom: 30px;
         }
         
-        /* Navegação das questões */
         .quest-nav {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
             margin-bottom: 25px;
             justify-content: center;
         }
         .quest-nav button {
-            width: 40px; height: 40px;
-            border-radius: 10px;
+            width: 48px; height: 48px;
+            border-radius: 12px;
             border: 2px solid var(--border);
             background: var(--surface);
             color: var(--text);
             font-weight: 700;
-            font-size: 14px;
+            font-size: 18px;
             cursor: pointer;
             transition: all 0.3s;
         }
         .quest-nav button:hover { border-color: var(--accent); }
-        .quest-nav button.active { 
-            background: var(--accent); 
-            border-color: var(--accent);
-            color: #fff;
-        }
-        .quest-nav button.correct { 
-            background: var(--correct); 
-            border-color: var(--correct);
-            color: #fff;
-        }
-        .quest-nav button.wrong { 
-            background: var(--wrong); 
-            border-color: var(--wrong);
-            color: #fff;
-        }
+        .quest-nav button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .quest-nav button.correct { background: var(--correct); border-color: var(--correct); color: #fff; }
+        .quest-nav button.wrong { background: var(--wrong); border-color: var(--wrong); color: #fff; }
         
-        /* Card da questão */
         .quest-card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 25px;
         }
         
         .quest-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .quest-number {
             font-family: 'Syne', sans-serif;
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--accent);
         }
         .quest-points {
             background: rgba(250,220,109,0.15);
             color: var(--warning);
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 16px;
             font-weight: 600;
         }
         
         .quest-title {
-            font-size: 20px;
+            font-size: 26px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #fff;
         }
         .quest-desc {
             color: var(--muted);
-            margin-bottom: 20px;
-            line-height: 1.8;
+            margin-bottom: 25px;
+            line-height: 2;
+            font-size: 18px;
         }
         .quest-desc code {
             background: rgba(124,109,250,0.15);
             color: var(--accent);
-            padding: 2px 8px;
-            border-radius: 5px;
+            padding: 3px 10px;
+            border-radius: 6px;
             font-family: 'Fira Code', monospace;
-            font-size: 13px;
+            font-size: 16px;
         }
         .quest-example {
             background: #0a0a0d;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 25px;
         }
         .quest-example h4 {
             color: var(--accent2);
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 12px;
+            font-size: 18px;
         }
         .quest-example pre {
             font-family: 'Fira Code', monospace;
-            font-size: 13px;
+            font-size: 16px;
             color: var(--muted);
             white-space: pre-wrap;
-            line-height: 1.6;
+            line-height: 1.8;
         }
         
-        /* Área de código */
         .code-section {
             display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
             .code-section { grid-template-columns: 1fr; }
         }
         
-        .code-editor {
-            background: var(--surface);
+        /* ========== EDITOR COM SYNTAX HIGHLIGHT ========== */
+        .code-editor-wrapper {
+            position: relative;
+            background: #1E1E1E;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
         }
-        .code-header {
-            background: var(--border);
-            padding: 10px 16px;
-            font-size: 12px;
-            color: var(--muted);
+        .code-editor-header {
+            background: #2D2D2D;
+            padding: 12px 20px;
+            font-size: 13px;
+            color: #CCCCCC;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #3C3C3C;
+            font-weight: 600;
         }
-        textarea.code-area {
-            width: 100%;
-            min-height: 350px;
-            background: #0a0a0d;
-            color: #e8e8f0;
-            border: none;
-            padding: 20px;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            line-height: 1.7;
-            resize: vertical;
-            outline: none;
+        .code-editor-header .dots {
+            display: flex;
+            gap: 8px;
+        }
+        .code-editor-header .dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+        
+        .code-editor-body {
+            position: relative;
+            min-height: 450px;
+        }
+        
+        /* Camada de highlight (por cima) */
+        .code-highlight {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            padding: 22px;
+            font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+            font-size: 17px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow: auto;
+            pointer-events: none;
+            color: #D4D4D4;
+            background: transparent;
             tab-size: 4;
         }
+        
+        /* Camada de edição (por baixo) */
+        .code-textarea {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 22px;
+            font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+            font-size: 17px;
+            line-height: 1.9;
+            resize: none;
+            outline: none;
+            border: none;
+            background: transparent;
+            color: transparent;
+            caret-color: #FFFFFF;
+            tab-size: 4;
+            z-index: 2;
+            overflow: auto;
+        }
+        
+        /* Cores da sintaxe C */
+        .code-highlight .keyword { color: #569CD6; font-weight: 600; }
+        .code-highlight .preprocessor { color: #9B9B9B; }
+        .code-highlight .string { color: #CE9178; }
+        .code-highlight .comment { color: #6A9955; font-style: italic; }
+        .code-highlight .number { color: #B5CEA8; }
+        .code-highlight .type { color: #4EC9B0; }
+        .code-highlight .function { color: #DCDCAA; }
+        .code-highlight .operator { color: #D4D4D4; }
+        .code-highlight .parenthesis { color: #FFD700; }
+        .code-highlight .semicolon { color: #D4D4D4; }
+        .code-highlight .include { color: #C586C0; }
+        .code-highlight .header { color: #CE9178; }
         
         .test-panel {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 24px;
         }
         .test-panel h3 {
-            font-size: 14px;
+            font-size: 18px;
             color: var(--accent);
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            font-weight: 700;
         }
         .test-case {
             background: #0a0a0d;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            font-size: 12px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 15px;
         }
         .test-case .label {
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+            font-weight: 700;
         }
         .test-case .value {
             font-family: 'Fira Code', monospace;
-            font-size: 13px;
+            font-size: 15px;
             color: var(--text);
+            line-height: 1.6;
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-family: 'Syne', sans-serif;
-            font-size: 14px;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: 0.5px;
         }
         .btn-submit {
             background: var(--accent);
             color: #fff;
-            font-size: 16px;
-            padding: 14px 36px;
-            box-shadow: 0 6px 20px rgba(124,109,250,0.3);
+            font-size: 20px;
+            padding: 18px 44px;
+            box-shadow: 0 8px 25px rgba(124,109,250,0.3);
+            border-radius: 16px;
         }
-        .btn-submit:hover { background: #8f80ff; transform: translateY(-1px); }
+        .btn-submit:hover { background: #8f80ff; transform: translateY(-2px); }
         .btn-submit:disabled { background: #555; cursor: not-allowed; transform: none; }
         .btn-hint {
             background: transparent;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             color: var(--muted);
+            font-size: 16px;
         }
         .btn-hint:hover { border-color: var(--warning); color: var(--warning); }
         
         .result-box {
             display: none;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 15px;
-            font-size: 14px;
-            line-height: 1.7;
+            padding: 24px;
+            border-radius: 14px;
+            margin-top: 20px;
+            font-size: 17px;
+            line-height: 1.9;
         }
         .result-box.show { display: block; }
-        .result-box.success {
-            background: rgba(46,204,113,0.1);
-            border: 1px solid rgba(46,204,113,0.3);
-            color: var(--correct);
-        }
-        .result-box.fail {
-            background: rgba(231,76,60,0.1);
-            border: 1px solid rgba(231,76,60,0.3);
-            color: #ff8080;
-        }
-        .result-box pre {
-            font-family: 'Fira Code', monospace;
-            font-size: 12px;
-            margin-top: 8px;
-            white-space: pre-wrap;
-        }
+        .result-box.success { background: rgba(46,204,113,0.1); border: 2px solid rgba(46,204,113,0.3); color: var(--correct); }
+        .result-box.fail { background: rgba(231,76,60,0.1); border: 2px solid rgba(231,76,60,0.3); color: #ff8080; }
+        .result-box h3 { font-size: 22px; margin-bottom: 12px; }
         
         .score-bar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(13,13,15,0.9);
-            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,13,15,0.92); backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-radius: 12px;
-        }
-        .score-info {
-            display: flex;
-            gap: 20px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .score-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            padding: 16px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; border-radius: 14px; font-size: 17px;
         }
         
         .spinner {
-            display: none;
-            width: 20px; height: 20px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            display: none; width: 28px; height: 28px;
+            border: 4px solid var(--border); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
         }
         .spinner.show { display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -320,13 +351,10 @@
         .hint-box {
             display: none;
             background: rgba(250,220,109,0.08);
-            border: 1px solid rgba(250,220,109,0.25);
+            border: 2px solid rgba(250,220,109,0.25);
             color: var(--warning);
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-size: 13px;
-            line-height: 1.7;
+            padding: 18px 22px; border-radius: 12px;
+            margin-top: 18px; font-size: 16px; line-height: 1.9;
         }
         .hint-box.show { display: block; }
     </style>
@@ -336,21 +364,13 @@
 <div class="container">
     <h1>📝 Questões de Programação em C</h1>
     
-    <!-- Barra de Progresso -->
     <div class="score-bar">
-        <div class="score-info">
-            <div class="score-item">✅ <span id="correct-count">0</span>/<span id="total-quest">5</span></div>
-            <div class="score-item">⭐ <span id="total-score">0</span> pontos</div>
-        </div>
-        <div class="score-info">
-            <div class="score-item" style="color: var(--accent2);">🟢 GCC Online</div>
-        </div>
+        <span style="font-weight:700;">✅ <span id="correct-count">0</span> / <span id="total-quest">5</span></span>
+        <span style="font-weight:700;">⭐ <span id="total-score">0</span> pontos</span>
+        <span style="color: var(--accent2); font-weight: 700;">🟢 GCC Online</span>
     </div>
     
-    <!-- Navegação -->
     <div class="quest-nav" id="quest-nav"></div>
-    
-    <!-- Questão Atual -->
     <div class="quest-card" id="quest-card"></div>
 </div>
 
@@ -358,20 +378,16 @@
 // ========== BANCO DE QUESTÕES ==========
 const QUESTOES = [
     {
-        id: 1,
-        titulo: "Soma de Dois Números",
-        pontos: 10,
-        enunciado: `
-            <p>Escreva um programa em C que <strong>leia dois números inteiros</strong> e <strong>imprima a soma</strong> deles.</p>
-        `,
-        exemplo: `Entrada:  5 8\nSaída:    13\n\nEntrada:  -3 10\nSaída:    7`,
+        id: 1, titulo: "Soma de Dois Números", pontos: 10,
+        enunciado: `<p>Escreva um programa que <strong>leia dois números inteiros</strong> e <strong>imprima a soma</strong> deles.</p>`,
+        exemplo: `📥 Entrada:  5 8\n📤 Saída:    13\n\n📥 Entrada:  -3 10\n📤 Saída:    7`,
         codeTemplate: `#include <stdio.h>
 
 int main() {
     int a, b;
     scanf("%d %d", &a, &b);
     
-    // Seu código aqui
+    printf("%d\\n", a + b);
     
     return 0;
 }`,
@@ -384,65 +400,54 @@ int main() {
         dica: "Use <code>printf(\"%d\", a + b);</code> para imprimir a soma."
     },
     {
-        id: 2,
-        titulo: "Maior de Três Números",
-        pontos: 15,
-        enunciado: `
-            <p>Escreva um programa que <strong>leia três números inteiros</strong> e <strong>imprima o maior</strong> deles.</p>
-        `,
-        exemplo: `Entrada:  5 8 3\nSaída:    8\n\nEntrada:  10 10 5\nSaída:    10`,
+        id: 2, titulo: "Maior de Três Números", pontos: 15,
+        enunciado: `<p>Escreva um programa que <strong>leia três números</strong> e <strong>imprima o maior</strong>.</p>`,
+        exemplo: `📥 Entrada:  5 8 3\n📤 Saída:    8`,
         codeTemplate: `#include <stdio.h>
 
 int main() {
-    int a, b, c;
+    int a, b, c, maior;
     scanf("%d %d %d", &a, &b, &c);
     
-    // Seu código aqui
+    maior = a;
+    if(b > maior) maior = b;
+    if(c > maior) maior = c;
     
+    printf("%d\\n", maior);
     return 0;
 }`,
         testCases: [
             { input: "5 8 3", expected: "8" },
             { input: "10 10 5", expected: "10" },
-            { input: "-1 -5 -3", expected: "-1" },
-            { input: "7 7 7", expected: "7" }
+            { input: "-1 -5 -3", expected: "-1" }
         ],
-        dica: "Use <code>if</code> e <code>else</code> para comparar. Crie uma variável <code>maior</code>."
+        dica: "Compare com <code>if</code>. Crie uma variável <code>maior</code>."
     },
     {
-        id: 3,
-        titulo: "Tabuada",
-        pontos: 15,
-        enunciado: `
-            <p>Escreva um programa que <strong>leia um número inteiro</strong> e <strong>imprima a tabuada</strong> dele de 1 a 10.</p>
-            <p>Cada linha no formato: <code>N x i = resultado</code></p>
-        `,
-        exemplo: `Entrada:  7\nSaída:\n7 x 1 = 7\n7 x 2 = 14\n...\n7 x 10 = 70`,
+        id: 3, titulo: "Tabuada", pontos: 15,
+        enunciado: `<p>Leia um número e imprima a tabuada de 1 a 10 no formato <code>N x i = R</code>.</p>`,
+        exemplo: `📥 7\n📤 7 x 1 = 7\n...\n7 x 10 = 70`,
         codeTemplate: `#include <stdio.h>
 
 int main() {
     int n, i;
     scanf("%d", &n);
     
-    // Seu código aqui
+    for(i = 1; i <= 10; i++) {
+        printf("%d x %d = %d\\n", n, i, n * i);
+    }
     
     return 0;
 }`,
         testCases: [
-            { input: "7", expected: "7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70" },
-            { input: "3", expected: "3 x 1 = 3\n3 x 2 = 6\n3 x 3 = 9\n3 x 4 = 12\n3 x 5 = 15\n3 x 6 = 18\n3 x 7 = 21\n3 x 8 = 24\n3 x 9 = 27\n3 x 10 = 30" }
+            { input: "7", expected: "7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70" }
         ],
-        dica: "Use um loop <code>for(i = 1; i <= 10; i++)</code> e imprima no formato pedido."
+        dica: "<code>for(i=1;i<=10;i++) printf(\"%d x %d = %d\\n\", n, i, n*i);</code>"
     },
     {
-        id: 4,
-        titulo: "Fatorial",
-        pontos: 20,
-        enunciado: `
-            <p>Escreva um programa que <strong>leia um número inteiro positivo</strong> e <strong>calcule o fatorial</strong> dele.</p>
-            <p>Imprima apenas o resultado.</p>
-        `,
-        exemplo: `Entrada:  5\nSaída:    120\n\nEntrada:  0\nSaída:    1`,
+        id: 4, titulo: "Fatorial", pontos: 20,
+        enunciado: `<p>Leia um número e calcule o <strong>fatorial</strong>. Imprima só o resultado.</p>`,
+        exemplo: `📥 5\n📤 120`,
         codeTemplate: `#include <stdio.h>
 
 int main() {
@@ -450,53 +455,86 @@ int main() {
     long long fat = 1;
     scanf("%d", &n);
     
-    // Seu código aqui
+    for(i = 1; i <= n; i++) fat *= i;
     
+    printf("%lld\\n", fat);
     return 0;
 }`,
         testCases: [
             { input: "5", expected: "120" },
-            { input: "0", expected: "1" },
-            { input: "1", expected: "1" },
-            { input: "10", expected: "3628800" }
+            { input: "0", expected: "1" }
         ],
-        dica: "Use <code>for(i = 1; i <= n; i++) fat *= i;</code> e depois imprima <code>fat</code>."
+        dica: "<code>for(i=1;i<=n;i++)fat*=i;</code> Use <code>long long</code>."
     },
     {
-        id: 5,
-        titulo: "Contar Pares e Ímpares",
-        pontos: 20,
-        enunciado: `
-            <p>Escreva um programa que <strong>leia 5 números inteiros</strong> e <strong>imprima quantos são pares e quantos são ímpares</strong>.</p>
-            <p>Formato: <code>Pares: X\nImpares: Y</code></p>
-        `,
-        exemplo: `Entrada:  2 4 7 9 10\nSaída:    Pares: 3\nImpares: 2`,
+        id: 5, titulo: "Pares e Ímpares", pontos: 20,
+        enunciado: `<p>Leia <strong>5 números</strong> e imprima quantos são pares e ímpares.</p>`,
+        exemplo: `📥 2 4 7 9 10\n📤 Pares: 3\nImpares: 2`,
         codeTemplate: `#include <stdio.h>
 
 int main() {
-    int num, i;
-    int pares = 0, impares = 0;
+    int num, i, pares = 0, impares = 0;
     
-    // Seu código aqui
+    for(i = 0; i < 5; i++) {
+        scanf("%d", &num);
+        if(num % 2 == 0) pares++;
+        else impares++;
+    }
     
+    printf("Pares: %d\\nImpares: %d\\n", pares, impares);
     return 0;
 }`,
         testCases: [
             { input: "2 4 7 9 10", expected: "Pares: 3\nImpares: 2" },
-            { input: "1 3 5 7 9", expected: "Pares: 0\nImpares: 5" },
-            { input: "2 4 6 8 10", expected: "Pares: 5\nImpares: 0" }
+            { input: "1 3 5 7 9", expected: "Pares: 0\nImpares: 5" }
         ],
-        dica: "Use <code>for</code> com <code>scanf</code> dentro. Verifique com <code>if(num % 2 == 0)</code>."
+        dica: "<code>if(num%2==0)pares++;else impares++;</code>"
     }
 ];
 
+// ========== SINTAXE HIGHLIGHT ==========
+function highlightC(code) {
+    return code
+        // Preprocessor
+        .replace(/^(#include\s+)(<.*?>|".*?")/gm, '<span class="preprocessor">$1</span><span class="include">$2</span>')
+        .replace(/^(#define\s+\w+.*)/gm, '<span class="preprocessor">$1</span>')
+        // Comentários
+        .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
+        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="comment">$1</span>')
+        // Strings
+        .replace(/"([^"\\]|\\.)*"/g, '<span class="string">$&</span>')
+        // Palavras-chave
+        .replace(/\b(int|float|double|char|void|long|short|unsigned|signed|const|static|extern|volatile|register|auto|sizeof|typedef|struct|union|enum)\b/g, '<span class="type">$1</span>')
+        .replace(/\b(if|else|for|while|do|switch|case|break|continue|return|goto|default)\b/g, '<span class="keyword">$1</span>')
+        .replace(/\b(printf|scanf|puts|gets|putchar|getchar|fopen|fclose|fprintf|fscanf|malloc|calloc|free|main)\b/g, '<span class="function">$1</span>')
+        // Números
+        .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>')
+        // Include
+        .replace(/(&lt;.*?&gt;)/g, '<span class="header">$1</span>')
+        .replace(/(<.*?>)/g, '<span class="header">$1</span>');
+}
+
+function syncHighlight() {
+    const textarea = document.getElementById('code-textarea');
+    const highlight = document.getElementById('code-highlight');
+    if (textarea && highlight) {
+        const code = textarea.value;
+        highlight.innerHTML = highlightC(escapeHTML(code));
+        highlight.scrollTop = textarea.scrollTop;
+        highlight.scrollLeft = textarea.scrollLeft;
+    }
+}
+
+function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ========== ESTADO ==========
 let currentQuest = 0;
-let questResults = {}; // { id: 'correct' | 'wrong' | null }
+let questResults = {};
 let totalScore = 0;
 let correctCount = 0;
 
-// ========== INICIALIZAÇÃO ==========
 function init() {
     document.getElementById('total-quest').textContent = QUESTOES.length;
     renderNav();
@@ -538,16 +576,24 @@ function renderQuest(index) {
         </div>
         
         <div class="code-section">
-            <div class="code-editor">
-                <div class="code-header">
+            <div class="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <div class="dots">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                    </div>
                     <span>📝 main.c</span>
-                    <span>Ctrl+Enter para enviar</span>
+                    <span style="font-size:12px;">Ctrl+Enter</span>
                 </div>
-                <textarea class="code-area" id="code-area" 
-                    placeholder="Digite seu código C aqui..."
-                    onkeydown="handleKeyDown(event)">${questResults[q.id] ? 
-                        document.getElementById('code-area')?.value || q.codeTemplate : 
-                        q.codeTemplate}</textarea>
+                <div class="code-editor-body">
+                    <div class="code-highlight" id="code-highlight"></div>
+                    <textarea class="code-textarea" id="code-textarea" 
+                        placeholder="Digite seu código C..."
+                        oninput="syncHighlight()"
+                        onscroll="syncHighlight()"
+                        onkeydown="handleKeyDown(event)"></textarea>
+                </div>
             </div>
             
             <div class="test-panel">
@@ -562,7 +608,7 @@ function renderQuest(index) {
             </div>
         </div>
         
-        <div style="text-align: center; margin-top: 20px;">
+        <div style="text-align: center; margin-top: 28px;">
             <button class="btn btn-submit" id="submit-btn" onclick="submitCode(${q.id})">
                 ✅ Enviar e Validar
             </button>
@@ -573,11 +619,22 @@ function renderQuest(index) {
         <div class="result-box" id="result-box-${q.id}"></div>
         <div class="hint-box" id="hint-box-${q.id}">${q.dica}</div>
     `;
+    
+    // Inicializa o editor com o template
+    const textarea = document.getElementById('code-textarea');
+    if (textarea) {
+        textarea.value = q.codeTemplate;
+        syncHighlight();
+    }
 }
 
-// ========== SUBMETER CÓDIGO ==========
+function getCode() {
+    const textarea = document.getElementById('code-textarea');
+    return textarea ? textarea.value.trim() : '';
+}
+
 async function submitCode(questId) {
-    const code = document.getElementById('code-area').value.trim();
+    const code = getCode();
     const quest = QUESTOES.find(q => q.id === questId);
     const resultBox = document.getElementById(`result-box-${questId}`);
     const submitBtn = document.getElementById('submit-btn');
@@ -585,83 +642,59 @@ async function submitCode(questId) {
     
     if (!code) {
         resultBox.className = 'result-box fail show';
-        resultBox.innerHTML = '❌ Digite seu código antes de enviar!';
+        resultBox.innerHTML = '<h3>❌ Erro</h3>Digite seu código antes de enviar!';
         return;
     }
     
-    // UI loading
     submitBtn.disabled = true;
     spinner.classList.add('show');
     resultBox.className = 'result-box show';
-    resultBox.innerHTML = '🔄 Compilando e testando...';
+    resultBox.innerHTML = '<h3>🔄 Compilando...</h3>Enviando para GCC...';
     
     let allPassed = true;
     let results = [];
     
     for (let i = 0; i < quest.testCases.length; i++) {
         const tc = quest.testCases[i];
-        
         try {
             const response = await fetch('https://siteparaestudar-production.up.railway.app/compilar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code, input: tc.input })
+                body: JSON.stringify({ code, input: tc.input })
             });
             
             if (!response.ok) throw new Error('Erro no servidor');
             
             const result = await response.json();
-            
-            // Comparar saída (remover espaços extras)
             const expected = tc.expected.trim();
             const got = (result.output || '').trim();
-            
             const passed = got === expected && !result.error;
             
-            results.push({
-                test: i + 1,
-                input: tc.input,
-                expected: expected,
-                got: got,
-                error: result.error || '',
-                passed: passed
-            });
-            
+            results.push({ test: i + 1, input: tc.input, expected, got, error: result.error || '', passed });
             if (!passed) allPassed = false;
-            
         } catch (error) {
-            results.push({
-                test: i + 1,
-                input: tc.input,
-                expected: tc.expected,
-                got: 'ERRO DE CONEXÃO',
-                error: error.message,
-                passed: false
-            });
+            results.push({ test: i + 1, input: tc.input, expected: tc.expected, got: 'ERRO', error: error.message, passed: false });
             allPassed = false;
         }
     }
     
-    // Exibir resultados
-    let html = allPassed ? 
-        '<h3>🎉 Todos os testes passaram! +' + quest.pontos + ' pontos</h3>' :
-        '<h3>❌ Alguns testes falharam</h3>';
+    let html = allPassed ? `<h3>🎉 Todos os testes passaram! +${quest.pontos} pontos</h3>` : '<h3>❌ Alguns testes falharam</h3>';
     
     results.forEach(r => {
-        const icon = r.passed ? '✅' : '❌';
         html += `
-            <div style="margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                <strong>${icon} Teste ${r.test}:</strong> Entrada: <code>${r.input}</code><br>
-                Esperado: <code>${r.expected}</code><br>
-                Obtido: <code>${r.got || '(vazio)'}</code>
-                ${r.error ? `<br><span style="color:#e74c3c;">Erro: ${r.error}</span>` : ''}
+            <div style="margin:12px 0;padding:14px;background:rgba(0,0,0,0.3);border-radius:10px;font-size:16px;">
+                <strong>${r.passed ? '✅' : '❌'} Teste ${r.test}:</strong><br>
+                📥 Entrada: <code>${r.input}</code><br>
+                📤 Esperado: <code style="color:#6dfabc;">${r.expected}</code><br>
+                📤 Obtido: <code style="color:${r.passed ? '#6dfabc' : '#e74c3c'};">${r.got || '(vazio)'}</code>
+                ${r.error ? `<br>⚠️ <span style="color:#e74c3c;">Erro: ${r.error}</span>` : ''}
             </div>
         `;
     });
     
+    resultBox.className = `result-box show ${allPassed ? 'success' : 'fail'}`;
     resultBox.innerHTML = html;
     
-    // Atualizar pontuação
     if (allPassed) {
         questResults[questId] = 'correct';
         totalScore += quest.pontos;
@@ -670,17 +703,13 @@ async function submitCode(questId) {
         questResults[questId] = 'wrong';
     }
     
-    // Atualizar UI
     document.getElementById('total-score').textContent = totalScore;
     document.getElementById('correct-count').textContent = correctCount;
     renderNav();
     
-    // Próxima questão (se existir)
     if (allPassed && currentQuest < QUESTOES.length - 1) {
         setTimeout(() => {
-            if (confirm('🎉 Parabéns! Quer ir para a próxima questão?')) {
-                goToQuest(currentQuest + 1);
-            }
+            if (confirm('🎉 Parabéns! Próxima questão?')) goToQuest(currentQuest + 1);
         }, 1000);
     }
     
@@ -689,25 +718,23 @@ async function submitCode(questId) {
 }
 
 function showHint(questId) {
-    const hintBox = document.getElementById(`hint-box-${questId}`);
-    if (hintBox) hintBox.classList.toggle('show');
+    document.getElementById(`hint-box-${questId}`)?.classList.toggle('show');
 }
 
 function handleKeyDown(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        const quest = QUESTOES[currentQuest];
-        submitCode(quest.id);
+        submitCode(QUESTOES[currentQuest].id);
     }
     if (e.key === 'Tab') {
         e.preventDefault();
         const s = e.target.selectionStart;
         e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd);
         e.target.selectionStart = e.target.selectionEnd = s + 4;
+        syncHighlight();
     }
 }
 
-// Iniciar
 init();
 </script>
 </body>
