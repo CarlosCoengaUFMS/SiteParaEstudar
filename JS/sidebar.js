@@ -18,7 +18,7 @@
     const sidebarHTML = `
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">SP</div>
+                <div class="sidebar-logo">SPE</div>
                 <span class="sidebar-title">SiteParaEstudar</span>
             </div>
             <nav class="sidebar-nav">

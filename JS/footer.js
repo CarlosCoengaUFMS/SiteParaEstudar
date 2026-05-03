@@ -180,7 +180,7 @@
             
             <div class="footer-bottom">
                 <div class="footer-credits">
-                    <span class="footer-logo-small">SP</span>
+                    <span class="footer-logo-small">SPE</span>
                     <span>SiteParaEstudar © 2026</span>
                 </div>
                 <div>UFMS · Campus Ponta Porã</div>
