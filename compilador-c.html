@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compilador C · SiteParaEstudar</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0d0d0f;
@@ -29,7 +29,6 @@
             font-family: 'Inter', 'Syne', sans-serif;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
             line-height: 1.5;
             position: relative;
         }
@@ -62,15 +61,15 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             letter-spacing: -1px;
         }
 
         .subtitle {
             text-align: center;
             color: var(--muted);
-            font-size: 14px;
-            margin-bottom: 30px;
+            font-size: 15px;
+            margin-bottom: 25px;
         }
         
         .editor-panel {
@@ -96,7 +95,7 @@
         
         .panel h3 {
             font-family: 'Syne', sans-serif;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 700;
             color: var(--accent);
             margin-bottom: 16px;
@@ -106,7 +105,135 @@
             flex-shrink: 0;
         }
         
-        textarea {
+        /* ========== EDITOR COM TERMINAL - ESTILO QUESTOES-C ========== */
+        .code-editor-wrapper {
+            background: #1E1E1E;
+            border: 1px solid #3C3C3C;
+            border-radius: 10px;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .code-editor-header {
+            background: #2D2D2D;
+            padding: 8px 16px;
+            font-size: 13px;
+            color: #CCCCCC;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3C3C3C;
+            flex-shrink: 0;
+        }
+        
+        .code-editor-body {
+            position: relative;
+            flex: 1;
+            min-height: 400px;
+            overflow: hidden;
+        }
+        
+        .code-highlight {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 16px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow: auto;
+            background: #1E1E1E;
+            tab-size: 4;
+            z-index: 1;
+            color: #D4D4D4;
+        }
+        
+        .code-textarea {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            resize: none;
+            outline: none;
+            border: none;
+            background: transparent !important;
+            color: transparent !important;
+            caret-color: #FFFFFF;
+            tab-size: 4;
+            z-index: 2;
+            overflow: auto;
+            -webkit-text-fill-color: transparent !important;
+        }
+
+        /* Cores da sintaxe */
+        .code-highlight .preprocessor { color: #C586C0; }
+        .code-highlight .header-file { color: #CE9178; }
+        .code-highlight .keyword { color: #569CD6; font-weight: 600; }
+        .code-highlight .type { color: #569CD6; }
+        .code-highlight .function { color: #DCDCAA; }
+        .code-highlight .string { color: #CE9178; }
+        .code-highlight .format { color: #E57373; }
+        .code-highlight .number { color: #B5CEA8; }
+        .code-highlight .comment { color: #6A9955; font-style: italic; }
+        .code-highlight .brace { color: #FFD700; }
+
+        /* Botão expandir */
+        .btn-expand {
+            background: transparent;
+            border: 1px solid #555;
+            color: #CCCCCC;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-expand:hover {
+            background: #3C3C3C;
+            border-color: #888;
+            color: #fff;
+        }
+
+        /* Expansão do editor */
+        .code-editor-wrapper.expanded {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            z-index: 9999;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        .code-editor-wrapper.expanded .code-editor-body {
+            height: calc(100vh - 80px) !important;
+        }
+        .code-editor-wrapper.expanded .code-highlight,
+        .code-editor-wrapper.expanded .code-textarea {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px !important;
+        }
+
+        /* Input textarea */
+        textarea.input-area {
             width: 100%;
             flex: 1;
             background: #0a0a0d;
@@ -119,27 +246,24 @@
             line-height: 1.8;
             resize: vertical;
             outline: none;
-            tab-size: 4;
-            transition: all 0.3s;
-            min-height: 450px;
+            min-height: 400px;
         }
-        
-        textarea:focus {
+        textarea.input-area:focus {
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(124,109,250,0.15);
         }
         
         #output-area {
             width: 100%;
-            min-height: 250px;
-            max-height: 500px;
+            min-height: 200px;
+            max-height: 400px;
             background: #0a0a0d;
             color: var(--accent2);
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 18px;
             font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.7;
             white-space: pre-wrap;
             overflow-y: auto;
@@ -150,14 +274,13 @@
             border: none;
             border-radius: 10px;
             font-family: 'Syne', sans-serif;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            letter-spacing: 0.5px;
         }
         
         .btn-run {
@@ -168,37 +291,20 @@
             border-radius: 14px;
             box-shadow: 0 8px 25px rgba(46,204,113,0.3);
         }
-        .btn-run:hover { 
-            background: #27ae60; 
-            transform: translateY(-2px); 
-            box-shadow: 0 12px 35px rgba(46,204,113,0.4);
-        }
-        .btn-run:disabled { 
-            background: #555; 
-            cursor: not-allowed; 
-            box-shadow: none;
-            transform: none;
-        }
+        .btn-run:hover { background: #27ae60; transform: translateY(-2px); }
+        .btn-run:disabled { background: #555; cursor: not-allowed; }
         
-        .btn-clear {
-            background: var(--border);
-            color: var(--muted);
-            font-size: 12px;
-        }
+        .btn-clear { background: var(--border); color: var(--muted); font-size: 13px; }
         .btn-clear:hover { background: #3a3a48; color: var(--text); }
         
         .btn-example {
             background: rgba(124,109,250,0.1);
             color: var(--accent);
             border: 1px solid rgba(124,109,250,0.25);
-            font-size: 12px;
+            font-size: 13px;
             padding: 8px 18px;
-            flex-shrink: 0;
         }
-        .btn-example:hover { 
-            background: rgba(124,109,250,0.2); 
-            border-color: var(--accent);
-        }
+        .btn-example:hover { background: rgba(124,109,250,0.2); border-color: var(--accent); }
         
         .button-group {
             display: flex;
@@ -222,7 +328,7 @@
             align-items: center;
             gap: 10px;
             margin-top: 12px;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--muted);
             font-weight: 500;
         }
@@ -237,7 +343,6 @@
             animation: spin 0.8s linear infinite;
         }
         .spinner.show { display: inline-block; }
-        
         @keyframes spin { to { transform: rotate(360deg); } }
         
         .error { color: var(--wrong) !important; font-weight: 600; }
@@ -245,110 +350,170 @@
 
         /* ========== SIDEBAR ========== */
         .hamburger-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 200;
-            width: 44px; height: 44px;
-            background: rgba(21,21,26,0.85); backdrop-filter: blur(16px);
-            border: 1px solid var(--border); border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 5px; cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            background: rgba(21,21,26,0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
             transition: all 0.3s;
         }
-        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(124,109,250,0.2); }
+        .hamburger-btn:hover { border-color: var(--accent); }
         .hamburger-line {
-            width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
             transition: all 0.3s;
         }
         .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
         .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
         
         .sidebar-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px); z-index: 250; opacity: 0;
-            pointer-events: none; transition: opacity 0.3s;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
         .sidebar-overlay.show { opacity: 1; pointer-events: all; }
         
         .sidebar {
-            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
-            background: rgba(21,21,26,0.95); backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border); z-index: 260;
-            transform: translateX(-100%); transition: transform 0.35s;
-            display: flex; flex-direction: column; padding: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(21,21,26,0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            z-index: 260;
+            transform: translateX(-100%);
+            transition: transform 0.35s;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
         }
         .sidebar.open { transform: translateX(0); }
-        
         .sidebar-header {
-            padding: 24px 20px; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 12px;
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         .sidebar-logo {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #fff;
         }
-        .sidebar-title { 
-            font-family: 'Syne', sans-serif;
-            font-weight: 700; 
-            font-size: 16px; 
-        }
-        
+        .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
         .sidebar-nav {
-            flex: 1; padding: 16px 12px; display: flex;
-            flex-direction: column; gap: 4px; overflow-y: auto;
+            flex: 1;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
         }
         .sidebar-link {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 10px;
-            color: var(--muted); text-decoration: none;
-            font-size: 14px; transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
             font-weight: 500;
         }
         .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
         .sidebar-link.active { background: rgba(124,109,250,0.15); color: #fff; }
         .sidebar-link .icon {
-            width: 28px; height: 28px; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
         }
         .sidebar-footer {
-            padding: 16px 20px; border-top: 1px solid var(--border);
-            font-size: 11px; color: var(--muted); text-align: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
             font-family: 'Space Mono', monospace;
         }
 
         @media (max-width: 600px) {
             body { padding: 10px; }
             .panel { padding: 16px; }
-            textarea { font-size: 13px; padding: 14px; min-height: 300px; }
+            .code-highlight, .code-textarea { font-size: 13px; padding: 14px; }
             .btn-run { font-size: 16px; padding: 14px 30px; }
         }
+
+       .code-overlay {
+    z-index: 9998;
+}
+
+.code-editor-wrapper.expanded {
+    z-index: 9999; /* já está ok */
+}
     </style>
 </head>
 <body>
 
+<!-- Overlay para expandir -->
+<div class="code-overlay" id="code-overlay"></div>
+
 <div class="compiler-container">
     <h1>💻 Compilador C Online</h1>
-    <p class="subtitle">Escreva, compile e execute código C diretamente no navegador · GCC no backend</p>
+    <p class="subtitle">Escreva, compile e execute código C · GCC no backend</p>
     
     <div class="editor-panel">
-        <!-- COLUNA ESQUERDA: Código -->
-        <div class="panel">
+        <div class="panel" id="code-panel">
             <h3>📝 Código Fonte</h3>
-            <textarea id="code-area" placeholder="// Digite seu código C aqui...
-#include <stdio.h>
-
-int main() {
-    printf(&quot;Hello, World!\n&quot;);
-    return 0;
-}">#include <stdio.h>
-
-int main() {
-    printf("Hello, World!\n");
-    return 0;
-}</textarea>
-            
+            <div class="code-editor-wrapper" id="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <span>📝 main.c</span>
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <button class="btn-expand" onclick="toggleExpand(event)" title="Expandir/Recolher">⛶ Expandir</button>
+                        <span style="font-size:12px;">Ctrl+Enter</span>
+                    </span>
+                </div>
+                <div class="code-editor-body">
+                    <div class="code-highlight" id="code-highlight"></div>
+                    <textarea class="code-textarea" id="code-textarea" 
+                        oninput="syncHighlight()" 
+                        onscroll="syncHighlight()"
+                        onkeydown="handleKeyDown(event)"></textarea>
+                </div>
+            </div>
             <div class="button-group">
                 <button class="btn btn-example" onclick="loadExample('hello')">👋 Hello World</button>
                 <button class="btn btn-example" onclick="loadExample('menorNumero')">🔢 Menor Número</button>
@@ -359,33 +524,20 @@ int main() {
             </div>
         </div>
         
-        <!-- COLUNA DIREITA: Entrada -->
         <div class="panel">
             <h3>📥 Entrada (stdin)</h3>
-            <textarea id="input-area" placeholder="Digite aqui os dados de entrada para scanf()...
+            <textarea class="input-area" id="input-area" placeholder="Digite aqui os dados de entrada para scanf()...
 Exemplo:
 45
 23
 67
 12
-89
-34
-56
-78
-90
-15
-42
-31
-68
-55
-21"></textarea>
+89"></textarea>
         </div>
     </div>
     
     <div class="run-section">
-        <button class="btn btn-run" id="run-btn" onclick="compileAndRun()">
-            ▶ Executar Código
-        </button>
+        <button class="btn btn-run" id="run-btn" onclick="compileAndRun()">▶ Executar Código</button>
         <span class="spinner" id="spinner"></span>
     </div>
     
@@ -399,7 +551,186 @@ Exemplo:
     </div>
 </div>
 
-<script src="compiler-c.js"></script>
+<script>
+// ========== EXEMPLOS ==========
+const examples = {
+    hello: '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    printf("SiteParaEstudar © 2026\\n");\n    return 0;\n}',
+    menorNumero: '#include <stdio.h>\n\nint main() {\n    int x, i, menor;\n    printf("Digite o 1o numero: ");\n    scanf("%d", &x);\n    menor = x;\n    for(i = 2; i <= 5; i++) {\n        printf("Digite o %do numero: ", i);\n        scanf("%d", &x);\n        if(x < menor) menor = x;\n    }\n    printf("\\nO menor numero foi: %d\\n", menor);\n    return 0;\n}',
+    fatorial: '#include <stdio.h>\n\nint main() {\n    int n, i;\n    long long fat = 1;\n    scanf("%d", &n);\n    for(i = 1; i <= n; i++) fat *= i;\n    printf("%d! = %lld\\n", n, fat);\n    return 0;\n}',
+    calculadora: '#include <stdio.h>\n\nint main() {\n    int a, b;\n    char op;\n    printf("Digite a operacao: ");\n    scanf("%d%c%d", &a, &op, &b);\n    switch(op) {\n        case \'+\': printf("%d + %d = %d\\n", a, b, a+b); break;\n        case \'-\': printf("%d - %d = %d\\n", a, b, a-b); break;\n        case \'*\': printf("%d * %d = %d\\n", a, b, a*b); break;\n        case \'/\':\n            if(b != 0) printf("%d / %d = %d\\n", a, b, a/b);\n            else printf("Erro: divisao por zero!\\n");\n            break;\n    }\n    return 0;\n}',
+    tabuada: '#include <stdio.h>\n\nint main() {\n    int n, i;\n    scanf("%d", &n);\n    for(i = 1; i <= 10; i++)\n        printf("%d x %d = %d\\n", n, i, n * i);\n    return 0;\n}'
+};
+
+// ========== HIGHLIGHT ==========
+function highlightC(code) {
+    return code
+        .replace(/^(#include)\s+(<.*?>)/gm, '<span class="preprocessor">$1</span> <span class="header-file">$2</span>')
+        .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
+        .replace(/"([^"\\]|\\.)*"/g, '<span class="string">$&</span>')
+        .replace(/%[dfsclu]/g, '<span class="format">$&</span>')
+        .replace(/\b(int|float|double|char|void|long|short|unsigned|signed|const|static|extern|struct|enum|typedef|sizeof)\b/g, '<span class="type">$1</span>')
+        .replace(/\b(if|else|for|while|do|switch|case|break|continue|return|goto|default)\b/g, '<span class="keyword">$1</span>')
+        .replace(/\b(printf|scanf|puts|gets|putchar|getchar|fopen|fclose|fprintf|fscanf|malloc|calloc|free|main)\b/g, '<span class="function">$1</span>')
+        .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>')
+        .replace(/(\{|\})/g, '<span class="brace">$1</span>');
+}
+
+function syncHighlight() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    if (ta && hl) {
+        // Sanitiza o código para evitar injeção HTML
+        const sanitized = ta.value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        
+        hl.innerHTML = highlightC(sanitized);
+        hl.scrollTop = ta.scrollTop;
+        hl.scrollLeft = ta.scrollLeft;
+    }
+}
+
+// ========== EXPANDIR - ESTILO QUESTOES-C ==========
+function toggleExpand(e) {
+    if (e) e.stopPropagation();
+
+    const wrapper = document.getElementById('code-editor-wrapper');
+    const overlay = document.getElementById('code-overlay');
+    const btn = document.querySelector('.btn-expand');
+
+    if (!wrapper || !overlay) return;
+
+    const isExpanded = wrapper.classList.contains('expanded');
+
+    if (!isExpanded) {
+        // ABRIR
+        wrapper.classList.add('expanded');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        if (btn) btn.innerHTML = '⛶ Recolher';
+    } else {
+        // FECHAR
+        wrapper.classList.remove('expanded');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        if (btn) btn.innerHTML = '⛶ Expandir';
+    }
+
+    setTimeout(syncHighlight, 50);
+}
+
+// ========== COMPILAR ==========
+async function compileAndRun() {
+    const code = document.getElementById('code-textarea').value.trim();
+    const input = document.getElementById('input-area').value;
+    const outputArea = document.getElementById('output-area');
+    const runBtn = document.getElementById('run-btn');
+    const spinner = document.getElementById('spinner');
+    const statusText = document.getElementById('status-text');
+    
+    if (!code) { outputArea.textContent = '⚠️ Digite um código C!'; return; }
+    
+    runBtn.disabled = true;
+    spinner.classList.add('show');
+    outputArea.textContent = '🔄 Compilando com GCC...';
+    statusText.textContent = '⏳ Compilando...';
+    statusText.style.color = '#fadc6d';
+    
+    try {
+        const response = await fetch('https://siteparaestudar-production.up.railway.app/compilar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, input })
+        });
+        
+        const result = await response.json();
+        
+        let output = '';
+        if (result.error) output += '❌ ERROS:\n' + result.error + '\n\n';
+        if (result.output) output += '📤 SAÍDA:\n' + result.output;
+        if (!result.output && !result.error) output = '✅ Executado! (sem saída)';
+        
+        outputArea.textContent = output;
+        statusText.textContent = result.success ? '✅ Sucesso!' : '❌ Erro';
+        statusText.style.color = result.success ? '#2ecc71' : '#e74c3c';
+        
+    } catch (error) {
+        outputArea.textContent = '❌ ERRO DE CONEXÃO\n\nVerifique sua internet e tente novamente.';
+        statusText.textContent = '❌ Sem conexão';
+        statusText.style.color = '#e74c3c';
+    } finally {
+        runBtn.disabled = false;
+        spinner.classList.remove('show');
+    }
+}
+
+function loadExample(name) {
+    if (examples[name]) {
+        document.getElementById('code-textarea').value = examples[name];
+        document.getElementById('output-area').textContent = '✅ Exemplo carregado! Ctrl+Enter para executar.';
+        syncHighlight();
+    }
+}
+
+function clearCode() {
+    document.getElementById('code-textarea').value = '';
+    document.getElementById('input-area').value = '';
+    document.getElementById('output-area').textContent = '// Digite seu código C...';
+    syncHighlight();
+}
+
+function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        compileAndRun();
+    }
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = e.target.selectionStart;
+        e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd);
+        e.target.selectionStart = e.target.selectionEnd = s + 4;
+        syncHighlight();
+    }
+}
+
+// Inicializar
+document.getElementById('code-textarea').value = examples.hello;
+syncHighlight();
+
+// Ping backend
+fetch('https://siteparaestudar-production.up.railway.app/ping')
+    .then(r => r.json())
+    .then(d => {
+        document.getElementById('status-text').textContent = d.gcc ? '🟢 Online' : '🔴 Offline';
+        document.getElementById('status-text').style.color = d.gcc ? '#2ecc71' : '#e74c3c';
+    })
+    .catch(() => {
+        document.getElementById('status-text').textContent = '🔴 Offline';
+        document.getElementById('status-text').style.color = '#e74c3c';
+    });
+   document.getElementById('code-overlay').addEventListener('click', (e) => {
+    const wrapper = document.getElementById('code-editor-wrapper');
+
+    // Só fecha se clicou EXATAMENTE no overlay
+    if (e.target.id === 'code-overlay' && wrapper.classList.contains('expanded')) {
+        toggleExpand();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") {
+        const wrapper = document.getElementById('code-editor-wrapper');
+        if (wrapper.classList.contains('expanded')) {
+            toggleExpand();
+        }
+    }
+});
+document.getElementById('code-editor-wrapper').addEventListener('click', (e) => {
+    e.stopPropagation();
+});
+</script>
+
 <script src="footer.js"></script>
 <script src="sidebar.js"></script>
 
