@@ -735,7 +735,7 @@ async function submitCode(id) {
     for (let i = 0; i < q.testCases.length; i++) {
         const tc = q.testCases[i];
         try {
-            const r = await fetch('https://siteparaestudar-production.up.railway.app/compilar', {
+            const r = await fetch('https://siteparaestudar.onrender.com/compilar', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({code, input: tc.input})
