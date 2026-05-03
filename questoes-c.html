@@ -99,8 +99,30 @@
             align-items: center; border-bottom: 1px solid #3C3C3C;
         }
         .code-editor-body {
-            position: relative;
+            display: flex;
             height: 380px;
+            overflow: hidden;
+        }
+
+        .line-numbers {
+            padding: 16px 10px 16px 16px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #858585;
+            background: #1A1A1A;
+            border-right: 1px solid #3C3C3C;
+            text-align: right;
+            user-select: none;
+            white-space: pre;
+            overflow: hidden;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .code-content {
+            position: relative;
+            flex: 1;
             overflow: hidden;
         }
 
@@ -176,6 +198,11 @@
         }
         .code-editor-wrapper.expanded .code-editor-body {
             height: calc(100vh - 80px) !important;
+        }
+        .code-editor-wrapper.expanded .line-numbers {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px 10px 22px 22px !important;
         }
         .code-editor-wrapper.expanded .code-highlight,
         .code-editor-wrapper.expanded .code-textarea {
@@ -278,6 +305,11 @@
             font-size: 11px; color: var(--muted); text-align: center;
             font-family: 'Space Mono', monospace;
         }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .code-highlight, .code-textarea, .line-numbers { font-size: 13px; padding: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -304,7 +336,7 @@ const QUESTOES = [
         id: 1, titulo: "Soma de Dois Números", pontos: 10,
         enunciado: `<p>Escreva um programa que <strong>leia dois números</strong> e <strong>imprima a soma</strong>.</p>`,
         exemplo: `📥 Entrada:  5 8\n📤 Saída:    13`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {\n    int a, b;\n    scanf("%d %d", &a, &b);\n    printf("%d\\n", a + b);\n    return 0;\n}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
         testCases: [{input:"5 8",expected:"13"},{input:"-3 10",expected:"7"},{input:"0 0",expected:"0"}],
         dica: "Use <code>printf(\"%d\", a + b);</code>"
     },
@@ -312,7 +344,7 @@ const QUESTOES = [
         id: 2, titulo: "Maior de Três", pontos: 15,
         enunciado: `<p>Leia <strong>três números</strong> e imprima o <strong>maior</strong>.</p>`,
         exemplo: `📥 5 8 3\n📤 8`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {\n    int a, b, c, maior;\n    scanf("%d %d %d", &a, &b, &c);\n    maior = a;\n    if(b > maior) maior = b;\n    if(c > maior) maior = c;\n    printf("%d\\n", maior);\n    return 0;\n}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
         testCases: [{input:"5 8 3",expected:"8"},{input:"10 10 5",expected:"10"},{input:"-1 -5 -3",expected:"-1"}],
         dica: "<code>if</code> para comparar. Use variável <code>maior</code>."
     },
@@ -320,7 +352,7 @@ const QUESTOES = [
         id: 3, titulo: "Tabuada", pontos: 15,
         enunciado: `<p>Leia um número e imprima a <strong>tabuada</strong> (1 a 10).</p>`,
         exemplo: `📥 7\n📤 7 x 1 = 7\n...\n7 x 10 = 70`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {\n    int n, i;\n    scanf("%d", &n);\n    for(i = 1; i <= 10; i++)\n        printf("%d x %d = %d\\n", n, i, n * i);\n    return 0;\n}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
         testCases: [{input:"7",expected:"7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70"}],
         dica: "<code>for(i=1;i<=10;i++)</code>"
     },
@@ -328,7 +360,7 @@ const QUESTOES = [
         id: 4, titulo: "Fatorial", pontos: 20,
         enunciado: `<p>Leia um número e calcule o <strong>fatorial</strong>.</p>`,
         exemplo: `📥 5\n📤 120`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {\n    int n, i;\n    long long fat = 1;\n    scanf("%d", &n);\n    for(i = 1; i <= n; i++) fat *= i;\n    printf("%lld\\n", fat);\n    return 0;\n}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
         testCases: [{input:"5",expected:"120"},{input:"0",expected:"1"}],
         dica: "<code>long long</code> para números grandes."
     },
@@ -336,7 +368,7 @@ const QUESTOES = [
         id: 5, titulo: "Pares e Ímpares", pontos: 20,
         enunciado: `<p>Leia <strong>5 números</strong> e imprima quantos são pares e ímpares.</p>`,
         exemplo: `📥 2 4 7 9 10\n📤 Pares: 3\nImpares: 2`,
-        codeTemplate: `#include <stdio.h>\n\nint main() {\n    int num, i, p = 0, im = 0;\n    for(i = 0; i < 5; i++) {\n        scanf("%d", &num);\n        if(num % 2 == 0) p++;\n        else im++;\n    }\n    printf("Pares: %d\\nImpares: %d\\n", p, im);\n    return 0;\n}`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {}`,
         testCases: [{input:"2 4 7 9 10",expected:"Pares: 3\nImpares: 2"},{input:"1 3 5 7 9",expected:"Pares: 0\nImpares: 5"}],
         dica: "<code>num % 2 == 0</code> verifica se é par."
     }
@@ -358,6 +390,8 @@ function highlightC(code) {
 function syncHighlight() {
     const ta = document.getElementById('code-textarea');
     const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    
     if (ta && hl) {
         // Sanitiza o código para evitar injeção HTML
         const sanitized = ta.value
@@ -366,8 +400,32 @@ function syncHighlight() {
             .replace(/>/g, '&gt;');
         
         hl.innerHTML = highlightC(sanitized);
+        
+        // Atualizar números de linha
+        if (lineNumbers) {
+            const lines = ta.value.split('\n');
+            const lineCount = lines.length || 1;
+            let lineNumbersHtml = '';
+            for (let i = 1; i <= lineCount; i++) {
+                lineNumbersHtml += i + '\n';
+            }
+            lineNumbers.textContent = lineNumbersHtml;
+        }
+    }
+}
+
+function syncScroll() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    
+    if (ta && hl) {
         hl.scrollTop = ta.scrollTop;
         hl.scrollLeft = ta.scrollLeft;
+    }
+    
+    if (lineNumbers) {
+        lineNumbers.scrollTop = ta.scrollTop;
     }
 }
 
@@ -409,8 +467,11 @@ function renderQuest(i) {
                     </span>
                 </div>
                 <div class="code-editor-body">
-                    <div class="code-highlight" id="code-highlight"></div>
-                    <textarea class="code-textarea" id="code-textarea" oninput="syncHighlight()" onscroll="syncHighlight()" onkeydown="handleKeyDown(event)"></textarea>
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="code-content">
+                        <div class="code-highlight" id="code-highlight"></div>
+                        <textarea class="code-textarea" id="code-textarea" oninput="syncHighlight()" onscroll="syncScroll()" onkeydown="handleKeyDown(event)"></textarea>
+                    </div>
                 </div>
             </div>
             <div class="test-panel">

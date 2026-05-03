@@ -148,6 +148,7 @@
                     <h4>📚 Programação em C</h4>
                     <ul>
                         <li><a href="compilador-c.html">Copilador C</a></li>
+                        <li><a href="questoes-c.html">Questões em C</a></li>
                         
                     </ul>
                 </div>

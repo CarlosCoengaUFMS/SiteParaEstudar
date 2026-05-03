@@ -105,7 +105,7 @@
             flex-shrink: 0;
         }
         
-        /* ========== EDITOR COM TERMINAL - ESTILO QUESTOES-C ========== */
+        /* ========== EDITOR COM TERMINAL ========== */
         .code-editor-wrapper {
             background: #1E1E1E;
             border: 1px solid #3C3C3C;
@@ -129,9 +129,31 @@
         }
         
         .code-editor-body {
-            position: relative;
+            display: flex;
             flex: 1;
             min-height: 400px;
+            overflow: hidden;
+        }
+        
+        .line-numbers {
+            padding: 16px 10px 16px 16px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #858585;
+            background: #1A1A1A;
+            border-right: 1px solid #3C3C3C;
+            text-align: right;
+            user-select: none;
+            white-space: pre;
+            overflow: hidden;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+        
+        .code-content {
+            position: relative;
+            flex: 1;
             overflow: hidden;
         }
         
@@ -211,7 +233,19 @@
             color: #fff;
         }
 
-        /* Expansão do editor */
+        /* Overlay e Expansão */
+        .code-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            cursor: pointer;
+        }
+        .code-overlay.show {
+            display: block;
+        }
+
         .code-editor-wrapper.expanded {
             position: fixed;
             top: 20px;
@@ -224,6 +258,11 @@
         }
         .code-editor-wrapper.expanded .code-editor-body {
             height: calc(100vh - 80px) !important;
+        }
+        .code-editor-wrapper.expanded .line-numbers {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px 10px 22px 22px !important;
         }
         .code-editor-wrapper.expanded .code-highlight,
         .code-editor-wrapper.expanded .code-textarea {
@@ -473,17 +512,9 @@
         @media (max-width: 600px) {
             body { padding: 10px; }
             .panel { padding: 16px; }
-            .code-highlight, .code-textarea { font-size: 13px; padding: 14px; }
+            .code-highlight, .code-textarea, .line-numbers { font-size: 13px; padding: 14px; }
             .btn-run { font-size: 16px; padding: 14px 30px; }
         }
-
-       .code-overlay {
-    z-index: 9998;
-}
-
-.code-editor-wrapper.expanded {
-    z-index: 9999; /* já está ok */
-}
     </style>
 </head>
 <body>
@@ -507,11 +538,14 @@
                     </span>
                 </div>
                 <div class="code-editor-body">
-                    <div class="code-highlight" id="code-highlight"></div>
-                    <textarea class="code-textarea" id="code-textarea" 
-                        oninput="syncHighlight()" 
-                        onscroll="syncHighlight()"
-                        onkeydown="handleKeyDown(event)"></textarea>
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="code-content">
+                        <div class="code-highlight" id="code-highlight"></div>
+                        <textarea class="code-textarea" id="code-textarea" 
+                            oninput="syncHighlight()" 
+                            onscroll="syncScroll()"
+                            onkeydown="handleKeyDown(event)"></textarea>
+                    </div>
                 </div>
             </div>
             <div class="button-group">
@@ -578,6 +612,8 @@ function highlightC(code) {
 function syncHighlight() {
     const ta = document.getElementById('code-textarea');
     const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    
     if (ta && hl) {
         // Sanitiza o código para evitar injeção HTML
         const sanitized = ta.value
@@ -586,12 +622,36 @@ function syncHighlight() {
             .replace(/>/g, '&gt;');
         
         hl.innerHTML = highlightC(sanitized);
-        hl.scrollTop = ta.scrollTop;
-        hl.scrollLeft = ta.scrollLeft;
+        
+        // Atualizar números de linha
+        if (lineNumbers) {
+            const lines = ta.value.split('\n');
+            const lineCount = lines.length || 1;
+            let lineNumbersHtml = '';
+            for (let i = 1; i <= lineCount; i++) {
+                lineNumbersHtml += i + '\n';
+            }
+            lineNumbers.textContent = lineNumbersHtml;
+        }
     }
 }
 
-// ========== EXPANDIR - ESTILO QUESTOES-C ==========
+function syncScroll() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    
+    if (ta && hl) {
+        hl.scrollTop = ta.scrollTop;
+        hl.scrollLeft = ta.scrollLeft;
+    }
+    
+    if (lineNumbers) {
+        lineNumbers.scrollTop = ta.scrollTop;
+    }
+}
+
+// ========== EXPANDIR ==========
 function toggleExpand(e) {
     if (e) e.stopPropagation();
 
@@ -709,15 +769,16 @@ fetch('https://siteparaestudar-production.up.railway.app/ping')
         document.getElementById('status-text').textContent = '🔴 Offline';
         document.getElementById('status-text').style.color = '#e74c3c';
     });
-   document.getElementById('code-overlay').addEventListener('click', (e) => {
-    const wrapper = document.getElementById('code-editor-wrapper');
 
-    // Só fecha se clicou EXATAMENTE no overlay
+// Fechar overlay ao clicar
+document.getElementById('code-overlay').addEventListener('click', (e) => {
+    const wrapper = document.getElementById('code-editor-wrapper');
     if (e.target.id === 'code-overlay' && wrapper.classList.contains('expanded')) {
         toggleExpand();
     }
 });
 
+// Fechar com ESC
 document.addEventListener('keydown', function(e) {
     if (e.key === "Escape") {
         const wrapper = document.getElementById('code-editor-wrapper');
@@ -726,6 +787,8 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// Evitar propagação de clique no editor
 document.getElementById('code-editor-wrapper').addEventListener('click', (e) => {
     e.stopPropagation();
 });
