@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Livros e PDFs · SiteParaEstudar</title>
+    <link rel="icon" href="Style/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --accent3: #6dfabc;
+            --accent4: #fadc6d;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(124,109,250,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,109,250,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+            mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 70%);
+        }
+
+        /* ========== HAMBURGER MENU ========== */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            background: rgba(21, 21, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(124,109,250,0.2); }
+        .hamburger-line {
+            width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            transition: all 0.3s ease; transform-origin: center;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 250; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+            background: rgba(21, 21, 26, 0.95); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); z-index: 260;
+            transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; padding: 0; box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header {
+            padding: 24px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+        }
+        .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); }
+        .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 10px; color: var(--muted); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: all var(--transition);
+            cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+        }
+        .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
+        .sidebar-link.active {
+            background: rgba(124,109,250,0.15); border: 1px solid rgba(124,109,250,0.3); color: #fff;
+        }
+        .sidebar-link .icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+        }
+        .sidebar-footer {
+            padding: 16px 20px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--muted); text-align: center; font-family: 'Space Mono', monospace;
+        }
+
+        /* ========== CONTEÚDO ========== */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color var(--transition);
+        }
+        .back-home:hover { color: var(--accent); }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent4) 60%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 40px;
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .category-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: var(--accent);
+        }
+
+        .book-cover {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .book-cover canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .cover-fallback {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            width: 100%;
+            height: 100%;
+        }
+
+        .cover-fallback .icon-big {
+            font-size: 50px;
+        }
+
+        .cover-fallback .title-small {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .book-info {
+            padding: 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .book-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .book-author {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .book-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+
+        .book-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-home">← Voltar ao Início</a>
+    <h1>📚 Biblioteca Digital</h1>
+    <p class="subtitle">Materiais de estudo organizados por disciplina</p>
+
+    <!-- ============ CATEGORIA: PROGRAMAÇÃO EM C ============ -->
+    <div class="category-section">
+        <div class="category-header">
+            <div class="category-icon" style="background: rgba(124,109,250,0.15);">💻</div>
+            <span class="category-name">Programação em C</span>
+        </div>
+
+        <div class="books-grid">
+            <!-- Livro 1 -->
+           <a href="ler.html?pdf=Livros/Introdução_à_programação_em_C_-_Os_primeiros_passos_de_um_desenvolvedor.pdf&t=Apostila de Linguagem C" class="book-card">
+    <div class="book-cover">
+        <canvas id="cover-livro-c" data-pdf="Livros/Introdução_à_programação_em_C_-_Os_primeiros_passos_de_um_desenvolvedor.pdf"></canvas>
+    </div>
+    <div class="book-info">
+        <div class="book-title">Introdução à programação em C - Os primeiros passos de um desenvolvedor</div>
+        <div class="book-author">Material completo</div>
+        <div class="book-meta">
+            <span class="book-tag" style="border-color:#7c6dfa;color:#7c6dfa;background:rgba(124,109,250,0.1);">PDF</span>
+            <span class="book-tag" style="border-color:#6dfabc;color:#6dfabc;background:rgba(109,250,188,0.1);">Completo</span>
+        </div>
+    </div>
+</a>
+        </div>
+    </div>
+
+    <!-- ============ CATEGORIA: MATEMÁTICA ============ -->
+    <div class="category-section">
+        <div class="category-header">
+            <div class="category-icon" style="background: rgba(250,220,109,0.15);">📐</div>
+            <span class="category-name">Matemática Discreta</span>
+        </div>
+
+        <div class="books-grid">
+            <a href="ler.html?pdf=PDFs/matematica_discreta.pdf&t=Matemática Discreta" class="book-card">
+                <div class="book-cover">
+                    <canvas id="cover-matematica" data-pdf="PDFs/matematica_discreta.pdf"></canvas>
+                </div>
+                <div class="book-info">
+                    <div class="book-title">Matemática Discreta</div>
+                    <div class="book-author">Fundamentos</div>
+                    <div class="book-meta">
+                        <span class="book-tag" style="border-color:#fadc6d;color:#fadc6d;background:rgba(250,220,109,0.1);">PDF</span>
+                        <span class="book-tag" style="border-color:#6dfabc;color:#6dfabc;background:rgba(109,250,188,0.1);">Completo</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- ============ CATEGORIA: ADMINISTRAÇÃO ============ -->
+    <div class="category-section">
+        <div class="category-header">
+            <div class="category-icon" style="background: rgba(250,109,138,0.15);">📋</div>
+            <span class="category-name">Administração</span>
+        </div>
+
+        <div class="books-grid">
+            <a href="ler.html?pdf=Livros/Livro_Teorias_da_Administracao_I WEB atualizado.pdf" class="book-card">
+                <div class="book-cover">
+                    <canvas id="cover-adm" data-pdf="Livros/Livro_Teorias_da_Administracao_I WEB atualizado.pdf"></canvas>
+                </div>
+                <div class="book-info">
+                    <div class="book-title">Teorias da Administração I</div>
+                    <div class="book-author">Francisco Mirialdo Chaves Trigueiro
+                                            Neiva de Araújo Marques
+                    </div>
+                    <div class="book-meta">
+                        <span class="book-tag" style="border-color:#fa6d8a;color:#fa6d8a;background:rgba(250,109,138,0.1);">PDF</span>
+                        <span class="book-tag" style="border-color:#fadc6d;color:#fadc6d;background:rgba(250,220,109,0.1);">Resumo</span>
+                    </div>
+                </div>
+            </a>
+
+           <a href="ler.html?pdf=Livros/revolucao-dos-bichos.pdf&t=Revolução dos Bichos" class="book-card">
+    <div class="book-cover">
+        <canvas id="cover-revolucao" data-pdf="Livros/revolucao-dos-bichos.pdf"></canvas>
+    </div>
+    <div class="book-info">
+        <div class="book-title">Revolução dos Bichos</div>
+        <div class="book-author">George Orwell</div>
+        <div class="book-meta">
+            <span class="book-tag" style="border-color:#fa6d8a;color:#fa6d8a;background:rgba(250,109,138,0.1);">PDF</span>
+            <span class="book-tag" style="border-color:#fadc6d;color:#fadc6d;background:rgba(250,220,109,0.1);">Literatura</span>
+        </div>
+    </div>
+</a>
+        </div>
+    </div>
+</div>
+
+<!-- PDF.js para gerar capas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<script>
+// Configurar PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// Gerar capas dos PDFs
+async function generateCover(canvasId, pdfPath) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    try {
+        const pdf = await pdfjsLib.getDocument(pdfPath).promise;
+        const page = await pdf.getPage(1); // Primeira página
+        const viewport = page.getViewport({ scale: 0.3 });
+        
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        
+        const ctx = canvas.getContext('2d');
+        await page.render({
+            canvasContext: ctx,
+            viewport: viewport
+        }).promise;
+        
+    } catch (error) {
+        console.log('PDF não encontrado, mostrando fallback:', pdfPath);
+        // Criar capa fallback
+        const parent = canvas.parentElement;
+        parent.innerHTML = `
+            <div class="cover-fallback">
+                <div class="icon-big">📄</div>
+                <div class="title-small">${canvas.closest('.book-card').querySelector('.book-title').textContent}</div>
+            </div>
+        `;
+    }
+}
+
+// Inicializar todas as capas
+document.addEventListener('DOMContentLoaded', function() {
+    const canvases = document.querySelectorAll('canvas[data-pdf]');
+    canvases.forEach(canvas => {
+        const pdfPath = canvas.getAttribute('data-pdf');
+        const canvasId = canvas.id;
+        if (pdfPath) {
+            generateCover(canvasId, pdfPath);
+        }
+    });
+});
+</script>
+
+<script src="JS/sidebar.js"></script>
+<script src="JS/footer.js"></script>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Ler PDF · SiteParaEstudar</title>
+    <link rel="icon" href="Style/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --accent3: #6dfabc;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #1a1a1a;
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== HAMBURGER MENU ========== */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            background: rgba(21, 21, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(124,109,250,0.2); }
+        .hamburger-line {
+            width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            transition: all 0.3s ease; transform-origin: center;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 250; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+            background: rgba(21, 21, 26, 0.95); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); z-index: 260;
+            transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; padding: 0; box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header {
+            padding: 24px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+        }
+        .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); }
+        .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 10px; color: var(--muted); text-decoration: none;
+            font-size: 14px; font-weight: 500; transition: all var(--transition);
+            cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+        }
+        .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
+        .sidebar-link.active {
+            background: rgba(124,109,250,0.15); border: 1px solid rgba(124,109,250,0.3); color: #fff;
+        }
+        .sidebar-link .icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+        }
+        .sidebar-footer {
+            padding: 16px 20px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--muted); text-align: center; font-family: 'Space Mono', monospace;
+        }
+
+        /* ========== TOP BAR ========== */
+        .top-bar {
+            background: rgba(21, 21, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px 10px 80px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        .top-bar.hidden { transform: translateY(-100%); }
+        .btn-icon {
+            background: var(--border);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .btn-icon:hover { background: var(--accent); }
+        .doc-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .page-indicator {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: var(--muted);
+            background: var(--surface);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        /* ========== VIEWER COM SCROLL VERTICAL ========== */
+        .viewer-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #1a1a1a;
+            padding: 0;
+        }
+        .pages-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 10px 0;
+            min-height: 100%;
+            background: #0d0d0f;
+        }
+        .page-item {
+            position: relative;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin: 0 auto;
+            transition: box-shadow 0.3s ease;
+        }
+        .page-item:hover { box-shadow: 0 4px 20px rgba(124,109,250,0.3); }
+        .page-item canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .page-label {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.8);
+            padding: 3px 10px;
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        /* ========== LOADING ========== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(26,26,26,0.95);
+            z-index: 300;
+            gap: 20px;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loading-text {
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            text-align: center;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========== BOTTOM BAR ========== */
+        .bottom-bar {
+            background: rgba(21, 21, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            flex-wrap: wrap;
+        }
+        .bottom-bar.hidden { transform: translateY(100%); }
+
+        .zoom-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            padding: 6px 12px;
+            border-radius: 25px;
+            border: 1px solid var(--border);
+        }
+        .zoom-btn {
+            background: var(--border);
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .zoom-btn:hover { background: var(--accent); }
+        .zoom-level {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            color: #fff;
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .preset-zoom {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+        .preset-zoom:hover { border-color: var(--accent); color: #fff; }
+        .preset-zoom.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        .no-pdf {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--muted);
+        }
+        .no-pdf .icon-big { font-size: 80px; margin-bottom: 20px; }
+        .no-pdf h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .btn-back-big {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .btn-back-big:hover { background: #8f80ff; }
+
+        /* ========== FAB (SCROLL TO TOP) ========== */
+        .fab {
+            position: fixed;
+            bottom: 120px;
+            right: 25px;
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(124,109,250,0.4);
+            z-index: 150;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .fab.show { display: flex; }
+        .fab:hover { background: #8f80ff; transform: translateY(-2px); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 400;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 768px) {
+            .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; }
+            .top-bar { padding: 8px 12px 8px 60px; }
+            .bottom-bar { padding: 10px 12px; gap: 8px; }
+            .doc-title { font-size: 13px; }
+            .preset-zoom { font-size: 10px; padding: 5px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Carregando PDF...</div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Barra Superior -->
+    <div class="top-bar" id="top-bar">
+        <a href="livros.html" class="btn-icon" title="Voltar">←</a>
+        <span class="doc-title" id="pdf-title">Carregando...</span>
+        <span class="page-indicator" id="page-indicator">0 páginas</span>
+        <a href="#" class="btn-icon" id="btn-download" download title="Baixar">📥</a>
+    </div>
+
+    <!-- Visualizador com scroll vertical -->
+    <div class="viewer-container" id="viewer-container">
+        <div class="pages-wrapper" id="pages-wrapper">
+            <div class="no-pdf" id="no-pdf">
+                <div class="icon-big">📄</div>
+                <h2>Nenhum PDF selecionado</h2>
+                <p>Volte para a biblioteca e escolha um livro.</p>
+                <a href="livros.html" class="btn-back-big">📚 Ver Biblioteca</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Inferior -->
+    <div class="bottom-bar" id="bottom-bar">
+        <div class="zoom-group">
+            <button class="zoom-btn" onclick="zoomOut()" title="Diminuir">−</button>
+            <span class="zoom-level" id="zoom-level">100%</span>
+            <button class="zoom-btn" onclick="zoomIn()" title="Aumentar">+</button>
+        </div>
+        
+        <button class="preset-zoom" onclick="setZoom(0.8)" title="Modo confortável para leitura">📖 Confortável</button>
+        <button class="preset-zoom" onclick="setZoom(1.0)" title="Tamanho original">📄 Original</button>
+        <button class="preset-zoom" onclick="setZoom(1.3)" title="Letras maiores">🔍 Grande</button>
+        
+        <button class="zoom-btn" onclick="resetZoom()" title="Voltar ao zoom salvo" style="font-size:13px;border-radius:8px;">↺</button>
+    </div>
+
+    <!-- Botão voltar ao topo -->
+    <button class="fab" id="fab-top" onclick="scrollToTop()" title="Voltar ao topo">↑</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // ========== ESTADO ==========
+        let pdfDoc = null;
+        let totalPages = 0;
+        let currentScale = 1.0;
+        let renderedPages = new Set();
+        let pdfIdentifier = '';
+
+        // ========== LOCALSTORAGE PARA ZOOM ==========
+        const STORAGE_KEY = 'pdf_reader_zoom_settings';
+
+        function loadZoomSetting(pdfId) {
+            try {
+                const settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+                return settings[pdfId] || 1.0;
+            } catch(e) {
+                return 1.0;
+            }
+        }
+
+        function saveZoomSetting(pdfId, scale) {
+            try {
+                const settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+                settings[pdfId] = scale;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // ========== ATUALIZAR BOTÕES DE PRESET ==========
+        function updatePresetButtons() {
+            document.querySelectorAll('.preset-zoom').forEach(btn => {
+                const zoomValue = parseFloat(btn.getAttribute('onclick').match(/[\d.]+/)[0]);
+                if (Math.abs(currentScale - zoomValue) < 0.01) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // ========== CAPTURAR PARÂMETROS ==========
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const pdfPath = getQueryParam('pdf');
+        const pdfTitle = getQueryParam('t') || 'PDF';
+
+        // Criar identificador único para o PDF
+        pdfIdentifier = pdfPath ? pdfPath.replace(/[^a-zA-Z0-9]/g, '_') : 'default';
+
+        // Atualizar interface
+        document.getElementById('pdf-title').textContent = decodeURIComponent(pdfTitle);
+        document.title = decodeURIComponent(pdfTitle) + ' · SiteParaEstudar';
+        
+        const downloadBtn = document.getElementById('btn-download');
+        if (pdfPath) {
+            downloadBtn.href = pdfPath;
+            downloadBtn.download = decodeURIComponent(pdfTitle) + '.pdf';
+        }
+
+        // ========== CARREGAR ZOOM SALVO ==========
+        currentScale = loadZoomSetting(pdfIdentifier);
+        document.getElementById('zoom-level').textContent = Math.round(currentScale * 100) + '%';
+        updatePresetButtons();
+
+        // ========== CARREGAR PDF E RENDERIZAR TODAS AS PÁGINAS ==========
+        async function loadPDF(path) {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loading-text');
+            loadingOverlay.style.display = 'flex';
+            
+            try {
+                pdfDoc = await pdfjsLib.getDocument(path).promise;
+                totalPages = pdfDoc.numPages;
+                
+                document.getElementById('page-indicator').textContent = totalPages + ' páginas';
+                
+                const pagesWrapper = document.getElementById('pages-wrapper');
+                pagesWrapper.innerHTML = '';
+                
+                for (let i = 1; i <= totalPages; i++) {
+                    loadingText.textContent = `Carregando página ${i} de ${totalPages}...`;
+                    await renderPageToDiv(i, pagesWrapper);
+                }
+                
+                loadingOverlay.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Erro ao carregar PDF:', error);
+                document.getElementById('pages-wrapper').innerHTML = `
+                    <div class="no-pdf">
+                        <div class="icon-big">❌</div>
+                        <h2>Erro ao carregar PDF</h2>
+                        <p>${error.message}</p>
+                        <a href="livros.html" class="btn-back-big">📚 Voltar para Biblioteca</a>
+                    </div>
+                `;
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        // ========== RENDERIZAR PÁGINA NO SCROLL ==========
+        async function renderPageToDiv(pageNum, container) {
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: currentScale });
+            
+            const pageItem = document.createElement('div');
+            pageItem.className = 'page-item';
+            pageItem.id = 'page-' + pageNum;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            const maxWidth = Math.min(window.innerWidth - 40, 900);
+            if (viewport.width > maxWidth) {
+                const ratio = maxWidth / viewport.width;
+                canvas.style.width = maxWidth + 'px';
+                canvas.style.height = (viewport.height * ratio) + 'px';
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            await page.render({
+                canvasContext: ctx,
+                viewport: viewport
+            }).promise;
+            
+            pageItem.appendChild(canvas);
+            
+            const label = document.createElement('div');
+            label.className = 'page-label';
+            label.textContent = 'Pág. ' + pageNum;
+            pageItem.appendChild(label);
+            
+            container.appendChild(pageItem);
+            renderedPages.add(pageNum);
+        }
+
+        // ========== RE-RENDERIZAR COM NOVO ZOOM ==========
+        async function reRenderAll() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loading-text');
+            loadingOverlay.style.display = 'flex';
+            
+            const pagesWrapper = document.getElementById('pages-wrapper');
+            pagesWrapper.innerHTML = '';
+            renderedPages.clear();
+            
+            for (let i = 1; i <= totalPages; i++) {
+                loadingText.textContent = `Redimensionando página ${i} de ${totalPages}...`;
+                await renderPageToDiv(i, pagesWrapper);
+            }
+            
+            loadingOverlay.style.display = 'none';
+        }
+
+        // ========== ZOOM ==========
+        function applyZoom(newScale) {
+            currentScale = Math.max(0.4, Math.min(3.0, newScale));
+            document.getElementById('zoom-level').textContent = Math.round(currentScale * 100) + '%';
+            updatePresetButtons();
+            
+            // Salvar no localStorage
+            if (saveZoomSetting(pdfIdentifier, currentScale)) {
+                showToast('🔍 Zoom salvo: ' + Math.round(currentScale * 100) + '%');
+            }
+            
+            reRenderAll();
+        }
+
+        function zoomIn() {
+            applyZoom(currentScale + 0.1);
+        }
+
+        function zoomOut() {
+            applyZoom(currentScale - 0.1);
+        }
+
+        function setZoom(scale) {
+            applyZoom(scale);
+        }
+
+        function resetZoom() {
+            applyZoom(loadZoomSetting(pdfIdentifier));
+            showToast('↺ Zoom restaurado');
+        }
+
+        // ========== SCROLL TO TOP ==========
+        function scrollToTop() {
+            document.getElementById('viewer-container').scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // ========== FAB VISIBILIDADE ==========
+        const viewerContainer = document.getElementById('viewer-container');
+        const fabTop = document.getElementById('fab-top');
+        
+        viewerContainer.addEventListener('scroll', function() {
+            if (viewerContainer.scrollTop > 500) {
+                fabTop.classList.add('show');
+            } else {
+                fabTop.classList.remove('show');
+            }
+        });
+
+        // ========== TECLAS ==========
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '=':
+                    case '+':
+                        e.preventDefault();
+                        zoomIn();
+                        break;
+                    case '-':
+                        e.preventDefault();
+                        zoomOut();
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        setZoom(1.0);
+                        break;
+                }
+                return;
+            }
+            
+            switch(e.key) {
+                case 'Home':
+                    e.preventDefault();
+                    scrollToTop();
+                    break;
+            }
+        });
+
+        // ========== CLIQUE PARA ESCONDER BARRAS ==========
+        let barsVisible = true;
+        
+        viewerContainer.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT') return;
+            
+            barsVisible = !barsVisible;
+            
+            const topBar = document.getElementById('top-bar');
+            const bottomBar = document.getElementById('bottom-bar');
+            
+            if (barsVisible) {
+                topBar.classList.remove('hidden');
+                bottomBar.classList.remove('hidden');
+            } else {
+                topBar.classList.add('hidden');
+                bottomBar.classList.add('hidden');
+            }
+        });
+
+        // ========== PINÇA PARA ZOOM (MOBILE) ==========
+        let lastTouchDistance = 0;
+        
+        viewerContainer.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 2) {
+                lastTouchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+            }
+        });
+
+        viewerContainer.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 2) {
+                const distance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                
+                if (distance > lastTouchDistance * 1.05) {
+                    applyZoom(currentScale + 0.05);
+                    lastTouchDistance = distance;
+                } else if (distance < lastTouchDistance * 0.95) {
+                    applyZoom(currentScale - 0.05);
+                    lastTouchDistance = distance;
+                }
+            }
+        }, { passive: true });
+
+        // ========== INICIAR ==========
+        if (pdfPath) {
+            loadPDF(pdfPath);
+        }
+    </script>
+
+    <script src="JS/sidebar.js"></script>
+    <script src="JS/footer.js"></script>
+</body>
+</html>
