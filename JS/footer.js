@@ -169,7 +169,7 @@
                     <ul>
                         <li><a href="index.html">🏠 Início</a></li>
                         <li><a href="HomeMatematica.html">∑ Home Matemática</a></li>
-                        <li><a href="HomeProgramacao.html">PC Home Programação em C</a></li>
+                        <li><a href="HomeProgramacao.html">💻 Home Programação em C</a></li>
                         <li><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">⬆ Voltar ao Topo</a></li>
                     </ul>
                 </div>

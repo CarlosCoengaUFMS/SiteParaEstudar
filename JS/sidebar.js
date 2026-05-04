@@ -31,6 +31,9 @@
                 <a href="HomeProgramacao.html" class="sidebar-link">
                     <span class="icon" style="background:rgba(4, 245, 12, 0.2);color:#6dfabc;">📚</span> Programação em C
                 </a>
+                <a href="videos.html" class="sidebar-link">
+    <span class="icon" style="background:rgba(250,109,138,0.15);color:#fa6d8a;">▶️​</span> Videoaulas
+</a>
                 <hr style="border-color:#2a2a38;margin:8px 0;">
                 <a href="ListaConjuntos.html" class="sidebar-link">
                     <span class="icon" style="background:rgba(124,109,250,0.15);color:#a89fff;">∩</span> Conjuntos (21Q)

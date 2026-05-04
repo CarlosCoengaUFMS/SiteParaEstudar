@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Assistir Aula · SiteParaEstudar</title>
+    <link rel="icon" href="Style/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --accent3: #6dfabc;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #000;
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========== HAMBURGER MENU ========== */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            background: rgba(21, 21, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hamburger-btn:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(124,109,250,0.2);
+        }
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(21, 21, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            z-index: 260;
+            transform: translateX(-100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #fff;
+        }
+        .sidebar-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
+        .sidebar-link.active {
+            background: rgba(124,109,250,0.15);
+            border: 1px solid rgba(124,109,250,0.3);
+            color: #fff;
+        }
+        .sidebar-link .icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ========== PLAYER ========== */
+        .player-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px 12px 80px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            background: var(--border);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover { background: var(--accent); }
+
+        .player-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            flex: 1;
+        }
+
+        .player-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            position: relative;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16/9;
+            position: relative;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 0;
+        }
+
+        .no-video {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .no-video h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .video-info-bar {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .info-item {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-fullscreen {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .btn-fullscreen:hover { background: #8f80ff; }
+
+        @media (max-width: 768px) {
+            .hamburger-btn { top: 12px; left: 12px; width: 38px; height: 38px; }
+            .player-header { padding-left: 60px; }
+            .player-title { font-size: 14px; }
+            .back-btn { font-size: 12px; padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho do player -->
+    <div class="player-header">
+        <a href="videos.html" class="back-btn">← Voltar</a>
+        <span class="player-title" id="video-title">Carregando aula...</span>
+    </div>
+
+    <!-- Container do vídeo -->
+    <div class="player-container">
+        <div class="video-wrapper" id="video-wrapper">
+            <div class="no-video" id="no-video">
+                <h2>📺 Nenhum vídeo selecionado</h2>
+                <p>Volte para a lista de aulas e escolha um vídeo.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de informações -->
+    <div class="video-info-bar">
+        <div class="info-item">🎥 <span id="video-quality">1080p</span></div>
+        <div class="info-item">📅 <span id="video-date">2026</span></div>
+        <button class="btn-fullscreen" onclick="toggleFullscreen()">⛶ Tela Cheia</button>
+    </div>
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const videoId = getQueryParam('v');
+        const videoTitle = getQueryParam('t') || 'Videoaula';
+
+        document.getElementById('video-title').textContent = decodeURIComponent(videoTitle);
+
+        if (videoId) {
+            document.getElementById('video-wrapper').innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        }
+
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('video-wrapper');
+            if (!document.fullscreenElement) {
+                if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+                else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.querySelector('.btn-fullscreen');
+            btn.innerHTML = document.fullscreenElement ? '⛶ Sair da Tela Cheia' : '⛶ Tela Cheia';
+        });
+    </script>
+
+    <script src="JS/sidebar.js"></script>
+    <script src="JS/footer.js"></script>
+</body>
+</html>
