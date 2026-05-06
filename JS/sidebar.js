@@ -1,8 +1,11 @@
 // sidebar.js - Sidebar unificada para SiteParaEstudar
-// Para usar: <script src="sidebar.js"></script> antes de </body>
+// Para usar: <script src="JS/sidebar.js"></script> antes de </body>
 // Requer: CSS da sidebar já definido no <style> de cada página
 
 (function() {
+    // Verificar se a sidebar já foi carregada (evitar duplicação)
+    if (document.getElementById('sidebar')) return;
+
     // ========== HAMBURGER MENU ==========
     const hamburgerHTML = `
         <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
@@ -32,11 +35,14 @@
                     <span class="icon" style="background:rgba(4, 245, 12, 0.2);color:#6dfabc;">💻</span> Programação em C
                 </a>
                 <a href="videos.html" class="sidebar-link">
-    <span class="icon" style="background:rgba(250,109,138,0.15);color:#fa6d8a;">▶️​</span> Videoaulas
+                    <span class="icon" style="background:rgba(250,109,138,0.15);color:#fa6d8a;">▶️</span> Videoaulas
                 </a>
-                <a href="videos.html" class="sidebar-link">
-    <span class="icon" style="background:rgba(251, 42, 0, 0.15);color:#e62e00;">📚​</span> Biblioteca
-</a>
+                <a href="livros.html" class="sidebar-link">
+                    <span class="icon" style="background:rgba(251, 42, 0, 0.15);color:#e62e00;">📚</span> Biblioteca
+                </a>
+                <a href="filmes.html" class="sidebar-link">
+                    <span class="icon" style="background:rgba(250,109,138,0.9);box-shadow: 0 8px 25px rgba(250,109,138,0.4);color:#9200e6;">🎬</span> Filmes
+                </a>
                 <hr style="border-color:#2a2a38;margin:8px 0;">
                 <a href="ListaConjuntos.html" class="sidebar-link">
                     <span class="icon" style="background:rgba(124,109,250,0.15);color:#a89fff;">∩</span> Conjuntos (21Q)
@@ -87,51 +93,68 @@
     window.toggleSidebar = toggleSidebar;
 
     // Event listeners
-    hamburgerBtn.addEventListener('click', toggleSidebar);
-    overlay.addEventListener('click', toggleSidebar);
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', toggleSidebar);
+    if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+    // Fechar sidebar ao pressionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebarOpen) {
+            toggleSidebar();
+        }
+    });
+
+    // ========== MARCAR LINK ATIVO ==========
+    function markActiveLink() {
+        const path = window.location.pathname;
+        // Remove barra final se existir
+        const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
+        // Pega o último segmento (nome do arquivo)
+        const segments = cleanPath.split('/');
+        let currentPage = segments[segments.length - 1];
+        // Se estiver vazio (página raiz), assume index.html
+        if (!currentPage || currentPage === '') {
+            currentPage = 'index.html';
+        }
+        // Remove query strings e hash
+        currentPage = currentPage.split('?')[0].split('#')[0];
+
+        console.log('📄 Página atual detectada:', currentPage);
+
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (!href) return;
+
+            // Extrai apenas o nome do arquivo do href
+            const hrefFile = href.split('/').pop().split('?')[0].split('#')[0];
+
+            if (hrefFile === currentPage) {
+                link.classList.add('active');
+                // Dar um destaque extra no ícone ativo
+                const icon = link.querySelector('.icon');
+                if (icon) {
+                    icon.style.boxShadow = '0 0 12px currentColor';
+                    icon.style.border = '1px solid currentColor';
+                }
+            }
+        });
+    }
+
+    // Marcar link ativo quando o DOM estiver pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', markActiveLink);
+    } else {
+        markActiveLink();
+    }
 
     // Fechar sidebar ao clicar em links (mobile)
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth < 768 && sidebarOpen) {
-                toggleSidebar();
-            }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 768 && sidebarOpen) {
+                    toggleSidebar();
+                }
+            });
         });
     });
 
-    // ========== MARCAR LINK ATIVO (Corrigido para GitHub Pages) ==========
-    // Obtém o nome do arquivo atual de forma compatível com localhost e GitHub Pages
-    const path = window.location.pathname;
-    // Remove barra final se existir
-    const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
-    // Pega o último segmento (nome do arquivo)
-    const segments = cleanPath.split('/');
-    let currentPage = segments[segments.length - 1];
-    // Se estiver vazio (página raiz), assume index.html
-    if (!currentPage || currentPage === '') {
-        currentPage = 'index.html';
-    }
-    
-    // Remove query strings e hash
-    currentPage = currentPage.split('?')[0].split('#')[0];
-
-    console.log('📄 Página atual detectada:', currentPage); // Debug
-
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        const href = link.getAttribute('href');
-        if (!href) return;
-
-        // Extrai apenas o nome do arquivo do href
-        const hrefFile = href.split('/').pop().split('?')[0].split('#')[0];
-
-        if (hrefFile === currentPage) {
-            link.classList.add('active');
-            // Dar um destaque extra no ícone ativo
-            const icon = link.querySelector('.icon');
-            if (icon) {
-                icon.style.boxShadow = '0 0 12px currentColor';
-                icon.style.border = '1px solid currentColor';
-            }
-        }
-    });
 })();
