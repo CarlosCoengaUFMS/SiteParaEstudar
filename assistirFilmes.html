@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Assistir Filme · SiteParaEstudar</title>
+    <link rel="icon" href="Style/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #fa6d8a;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #000;
+            color: var(--text);
+            font-family: 'Inter', 'Syne', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ========== TOP BAR ========== */
+        .top-bar {
+            background: rgba(21, 21, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 100;
+            height: 56px;
+        }
+
+        .btn-icon {
+            background: var(--border);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .btn-icon:hover { background: var(--accent2); }
+
+        .movie-title-display {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ========== PLAYER CONTAINER ========== */
+        .player-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            position: relative;
+            min-height: 0;
+            padding: 0;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Iframe do Google Drive com espaçamento lateral */
+        .gdrive-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .native-video {
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* ========== NO VIDEO ========== */
+        .no-video {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+        .no-video .icon-big { font-size: 80px; margin-bottom: 20px; }
+        .no-video h2 { font-family: 'Syne', sans-serif; font-size: 24px; color: #fff; margin-bottom: 10px; }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent2);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        .btn-back:hover { background: #e55a75; }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent2);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 400;
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ========== RESPONSIVO ========== */
+@media (min-width: 769px) {
+    .player-wrapper {
+        padding: 20px 5%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .player-wrapper {
+        padding: 20px 10%;
+    }
+}
+
+@media (min-width: 1600px) {
+    .player-wrapper {
+        padding: 30px 15%;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-bar { padding: 8px 12px; height: 48px; }
+    .movie-title-display { font-size: 13px; }
+    .player-wrapper { padding: 0; }
+}
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar" id="top-bar">
+        <a href="filmes.html" class="btn-icon" title="Voltar">←</a>
+        <span class="movie-title-display" id="movie-title-display">Carregando...</span>
+        <a href="#" class="btn-icon" id="btn-open-drive" title="Abrir no Google Drive" target="_blank" style="display:none;">🔗</a>
+    </div>
+
+    <!-- Player -->
+    <div class="player-wrapper" id="player-wrapper">
+        <div class="video-container" id="video-container">
+            <div class="loading" id="loading" style="text-align:center; color:var(--muted);">
+                <p style="font-size:18px;">🎬</p>
+                <p>Carregando filme...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getQueryParam(param) {
+            return new URLSearchParams(window.location.search).get(param);
+        }
+
+        const videoPath = getQueryParam('video');
+        const movieTitle = getQueryParam('t') || 'Filme';
+        const tipo = getQueryParam('tipo') || 'local';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const decodedTitle = decodeURIComponent(movieTitle);
+            document.getElementById('movie-title-display').textContent = decodedTitle;
+            document.title = decodedTitle + ' · SiteParaEstudar';
+
+            if (!videoPath) {
+                showNoVideo('Nenhum filme selecionado');
+                return;
+            }
+
+            loadVideo();
+        });
+
+        function loadVideo() {
+            const decodedPath = decodeURIComponent(videoPath);
+            const container = document.getElementById('video-container');
+            const loading = document.getElementById('loading');
+
+            console.log('🎬 Carregando:', decodedPath);
+
+            if (tipo === 'gdrive' || decodedPath.includes('drive.google.com')) {
+                // Google Drive
+                const match = decodedPath.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                let embedUrl;
+                if (match && match[1]) {
+                    embedUrl = 'https://drive.google.com/file/d/' + match[1] + '/preview';
+                } else {
+                    embedUrl = decodedPath.replace(/\/view.*$/, '/preview');
+                }
+
+                console.log('☁️ Google Drive embed:', embedUrl);
+
+                const iframe = document.createElement('iframe');
+                iframe.className = 'gdrive-iframe';
+                iframe.src = embedUrl;
+                iframe.allow = 'autoplay; fullscreen';
+                iframe.allowfullscreen = true;
+                
+                iframe.onload = function() {
+                    if (loading) loading.style.display = 'none';
+                };
+
+                container.innerHTML = '';
+                container.appendChild(iframe);
+
+                // Mostrar botão para abrir no Drive
+                const btnDrive = document.getElementById('btn-open-drive');
+                if (btnDrive && match && match[1]) {
+                    btnDrive.style.display = 'flex';
+                    btnDrive.href = 'https://drive.google.com/file/d/' + match[1] + '/view';
+                }
+
+                setTimeout(() => {
+                    if (loading) loading.style.display = 'none';
+                }, 5000);
+
+            } else {
+                // Vídeo nativo
+                const video = document.createElement('video');
+                video.className = 'native-video';
+                video.controls = true;
+                video.playsinline = true;
+                video.preload = 'auto';
+                
+                const source = document.createElement('source');
+                source.src = decodedPath;
+                const ext = decodedPath.split('.').pop().toLowerCase();
+                const mimeTypes = { 
+                    mp4:'video/mp4', webm:'video/webm', ogg:'video/ogg',
+                    mkv:'video/x-matroska', avi:'video/x-msvideo', mov:'video/quicktime' 
+                };
+                source.type = mimeTypes[ext] || 'video/mp4';
+                
+                video.appendChild(source);
+                
+                video.addEventListener('loadeddata', function() {
+                    if (loading) loading.style.display = 'none';
+                    video.play().catch(e => console.log('Autoplay bloqueado'));
+                });
+
+                container.innerHTML = '';
+                container.appendChild(video);
+
+                setTimeout(() => {
+                    if (loading) loading.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showNoVideo(message) {
+            const container = document.getElementById('video-container');
+            container.innerHTML = `
+                <div class="no-video">
+                    <div class="icon-big">🎬</div>
+                    <h2>${message}</h2>
+                    <a href="filmes.html" class="btn-back">🎥 Voltar para Biblioteca</a>
+                </div>
+            `;
+        }
+
+        // Tecla Esc para voltar
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.location.href = 'filmes.html';
+            }
+        });
+    </script>
+
+
+</body>
+</html>
