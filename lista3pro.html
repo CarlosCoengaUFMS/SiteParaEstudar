@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Exercícios 3 · Programação C</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #6dfabc;
+            --accent3: #fa6d8a;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --warning: #fadc6d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 18px;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2em;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .quest-nav {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            justify-content: center; padding: 8px 0; margin-bottom: 10px;
+        }
+        .quest-nav button {
+            width: 42px; height: 42px; border-radius: 10px;
+            border: 2px solid var(--border); background: var(--surface);
+            color: var(--text); font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .quest-nav button:hover { border-color: var(--accent); }
+        .quest-nav button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .quest-nav button.correct { background: var(--correct); border-color: var(--correct); color: #fff; }
+        .quest-nav button.wrong { background: var(--wrong); border-color: var(--wrong); color: #fff; }
+
+        .quest-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 25px 30px; margin-bottom: 20px;
+        }
+
+        .quest-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 15px;
+        }
+        .quest-number { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent); }
+        .quest-points { background: rgba(250,220,109,0.15); color: var(--warning); padding: 5px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .quest-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; color: #fff; }
+        .quest-desc { color: var(--muted); margin-bottom: 18px; line-height: 1.8; font-size: 16px; }
+        .quest-example { background: #0a0a0d; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+        .quest-example h4 { color: var(--accent2); margin-bottom: 8px; font-size: 15px; }
+        .quest-example pre { font-family: 'Fira Code', monospace; font-size: 14px; color: var(--muted); white-space: pre-wrap; line-height: 1.6; }
+
+        /* Tabela para questão 6 */
+        .classif-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+            background: #0a0a0d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .classif-table th, .classif-table td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+        }
+        .classif-table th {
+            background: rgba(124,109,250,0.15);
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .classif-table td {
+            color: var(--text);
+        }
+        .classif-table .highlight-cell {
+            background: rgba(109,250,188,0.1);
+            color: var(--accent2);
+            font-weight: 700;
+        }
+
+        .code-section { display: grid; grid-template-columns: 1fr 320px; gap: 18px; margin-bottom: 10px; }
+        @media (max-width: 1000px) { .code-section { grid-template-columns: 1fr; } }
+
+        .code-editor-wrapper {
+            background: #1E1E1E; border: 1px solid #3C3C3C;
+            border-radius: 10px; overflow: hidden;
+        }
+        .code-editor-header {
+            background: #2D2D2D; padding: 8px 16px;
+            font-size: 13px; color: #CCCCCC;
+            display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid #3C3C3C;
+        }
+        .code-editor-body {
+            display: flex;
+            height: 380px;
+            overflow: hidden;
+        }
+
+        .line-numbers {
+            padding: 16px 10px 16px 16px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #858585;
+            background: #1A1A1A;
+            border-right: 1px solid #3C3C3C;
+            text-align: right;
+            user-select: none;
+            white-space: pre;
+            overflow: hidden;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .code-content {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .code-highlight {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            padding: 16px; font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px; line-height: 1.8; white-space: pre-wrap;
+            word-wrap: break-word; overflow: auto;
+            background: #1E1E1E; tab-size: 4;
+            z-index: 1;
+            color: #D4D4D4;
+        }
+
+        .code-textarea {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            padding: 16px; font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px; line-height: 1.8; resize: none;
+            outline: none; border: none;
+            background: transparent !important;
+            color: transparent !important;
+            caret-color: #FFFFFF;
+            tab-size: 4; z-index: 2; overflow: auto;
+            -webkit-text-fill-color: transparent !important;
+        }
+
+        .code-highlight .preprocessor { color: #C586C0; }
+        .code-highlight .header-file { color: #CE9178; }
+        .code-highlight .keyword { color: #569CD6; font-weight: 600; }
+        .code-highlight .type { color: #569CD6; }
+        .code-highlight .function { color: #DCDCAA; }
+        .code-highlight .string { color: #CE9178; }
+        .code-highlight .format { color: #E57373; }
+        .code-highlight .number { color: #B5CEA8; }
+        .code-highlight .comment { color: #6A9955; font-style: italic; }
+        .code-highlight .brace { color: #FFD700; }
+
+        .btn-expand {
+            background: transparent; border: 1px solid #555;
+            color: #CCCCCC; cursor: pointer;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 13px; transition: all 0.3s;
+            display: flex; align-items: center; gap: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-expand:hover { background: #3C3C3C; border-color: #888; color: #fff; }
+
+        .code-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            cursor: pointer;
+        }
+        .code-overlay.show { display: block; }
+
+        .code-editor-wrapper.expanded {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            z-index: 9999;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        .code-editor-wrapper.expanded .code-editor-body {
+            height: calc(100vh - 80px) !important;
+        }
+        .code-editor-wrapper.expanded .line-numbers {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px 10px 22px 22px !important;
+        }
+        .code-editor-wrapper.expanded .code-highlight,
+        .code-editor-wrapper.expanded .code-textarea {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px !important;
+        }
+
+        .test-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+        .test-panel h3 { font-size: 15px; color: var(--accent); margin-bottom: 10px; font-weight: 700; }
+        .test-case { background: #0a0a0d; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 13px; }
+        .test-case .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 700; }
+        .test-case .value { font-family: 'Fira Code', monospace; font-size: 13px; color: var(--text); line-height: 1.5; }
+
+        .btn { padding: 10px 22px; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-submit { background: var(--accent); color: #fff; font-size: 17px; padding: 14px 36px; box-shadow: 0 6px 20px rgba(124,109,250,0.3); border-radius: 14px; }
+        .btn-submit:hover { background: #8f80ff; transform: translateY(-1px); }
+        .btn-submit:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .btn-hint { background: transparent; border: 2px solid var(--border); color: var(--muted); font-size: 14px; }
+        .btn-hint:hover { border-color: var(--warning); color: var(--warning); }
+        .btn-reset { background: transparent; border: 2px solid #e74c3c; color: #e74c3c; font-size: 14px; }
+        .btn-reset:hover { background: rgba(231,76,60,0.1); }
+
+        .result-box { display: none; padding: 16px; border-radius: 12px; margin-top: 15px; font-size: 15px; line-height: 1.7; }
+        .result-box.show { display: block; }
+        .result-box.success { background: rgba(46,204,113,0.1); border: 2px solid rgba(46,204,113,0.3); color: var(--correct); }
+        .result-box.fail { background: rgba(231,76,60,0.1); border: 2px solid rgba(231,76,60,0.3); color: #ff8080; }
+
+        .score-bar {
+            background: rgba(13,13,15,0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px;
+            font-size: 15px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .spinner { display: none; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner.show { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hint-box { display: none; background: rgba(250,220,109,0.08); border: 2px solid rgba(250,220,109,0.25); color: var(--warning); padding: 12px 16px; border-radius: 10px; margin-top: 12px; font-size: 14px; line-height: 1.7; }
+        .hint-box.show { display: block; }
+
+        /* ========== SIDEBAR ========== */
+        .hamburger-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 200;
+            width: 44px; height: 44px;
+            background: rgba(21,21,26,0.85); backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 5px; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(124,109,250,0.2); }
+        .hamburger-line {
+            width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px); z-index: 250; opacity: 0;
+            pointer-events: none; transition: opacity 0.3s;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+            background: rgba(21,21,26,0.95); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); z-index: 260;
+            transform: translateX(-100%); transition: transform 0.35s;
+            display: flex; flex-direction: column; padding: 0;
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 24px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+        }
+        .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+
+        .sidebar-nav {
+            flex: 1; padding: 16px 12px; display: flex;
+            flex-direction: column; gap: 4px; overflow-y: auto;
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 10px;
+            color: var(--muted); text-decoration: none;
+            font-size: 14px; transition: all 0.3s; font-weight: 500;
+        }
+        .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
+        .sidebar-link.active { background: rgba(124,109,250,0.15); border: 1px solid rgba(124,109,250,0.3); color: #fff; }
+        .sidebar-link .icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .sidebar-footer {
+            padding: 16px 20px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--muted); text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .code-highlight, .code-textarea, .line-numbers { font-size: 13px; padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Overlay para expandir -->
+<div class="code-overlay" id="code-overlay"></div>
+
+<!-- Hamburger Menu -->
+<div class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+</div>
+
+<div class="container">
+    <h1>📝 Lista de Exercícios 3</h1>
+    <p class="subtitle">Programação em Linguagem C · 7 Exercícios com Condicionais</p>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="score-bar">
+        <span style="font-weight:700;">✅ <span id="correct-count">0</span> / <span id="total-quest">7</span></span>
+        <span style="font-weight:700;">⭐ <span id="total-score">0</span> pontos</span>
+        <span style="color: var(--accent2); font-weight: 700;">🟢 GCC Online</span>
+        <button class="btn-hint" onclick="resetProgress()" style="font-size: 13px; padding: 6px 14px;">🔄 Resetar Progresso</button>
+    </div>
+
+    <div class="quest-nav" id="quest-nav"></div>
+    <div class="quest-card" id="quest-card"></div>
+</div>
+
+<script>
+const QUESTOES = [
+    {
+        id: 1,
+        titulo: "Soma Condicional (+5 ou -7)",
+        pontos: 25,
+        enunciado: `<p>Escreva um programa que <strong>leia dois valores inteiros</strong> e efetue a <strong>soma</strong> entre eles.</p>
+                    <ul style="list-style-position:inside;margin:10px 0;">
+                        <li>Se a soma for <strong>≥ 10</strong>: some <strong>+5</strong> ao resultado</li>
+                        <li>Se a soma for <strong>&lt; 10</strong>: subtraia <strong>-7</strong> do resultado</li>
+                    </ul>
+                    <p>Apresente o resultado final na tela.</p>`,
+        exemplo: `📥 Entrada:  8 5\n📤 Saída:    Resultado: 18\n\n📥 Entrada:  3 4\n📤 Saída:    Resultado: 0`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "8 5", expected: "Resultado: 18" },
+            { input: "3 4", expected: "Resultado: 0" },
+            { input: "10 0", expected: "Resultado: 15" },
+            { input: "2 1", expected: "Resultado: -4" }
+        ],
+        dica: "soma = a + b; if (soma >= 10) resultado = soma + 5; else resultado = soma - 7;"
+    },
+    {
+        id: 2,
+        titulo: "Reajuste de Salário (3 Faixas)",
+        pontos: 30,
+        enunciado: `<p>Escreva um programa que efetue o <strong>cálculo do reajuste de salário</strong> de um funcionário:</p>
+                    <ul style="list-style-position:inside;margin:10px 0;">
+                        <li>Salário <strong>&lt; R$ 1.000,00</strong> → reajuste de <strong>15%</strong></li>
+                        <li>Salário <strong>≥ R$ 1.000,00 e ≤ R$ 1.500,00</strong> → reajuste de <strong>10%</strong></li>
+                        <li>Salário <strong>&gt; R$ 1.500,00</strong> → reajuste de <strong>5%</strong></li>
+                    </ul>
+                    <p>Apresente o novo salário.</p>`,
+        exemplo: `📥 Entrada:  800.00\n📤 Saída:    Novo salario: 920.00\n\n📥 Entrada:  1200.00\n📤 Saída:    Novo salario: 1320.00\n\n📥 Entrada:  2000.00\n📤 Saída:    Novo salario: 2100.00`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "800.00", expected: "Novo salario: 920.00" },
+            { input: "1200.00", expected: "Novo salario: 1320.00" },
+            { input: "2000.00", expected: "Novo salario: 2100.00" },
+            { input: "1000.00", expected: "Novo salario: 1100.00" },
+            { input: "1500.00", expected: "Novo salario: 1650.00" }
+        ],
+        dica: "Use if-else if-else. Cuidado com os limites: < 1000 (15%), 1000-1500 (10%), > 1500 (5%). Formate com %.2f."
+    },
+    {
+        id: 3,
+        titulo: "Maior Entre Dois Números",
+        pontos: 20,
+        enunciado: `<p>Escreva um programa que <strong>leia dois números</strong> e mostre <strong>qual deles é o maior</strong>.</p>`,
+        exemplo: `📥 Entrada:  10 25\n📤 Saída:    Maior: 25\n\n📥 Entrada:  50 50\n📤 Saída:    Maior: 50`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "10 25", expected: "Maior: 25" },
+            { input: "50 50", expected: "Maior: 50" },
+            { input: "-5 3", expected: "Maior: 3" },
+            { input: "100 99", expected: "Maior: 100" }
+        ],
+        dica: "Use if (a > b) maior = a; else maior = b; Se forem iguais, qualquer um serve."
+    },
+    {
+        id: 4,
+        titulo: "Ordenar Três Números (Crescente)",
+        pontos: 30,
+        enunciado: `<p>Escreva um programa que <strong>leia três números</strong> e mostre-os em <strong>ordem crescente</strong>.</p>`,
+        exemplo: `📥 Entrada:  30 10 20\n📤 Saída:    Ordem crescente: 10 20 30`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "30 10 20", expected: "Ordem crescente: 10 20 30" },
+            { input: "5 5 5", expected: "Ordem crescente: 5 5 5" },
+            { input: "7 3 9", expected: "Ordem crescente: 3 7 9" },
+            { input: "100 50 75", expected: "Ordem crescente: 50 75 100" }
+        ],
+        dica: "Compare e troque se necessário. Use variável temporária (temp) para trocar valores."
+    },
+    {
+        id: 5,
+        titulo: "Par ou Ímpar",
+        pontos: 20,
+        enunciado: `<p>Escreva um programa que <strong>leia um número inteiro</strong> e verifique se este número é <strong>par ou ímpar</strong>.</p>`,
+        exemplo: `📥 Entrada:  7\n📤 Saída:    Impar\n\n📥 Entrada:  10\n📤 Saída:    Par`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "7", expected: "Impar" },
+            { input: "10", expected: "Par" },
+            { input: "0", expected: "Par" },
+            { input: "-3", expected: "Impar" }
+        ],
+        dica: "Use o operador módulo (%). Se numero % 2 == 0, é par; senão, ímpar."
+    },
+    {
+        id: 6,
+        titulo: "Classificação por Altura e Peso",
+        pontos: 35,
+        enunciado: `<p>Escreva um programa que <strong>leia a altura e o peso</strong> de uma pessoa e mostre a <strong>classificação</strong> conforme a tabela:</p>
+                    <table class="classif-table">
+                        <tr><th>Altura</th><th colspan="3">Peso</th></tr>
+                        <tr><th></th><th>Até 60</th><th>Entre 60 e 90<br>(Inclusive)</th><th>Acima de 90</th></tr>
+                        <tr><td>Menor que 1,20</td><td>A</td><td>D</td><td>G</td></tr>
+                        <tr><td>De 1,20 a 1,70</td><td>B</td><td>E</td><td>H</td></tr>
+                        <tr><td>Maior que 1,70</td><td>C</td><td>F</td><td>I</td></tr>
+                    </table>`,
+        exemplo: `📥 Entrada:  1.65 75\n📤 Saída:    Classificacao: E\n\n📥 Entrada:  1.15 50\n📤 Saída:    Classificacao: A\n\n📥 Entrada:  1.80 95\n📤 Saída:    Classificacao: I`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "1.65 75", expected: "Classificacao: E" },
+            { input: "1.15 50", expected: "Classificacao: A" },
+            { input: "1.80 95", expected: "Classificacao: I" },
+            { input: "1.20 60", expected: "Classificacao: E" },
+            { input: "1.70 90", expected: "Classificacao: E" },
+            { input: "1.19 45", expected: "Classificacao: A" },
+            { input: "1.71 100", expected: "Classificacao: I" }
+        ],
+        dica: "Use if-else aninhado: primeiro verifique a altura, depois o peso. Cuidado com os limites: 'Até 60' (peso ≤ 60), 'Entre 60 e 90' (60 < peso ≤ 90), 'Acima de 90' (peso > 90)."
+    },
+    {
+        id: 7,
+        titulo: "Média e Conceito do Aluno",
+        pontos: 30,
+        enunciado: `<p>A <strong>média final</strong> de um estudante é calculada a partir de <strong>três notas</strong>: trabalho de laboratório, avaliação semestral e exame final.</p>
+                    <p>O programa deve calcular a média e atribuir um <strong>conceito</strong>:</p>
+                    <ul style="list-style-position:inside;margin:10px 0;">
+                        <li><strong>0,0 a 5,0</strong> → Conceito <strong>E</strong></li>
+                        <li><strong>5,1 a 6,0</strong> → Conceito <strong>D</strong></li>
+                        <li><strong>6,1 a 7,0</strong> → Conceito <strong>C</strong></li>
+                        <li><strong>7,1 a 8,0</strong> → Conceito <strong>B</strong></li>
+                        <li><strong>8,1 a 10,0</strong> → Conceito <strong>A</strong></li>
+                    </ul>`,
+        exemplo: `📥 Entrada:  7.5 8.0 9.0\n📤 Saída:    Media: 8.17\n            Conceito: B\n\n📥 Entrada:  4.0 5.0 6.0\n📤 Saída:    Media: 5.00\n            Conceito: E`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "7.5 8.0 9.0", expected: "Media: 8.17\nConceito: B" },
+            { input: "4.0 5.0 6.0", expected: "Media: 5.00\nConceito: E" },
+            { input: "5.5 6.0 6.5", expected: "Media: 6.00\nConceito: D" },
+            { input: "6.0 7.0 8.0", expected: "Media: 7.00\nConceito: C" },
+            { input: "9.0 9.5 10.0", expected: "Media: 9.50\nConceito: A" }
+        ],
+        dica: "Calcule media = (n1+n2+n3)/3.0. Use if-else if para os conceitos. Cuidado com os intervalos: ≤ 5.0 (E), 5.1-6.0 (D), 6.1-7.0 (C), 7.1-8.0 (B), 8.1-10.0 (A)."
+    }
+];
+
+// ========== LOCALSTORAGE ==========
+const STORAGE_KEY = 'lista3_exercicios_c_progress';
+
+function loadProgress() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch(e) {
+        return {};
+    }
+}
+
+function saveProgress(questionId, result, score) {
+    try {
+        const progress = loadProgress();
+        progress[questionId] = {
+            result: result,
+            score: score,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    } catch(e) {
+        console.warn('Não foi possível salvar no localStorage:', e);
+    }
+}
+
+function resetProgress() {
+    if (confirm('Tem certeza que deseja resetar TODO o progresso? Esta ação não pode ser desfeita.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        questResults = {};
+        totalScore = 0;
+        correctCount = 0;
+        document.getElementById('total-score').textContent = '0';
+        document.getElementById('correct-count').textContent = '0';
+        document.getElementById('progress-bar').style.width = '0%';
+        renderNav();
+        goToQuest(0);
+        alert('✅ Progresso resetado com sucesso!');
+    }
+}
+
+// ========== SIDEBAR ==========
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const hamburger = document.getElementById('hamburger-btn');
+
+    const isOpen = sidebar.classList.contains('open');
+
+    if (isOpen) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+        hamburger.classList.remove('open');
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+        hamburger.classList.add('open');
+    }
+}
+
+// ========== FUNÇÕES ==========
+function highlightC(code) {
+    return code
+        .replace(/^(#include)\s+(<.*?>)/gm, '<span class="preprocessor">$1</span> <span class="header-file">$2</span>')
+        .replace(/^(#define)\s+(\w+)\s+(.*)/gm, '<span class="preprocessor">$1</span> <span class="keyword">$2</span> <span class="number">$3</span>')
+        .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
+        .replace(/"([^"\\]|\\.)*"/g, '<span class="string">$&</span>')
+        .replace(/%[dfsclu]/g, '<span class="format">$&</span>')
+        .replace(/\b(int|float|double|char|void|long|short|unsigned|signed|const|static|extern|struct|enum|typedef|sizeof)\b/g, '<span class="type">$1</span>')
+        .replace(/\b(if|else|for|while|do|switch|case|break|continue|return|goto|default|define)\b/g, '<span class="keyword">$1</span>')
+        .replace(/\b(printf|scanf|puts|gets|putchar|getchar|fopen|fclose|fprintf|fscanf|malloc|calloc|free|main|ceil|pow|sqrt)\b/g, '<span class="function">$1</span>')
+        .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>')
+        .replace(/(\{|\})/g, '<span class="brace">$1</span>');
+}
+
+function syncHighlight() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+
+    if (ta && hl) {
+        const sanitized = ta.value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        hl.innerHTML = highlightC(sanitized);
+
+        if (lineNumbers) {
+            const lines = ta.value.split('\n');
+            const lineCount = lines.length || 1;
+            let lineNumbersHtml = '';
+            for (let i = 1; i <= lineCount; i++) {
+                lineNumbersHtml += i + '\n';
+            }
+            lineNumbers.textContent = lineNumbersHtml;
+        }
+    }
+}
+
+function syncScroll() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+
+    if (ta && hl) {
+        hl.scrollTop = ta.scrollTop;
+        hl.scrollLeft = ta.scrollLeft;
+    }
+
+    if (lineNumbers) {
+        lineNumbers.scrollTop = ta.scrollTop;
+    }
+}
+
+// Estado global
+let questResults = {};
+let totalScore = 0;
+let correctCount = 0;
+let currentQuest = 0;
+
+function init() {
+    const savedProgress = loadProgress();
+    questResults = {};
+    totalScore = 0;
+    correctCount = 0;
+
+    for (const [id, data] of Object.entries(savedProgress)) {
+        if (data.result === 'correct') {
+            questResults[id] = 'correct';
+            totalScore += data.score || 0;
+            correctCount++;
+        } else {
+            questResults[id] = 'wrong';
+        }
+    }
+
+    document.getElementById('total-quest').textContent = QUESTOES.length;
+    document.getElementById('correct-count').textContent = correctCount;
+    document.getElementById('total-score').textContent = totalScore;
+
+    const progressPercent = (correctCount / QUESTOES.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+
+    renderNav();
+    renderQuest(0);
+}
+
+function renderNav() {
+    document.getElementById('quest-nav').innerHTML = QUESTOES.map((q, i) => {
+        let c = '';
+        if (i === currentQuest) c = 'active';
+        else if (questResults[q.id] === 'correct') c = 'correct';
+        else if (questResults[q.id] === 'wrong') c = 'wrong';
+        return `<button class="${c}" onclick="goToQuest(${i})" title="Questão ${q.id}">${q.id}</button>`;
+    }).join('');
+}
+
+function goToQuest(i) {
+    currentQuest = i;
+    renderNav();
+    renderQuest(i);
+}
+
+function renderQuest(i) {
+    const q = QUESTOES[i];
+    const isCompleted = questResults[q.id] === 'correct';
+
+    document.getElementById('quest-card').innerHTML = `
+        <div class="quest-header">
+            <span class="quest-number">Questão ${q.id} ${isCompleted ? '✅' : ''}</span>
+            <span class="quest-points">⭐ ${q.pontos} pontos</span>
+        </div>
+        <div class="quest-title">${q.titulo}</div>
+        <div class="quest-desc">${q.enunciado}</div>
+        <div class="quest-example"><h4>📋 Exemplo:</h4><pre>${q.exemplo}</pre></div>
+        <div class="code-section">
+            <div class="code-editor-wrapper" id="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <span>📝 main.c</span>
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <button class="btn-expand" onclick="toggleExpand(event)" title="Expandir/Recolher">⛶ Expandir</button>
+                        <span style="font-size:12px;">Ctrl+Enter</span>
+                    </span>
+                </div>
+                <div class="code-editor-body">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="code-content">
+                        <div class="code-highlight" id="code-highlight"></div>
+                        <textarea class="code-textarea" id="code-textarea" oninput="syncHighlight()" onscroll="syncScroll()" onkeydown="handleKeyDown(event)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="test-panel">
+                <h3>🧪 Testes (${q.testCases.length})</h3>
+                ${q.testCases.map((t, i) => `<div class="test-case"><div class="label">Teste ${i+1}</div><div class="value">📥 ${t.input || '(sem entrada)'}</div><div class="value">📤 ${t.expected}</div></div>`).join('')}
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:20px;">
+            ${!isCompleted ? `
+                <button class="btn btn-submit" id="submit-btn" onclick="submitCode(${q.id})">✅ Enviar e Validar</button>
+                <span class="spinner" id="spinner"></span>
+                <button class="btn btn-hint" onclick="showHint(${q.id})">💡 Dica</button>
+            ` : `
+                <p style="color: var(--correct); font-weight: 700; font-size: 18px;">✅ Questão já resolvida! +${q.pontos} pontos</p>
+                <button class="btn btn-reset" onclick="retryQuest(${q.id})" style="margin-top: 10px;">🔄 Tentar Novamente</button>
+            `}
+        </div>
+        <div class="result-box" id="result-box-${q.id}"></div>
+        <div class="hint-box" id="hint-box-${q.id}">${q.dica}</div>`;
+
+    document.getElementById('code-textarea').value = q.codeTemplate;
+    syncHighlight();
+}
+
+function retryQuest(id) {
+    const q = QUESTOES.find(x => x.id === id);
+    if (!q) return;
+
+    delete questResults[id];
+
+    const progress = loadProgress();
+    delete progress[id];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+
+    totalScore -= q.pontos;
+    correctCount--;
+
+    document.getElementById('total-score').textContent = totalScore;
+    document.getElementById('correct-count').textContent = correctCount;
+
+    const progressPercent = (correctCount / QUESTOES.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+
+    renderNav();
+    renderQuest(QUESTOES.indexOf(q));
+}
+
+function getCode() {
+    const t = document.getElementById('code-textarea');
+    return t ? t.value.trim() : '';
+}
+
+async function submitCode(id) {
+    const code = getCode();
+    const q = QUESTOES.find(x => x.id === id);
+    const rb = document.getElementById(`result-box-${id}`);
+    const btn = document.getElementById('submit-btn');
+    const sp = document.getElementById('spinner');
+
+    if (!code) {
+        rb.className = 'result-box fail show';
+        rb.innerHTML = '<h3>❌ Erro</h3>Digite seu código!';
+        return;
+    }
+
+    btn.disabled = true;
+    sp.classList.add('show');
+    rb.className = 'result-box show';
+    rb.innerHTML = '<h3>🔄 Compilando...</h3>';
+
+    let ok = true;
+    let results = [];
+
+    for (let i = 0; i < q.testCases.length; i++) {
+        const tc = q.testCases[i];
+        try {
+            const r = await fetch('https://siteparaestudar.onrender.com/compilar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({code, input: tc.input})
+            });
+
+            if (!r.ok) throw new Error('Erro servidor');
+
+            const d = await r.json();
+            const exp = tc.expected.trim();
+            const got = (d.output || '').trim();
+            const pass = got === exp && !d.error;
+
+            results.push({
+                test: i + 1,
+                input: tc.input,
+                expected: exp,
+                got,
+                error: d.error || '',
+                passed: pass
+            });
+
+            if (!pass) ok = false;
+        } catch(e) {
+            results.push({
+                test: i + 1,
+                input: tc.input,
+                expected: tc.expected,
+                got: 'ERRO',
+                error: e.message,
+                passed: false
+            });
+            ok = false;
+        }
+    }
+
+    let h = ok ? `<h3>🎉 Todos passaram! +${q.pontos} pts</h3>` : '<h3>❌ Falhou</h3>';
+    results.forEach(r => {
+        h += `<div style="margin:10px 0;padding:12px;background:rgba(0,0,0,0.3);border-radius:10px;">
+            <strong>${r.passed ? '✅' : '❌'} Teste ${r.test}:</strong>
+            📥 <code>${r.input || '(sem entrada)'}</code> →
+            📤 Esperado: <code style="color:#6dfabc;">${r.expected}</code> |
+            Obtido: <code style="color:${r.passed ? '#6dfabc' : '#e74c3c'};">${r.got || '(vazio)'}</code>
+            ${r.error ? `<br>⚠️ ${r.error}` : ''}
+        </div>`;
+    });
+
+    rb.className = `result-box show ${ok ? 'success' : 'fail'}`;
+    rb.innerHTML = h;
+
+    if (ok) {
+        questResults[id] = 'correct';
+        totalScore += q.pontos;
+        correctCount++;
+
+        saveProgress(id, 'correct', q.pontos);
+
+        document.getElementById('total-score').textContent = totalScore;
+        document.getElementById('correct-count').textContent = correctCount;
+
+        const progressPercent = (correctCount / QUESTOES.length) * 100;
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+
+        renderNav();
+
+        const nextIndex = QUESTOES.findIndex(x => x.id === id) + 1;
+        if (nextIndex < QUESTOES.length) {
+            setTimeout(() => {
+                if (confirm('🎉 Parabéns! Deseja ir para a próxima questão?')) {
+                    goToQuest(nextIndex);
+                } else {
+                    renderQuest(QUESTOES.findIndex(x => x.id === id));
+                }
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                alert('🏆 PARABÉNS! Você completou todas as questões da Lista 3!');
+            }, 1000);
+        }
+    } else {
+        questResults[id] = 'wrong';
+        saveProgress(id, 'wrong', 0);
+        renderNav();
+    }
+
+    btn.disabled = false;
+    sp.classList.remove('show');
+}
+
+function showHint(id) {
+    document.getElementById(`hint-box-${id}`)?.classList.toggle('show');
+}
+
+function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        const q = QUESTOES[currentQuest];
+        if (!questResults[q.id] || questResults[q.id] !== 'correct') {
+            submitCode(q.id);
+        }
+    }
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = e.target.selectionStart;
+        e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd);
+        e.target.selectionStart = e.target.selectionEnd = s + 4;
+        syncHighlight();
+    }
+}
+
+// ========== EXPANDIR ==========
+function toggleExpand(e) {
+    if (e) e.stopPropagation();
+
+    const wrapper = document.getElementById('code-editor-wrapper');
+    const overlay = document.getElementById('code-overlay');
+    const btn = document.querySelector('.btn-expand');
+
+    if (!wrapper || !overlay) return;
+
+    const isExpanded = wrapper.classList.contains('expanded');
+
+    if (!isExpanded) {
+        wrapper.classList.add('expanded');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        if (btn) btn.innerHTML = '⛶ Recolher';
+    } else {
+        wrapper.classList.remove('expanded');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        if (btn) btn.innerHTML = '⛶ Expandir';
+    }
+
+    setTimeout(syncHighlight, 50);
+}
+
+// Inicializar
+init();
+
+// Event listeners
+document.getElementById('code-overlay').addEventListener('click', (e) => {
+    const wrapper = document.getElementById('code-editor-wrapper');
+    if (e.target.id === 'code-overlay' && wrapper && wrapper.classList.contains('expanded')) {
+        toggleExpand();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") {
+        const wrapper = document.getElementById('code-editor-wrapper');
+        if (wrapper && wrapper.classList.contains('expanded')) {
+            toggleExpand();
+        }
+    }
+});
+
+document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('code-editor-wrapper');
+    if (wrapper && wrapper.contains(e.target) && wrapper.classList.contains('expanded')) {
+        e.stopPropagation();
+    }
+});
+</script>
+<script src="JS/footer.js"></script>
+<script src="JS/sidebar.js"></script>
+
+</body>
+</html>

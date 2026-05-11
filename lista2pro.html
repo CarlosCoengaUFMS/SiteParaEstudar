@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Exercícios 2 · Programação C</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #6dfabc;
+            --accent3: #fa6d8a;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --warning: #fadc6d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            font-size: 18px;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2em;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .quest-nav {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            justify-content: center; padding: 8px 0; margin-bottom: 10px;
+        }
+        .quest-nav button {
+            width: 42px; height: 42px; border-radius: 10px;
+            border: 2px solid var(--border); background: var(--surface);
+            color: var(--text); font-weight: 700; font-size: 16px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .quest-nav button:hover { border-color: var(--accent); }
+        .quest-nav button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .quest-nav button.correct { background: var(--correct); border-color: var(--correct); color: #fff; }
+        .quest-nav button.wrong { background: var(--wrong); border-color: var(--wrong); color: #fff; }
+
+        .quest-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 25px 30px; margin-bottom: 20px;
+        }
+
+        .quest-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 15px;
+        }
+        .quest-number { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent); }
+        .quest-points { background: rgba(250,220,109,0.15); color: var(--warning); padding: 5px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+        .quest-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; color: #fff; }
+        .quest-desc { color: var(--muted); margin-bottom: 18px; line-height: 1.8; font-size: 16px; }
+        .quest-example { background: #0a0a0d; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+        .quest-example h4 { color: var(--accent2); margin-bottom: 8px; font-size: 15px; }
+        .quest-example pre { font-family: 'Fira Code', monospace; font-size: 14px; color: var(--muted); white-space: pre-wrap; line-height: 1.6; }
+
+        .code-section { display: grid; grid-template-columns: 1fr 320px; gap: 18px; margin-bottom: 10px; }
+        @media (max-width: 1000px) { .code-section { grid-template-columns: 1fr; } }
+
+        .code-editor-wrapper {
+            background: #1E1E1E; border: 1px solid #3C3C3C;
+            border-radius: 10px; overflow: hidden;
+        }
+        .code-editor-header {
+            background: #2D2D2D; padding: 8px 16px;
+            font-size: 13px; color: #CCCCCC;
+            display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid #3C3C3C;
+        }
+        .code-editor-body {
+            display: flex;
+            height: 380px;
+            overflow: hidden;
+        }
+
+        .line-numbers {
+            padding: 16px 10px 16px 16px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.8;
+            color: #858585;
+            background: #1A1A1A;
+            border-right: 1px solid #3C3C3C;
+            text-align: right;
+            user-select: none;
+            white-space: pre;
+            overflow: hidden;
+            min-width: 50px;
+            flex-shrink: 0;
+        }
+
+        .code-content {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .code-highlight {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            padding: 16px; font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px; line-height: 1.8; white-space: pre-wrap;
+            word-wrap: break-word; overflow: auto;
+            background: #1E1E1E; tab-size: 4;
+            z-index: 1;
+            color: #D4D4D4;
+        }
+
+        .code-textarea {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            padding: 16px; font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 15px; line-height: 1.8; resize: none;
+            outline: none; border: none;
+            background: transparent !important;
+            color: transparent !important;
+            caret-color: #FFFFFF;
+            tab-size: 4; z-index: 2; overflow: auto;
+            -webkit-text-fill-color: transparent !important;
+        }
+
+        .code-highlight .preprocessor { color: #C586C0; }
+        .code-highlight .header-file { color: #CE9178; }
+        .code-highlight .keyword { color: #569CD6; font-weight: 600; }
+        .code-highlight .type { color: #569CD6; }
+        .code-highlight .function { color: #DCDCAA; }
+        .code-highlight .string { color: #CE9178; }
+        .code-highlight .format { color: #E57373; }
+        .code-highlight .number { color: #B5CEA8; }
+        .code-highlight .comment { color: #6A9955; font-style: italic; }
+        .code-highlight .brace { color: #FFD700; }
+
+        .btn-expand {
+            background: transparent; border: 1px solid #555;
+            color: #CCCCCC; cursor: pointer;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 13px; transition: all 0.3s;
+            display: flex; align-items: center; gap: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-expand:hover { background: #3C3C3C; border-color: #888; color: #fff; }
+
+        .code-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            cursor: pointer;
+        }
+        .code-overlay.show { display: block; }
+
+        .code-editor-wrapper.expanded {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            z-index: 9999;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+        }
+        .code-editor-wrapper.expanded .code-editor-body {
+            height: calc(100vh - 80px) !important;
+        }
+        .code-editor-wrapper.expanded .line-numbers {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px 10px 22px 22px !important;
+        }
+        .code-editor-wrapper.expanded .code-highlight,
+        .code-editor-wrapper.expanded .code-textarea {
+            font-size: 20px !important;
+            line-height: 2 !important;
+            padding: 22px !important;
+        }
+
+        .test-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+        .test-panel h3 { font-size: 15px; color: var(--accent); margin-bottom: 10px; font-weight: 700; }
+        .test-case { background: #0a0a0d; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 13px; }
+        .test-case .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 700; }
+        .test-case .value { font-family: 'Fira Code', monospace; font-size: 13px; color: var(--text); line-height: 1.5; }
+
+        .btn { padding: 10px 22px; border: none; border-radius: 10px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-submit { background: var(--accent); color: #fff; font-size: 17px; padding: 14px 36px; box-shadow: 0 6px 20px rgba(124,109,250,0.3); border-radius: 14px; }
+        .btn-submit:hover { background: #8f80ff; transform: translateY(-1px); }
+        .btn-submit:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .btn-hint { background: transparent; border: 2px solid var(--border); color: var(--muted); font-size: 14px; }
+        .btn-hint:hover { border-color: var(--warning); color: var(--warning); }
+        .btn-reset { background: transparent; border: 2px solid #e74c3c; color: #e74c3c; font-size: 14px; }
+        .btn-reset:hover { background: rgba(231,76,60,0.1); }
+
+        .result-box { display: none; padding: 16px; border-radius: 12px; margin-top: 15px; font-size: 15px; line-height: 1.7; }
+        .result-box.show { display: block; }
+        .result-box.success { background: rgba(46,204,113,0.1); border: 2px solid rgba(46,204,113,0.3); color: var(--correct); }
+        .result-box.fail { background: rgba(231,76,60,0.1); border: 2px solid rgba(231,76,60,0.3); color: #ff8080; }
+
+        .score-bar { 
+            background: rgba(13,13,15,0.92); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--border); 
+            padding: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .spinner { display: none; width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner.show { display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hint-box { display: none; background: rgba(250,220,109,0.08); border: 2px solid rgba(250,220,109,0.25); color: var(--warning); padding: 12px 16px; border-radius: 10px; margin-top: 12px; font-size: 14px; line-height: 1.7; }
+        .hint-box.show { display: block; }
+
+        /* ========== SIDEBAR ========== */
+        .hamburger-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 200;
+            width: 44px; height: 44px;
+            background: rgba(21,21,26,0.85); backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 5px; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .hamburger-btn:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba(124,109,250,0.2); }
+        .hamburger-line {
+            width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px); z-index: 250; opacity: 0;
+            pointer-events: none; transition: opacity 0.3s;
+        }
+        .sidebar-overlay.show { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+            background: rgba(21,21,26,0.95); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); z-index: 260;
+            transform: translateX(-100%); transition: transform 0.35s;
+            display: flex; flex-direction: column; padding: 0;
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 24px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+        }
+        .sidebar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+
+        .sidebar-nav {
+            flex: 1; padding: 16px 12px; display: flex;
+            flex-direction: column; gap: 4px; overflow-y: auto;
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 10px;
+            color: var(--muted); text-decoration: none;
+            font-size: 14px; transition: all 0.3s; font-weight: 500;
+        }
+        .sidebar-link:hover { background: rgba(124,109,250,0.1); color: var(--text); }
+        .sidebar-link.active { background: rgba(124,109,250,0.15); border: 1px solid rgba(124,109,250,0.3); color: #fff; }
+        .sidebar-link .icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .sidebar-footer {
+            padding: 16px 20px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--muted); text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .code-highlight, .code-textarea, .line-numbers { font-size: 13px; padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Overlay para expandir -->
+<div class="code-overlay" id="code-overlay"></div>
+
+<!-- Hamburger Menu -->
+<div class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+</div>
+
+<div class="container">
+    <h1>📝 Lista de Exercícios 2</h1>
+    <p class="subtitle">Programação em Linguagem C · 10 Exercícios</p>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="score-bar">
+        <span style="font-weight:700;">✅ <span id="correct-count">0</span> / <span id="total-quest">10</span></span>
+        <span style="font-weight:700;">⭐ <span id="total-score">0</span> pontos</span>
+        <span style="color: var(--accent2); font-weight: 700;">🟢 GCC Online</span>
+        <button class="btn-hint" onclick="resetProgress()" style="font-size: 13px; padding: 6px 14px;">🔄 Resetar Progresso</button>
+    </div>
+    
+    <div class="quest-nav" id="quest-nav"></div>
+    <div class="quest-card" id="quest-card"></div>
+</div>
+
+<script>
+const QUESTOES = [
+    {
+        id: 1,
+        titulo: "Mensagem na Tela",
+        pontos: 10,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>imprima a seguinte mensagem</strong> na tela:</p>
+                    <p style="color:var(--accent2);background:rgba(124,109,250,0.1);padding:10px;border-radius:8px;text-align:center;font-weight:700;">"Eu vou aprender a programar em Linguagem C na disciplina Algoritmos e Programação I"</p>`,
+        exemplo: `📤 Saída: Eu vou aprender a programar em Linguagem C na disciplina Algoritmos e Programação I`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "", expected: "Eu vou aprender a programar em Linguagem C na disciplina Algoritmos e Programação I" }
+        ],
+        dica: "Use <code>printf(\"mensagem\");</code> para imprimir."
+    },
+    {
+        id: 2,
+        titulo: "Mensagem em Três Linhas",
+        pontos: 15,
+        enunciado: `<p>Altere o programa anterior para que a mensagem seja <strong>dividida e apresentada em três linhas diferentes</strong>.</p>
+                    <p style="color:var(--warning);">Divida o texto de forma coerente em 3 linhas.</p>`,
+        exemplo: `📤 Saída:\nEu vou aprender a programar\nem Linguagem C na disciplina\nAlgoritmos e Programação I`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "", expected: "Eu vou aprender a programar\nem Linguagem C na disciplina\nAlgoritmos e Programação I" }
+        ],
+        dica: "Use <code>\\n</code> para quebrar linhas ou use 3 <code>printf</code> separados."
+    },
+    {
+        id: 3,
+        titulo: "Média Aritmética de 4 Números",
+        pontos: 20,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia 4 números inteiros</strong>, calcule a <strong>média aritmética</strong> entre esses números e imprima o resultado na tela.</p>`,
+        exemplo: `📥 Entrada:  7 8 9 10\n📤 Saída:    Media: 8.50`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "7 8 9 10", expected: "Media: 8.50" },
+            { input: "5 5 5 5", expected: "Media: 5.00" },
+            { input: "10 20 30 40", expected: "Media: 25.00" }
+        ],
+        dica: "Use <code>float</code> para a média: (n1+n2+n3+n4)/4.0 e <code>%.2f</code>."
+    },
+    {
+        id: 4,
+        titulo: "Antecessor e Sucessor",
+        pontos: 15,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia um número</strong> e imprima o seu <strong>antecessor</strong> e o seu <strong>sucessor</strong>.</p>`,
+        exemplo: `📥 Entrada:  10\n📤 Saída:    Antecessor: 9\n            Sucessor: 11`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "10", expected: "Antecessor: 9\nSucessor: 11" },
+            { input: "0", expected: "Antecessor: -1\nSucessor: 1" },
+            { input: "-5", expected: "Antecessor: -6\nSucessor: -4" }
+        ],
+        dica: "Antecessor = numero - 1; Sucessor = numero + 1."
+    },
+    {
+        id: 5,
+        titulo: "Conversor Celsius para Fahrenheit e Kelvin",
+        pontos: 25,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia uma temperatura na escala Celsius</strong>, converta para o seu valor correspondente nas escalas <strong>Fahrenheit e Kelvin</strong> e imprima esses valores na tela.</p>
+                    <p style="color:var(--accent2);">Fórmulas: F = (C × 9/5) + 32 | K = C + 273.15</p>`,
+        exemplo: `📥 Entrada:  25\n📤 Saída:    Fahrenheit: 77.00\n            Kelvin: 298.15`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "25", expected: "Fahrenheit: 77.00\nKelvin: 298.15" },
+            { input: "0", expected: "Fahrenheit: 32.00\nKelvin: 273.15" },
+            { input: "100", expected: "Fahrenheit: 212.00\nKelvin: 373.15" }
+        ],
+        dica: "Use <code>float</code>. F = (C * 9.0/5.0) + 32; K = C + 273.15."
+    },
+    {
+        id: 6,
+        titulo: "Área do Triângulo",
+        pontos: 20,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia a base e a altura de um triângulo</strong>, calcule a <strong>área</strong> desse triângulo e imprima o resultado na tela.</p>
+                    <p style="color:var(--accent2);">Fórmula: Área = (base × altura) / 2</p>`,
+        exemplo: `📥 Entrada:  10 5\n📤 Saída:    Area do triangulo: 25.00`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "10 5", expected: "Area do triangulo: 25.00" },
+            { input: "7 3", expected: "Area do triangulo: 10.50" },
+            { input: "15 8", expected: "Area do triangulo: 60.00" }
+        ],
+        dica: "Use <code>float</code>. area = (base * altura) / 2.0."
+    },
+    {
+        id: 7,
+        titulo: "Conversor km/h para m/s",
+        pontos: 20,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia o valor de uma velocidade em quilômetros por hora</strong>, calcule o valor correspondente em <strong>metros por segundo</strong> e imprima o resultado na tela.</p>
+                    <p style="color:var(--accent2);">Fórmula: m/s = km/h / 3.6</p>`,
+        exemplo: `📥 Entrada:  72\n📤 Saída:    Velocidade: 20.00 m/s`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "72", expected: "Velocidade: 20.00 m/s" },
+            { input: "36", expected: "Velocidade: 10.00 m/s" },
+            { input: "108", expected: "Velocidade: 30.00 m/s" }
+        ],
+        dica: "Divida a velocidade em km/h por 3.6. Use <code>%.2f</code>."
+    },
+    {
+        id: 8,
+        titulo: "Área da Circunferência",
+        pontos: 20,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia o raio de uma circunferência</strong>, calcule a <strong>área</strong> dessa circunferência e imprima o resultado na tela.</p>
+                    <p style="color:var(--accent2);">Fórmula: Área = π × raio²</p>
+                    <p style="color:var(--warning);">Use π = 3.14159</p>`,
+        exemplo: `📥 Entrada:  5\n📤 Saída:    Area da circunferencia: 78.54`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "5", expected: "Area da circunferencia: 78.54" },
+            { input: "3", expected: "Area da circunferencia: 28.27" },
+            { input: "10", expected: "Area da circunferencia: 314.16" }
+        ],
+        dica: "Defina <code>#define PI 3.14159</code> ou use <code>const float PI = 3.14159;</code>"
+    },
+    {
+        id: 9,
+        titulo: "Triplo de um Número Real",
+        pontos: 15,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia um número real</strong>, calcule o <strong>triplo</strong> deste número e imprima o resultado na tela.</p>`,
+        exemplo: `📥 Entrada:  7.5\n📤 Saída:    Triplo: 22.50`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "7.5", expected: "Triplo: 22.50" },
+            { input: "3.0", expected: "Triplo: 9.00" },
+            { input: "-2.5", expected: "Triplo: -7.50" }
+        ],
+        dica: "Multiplique o número por 3. Use <code>float</code> e <code>%.2f</code>."
+    },
+    {
+        id: 10,
+        titulo: "Inversor de Número CDU para UDC",
+        pontos: 30,
+        enunciado: `<p>Escreva um programa em linguagem C que <strong>leia um número no formato CDU</strong> (centena, dezena e unidade) e imprima esse número <strong>invertido (UDC)</strong>.</p>
+                    <p style="color:var(--accent2);">Exemplo: quando o número lido for 123, o programa deve imprimir 321.</p>
+                    <p style="color:var(--warning);">Antes de imprimir o número invertido, ele deve ser <strong>armazenado em outra variável</strong>, diferente daquela usada para armazenar o número digitado.</p>
+                    <p style="color:var(--accent2);">Dica: utilize o operador de resto da divisão (%).</p>`,
+        exemplo: `📥 Entrada:  123\n📤 Saída:    Numero invertido: 321`,
+        codeTemplate: `#include <stdio.h>\n\nint main() {\n    \n}`,
+        testCases: [
+            { input: "123", expected: "Numero invertido: 321" },
+            { input: "456", expected: "Numero invertido: 654" },
+            { input: "789", expected: "Numero invertido: 987" },
+            { input: "100", expected: "Numero invertido: 1" }
+        ],
+        dica: "Separe centena (n/100), dezena ((n/10)%10) e unidade (n%10). Depois monte: inv = unidade*100 + dezena*10 + centena."
+    }
+];
+
+// ========== LOCALSTORAGE ==========
+const STORAGE_KEY = 'lista2_exercicios_c_progress';
+
+function loadProgress() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch(e) {
+        return {};
+    }
+}
+
+function saveProgress(questionId, result, score) {
+    try {
+        const progress = loadProgress();
+        progress[questionId] = {
+            result: result,
+            score: score,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    } catch(e) {
+        console.warn('Não foi possível salvar no localStorage:', e);
+    }
+}
+
+function resetProgress() {
+    if (confirm('Tem certeza que deseja resetar TODO o progresso? Esta ação não pode ser desfeita.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        questResults = {};
+        totalScore = 0;
+        correctCount = 0;
+        document.getElementById('total-score').textContent = '0';
+        document.getElementById('correct-count').textContent = '0';
+        document.getElementById('progress-bar').style.width = '0%';
+        renderNav();
+        goToQuest(0);
+        alert('✅ Progresso resetado com sucesso!');
+    }
+}
+
+// ========== SIDEBAR ==========
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const hamburger = document.getElementById('hamburger-btn');
+    
+    const isOpen = sidebar.classList.contains('open');
+    
+    if (isOpen) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+        hamburger.classList.remove('open');
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+        hamburger.classList.add('open');
+    }
+}
+
+// ========== FUNÇÕES ==========
+function highlightC(code) {
+    return code
+        .replace(/^(#include)\s+(<.*?>)/gm, '<span class="preprocessor">$1</span> <span class="header-file">$2</span>')
+        .replace(/^(#define)\s+(\w+)\s+(.*)/gm, '<span class="preprocessor">$1</span> <span class="keyword">$2</span> <span class="number">$3</span>')
+        .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
+        .replace(/"([^"\\]|\\.)*"/g, '<span class="string">$&</span>')
+        .replace(/%[dfsclu]/g, '<span class="format">$&</span>')
+        .replace(/\b(int|float|double|char|void|long|short|unsigned|signed|const|static|extern|struct|enum|typedef|sizeof)\b/g, '<span class="type">$1</span>')
+        .replace(/\b(if|else|for|while|do|switch|case|break|continue|return|goto|default|define)\b/g, '<span class="keyword">$1</span>')
+        .replace(/\b(printf|scanf|puts|gets|putchar|getchar|fopen|fclose|fprintf|fscanf|malloc|calloc|free|main|ceil|pow|sqrt)\b/g, '<span class="function">$1</span>')
+        .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>')
+        .replace(/(\{|\})/g, '<span class="brace">$1</span>');
+}
+
+function syncHighlight() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    
+    if (ta && hl) {
+        const sanitized = ta.value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        
+        hl.innerHTML = highlightC(sanitized);
+        
+        if (lineNumbers) {
+            const lines = ta.value.split('\n');
+            const lineCount = lines.length || 1;
+            let lineNumbersHtml = '';
+            for (let i = 1; i <= lineCount; i++) {
+                lineNumbersHtml += i + '\n';
+            }
+            lineNumbers.textContent = lineNumbersHtml;
+        }
+    }
+}
+
+function syncScroll() {
+    const ta = document.getElementById('code-textarea');
+    const hl = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    
+    if (ta && hl) {
+        hl.scrollTop = ta.scrollTop;
+        hl.scrollLeft = ta.scrollLeft;
+    }
+    
+    if (lineNumbers) {
+        lineNumbers.scrollTop = ta.scrollTop;
+    }
+}
+
+// Estado global
+let questResults = {};
+let totalScore = 0;
+let correctCount = 0;
+let currentQuest = 0;
+
+function init() {
+    // Carregar progresso salvo
+    const savedProgress = loadProgress();
+    questResults = {};
+    totalScore = 0;
+    correctCount = 0;
+    
+    for (const [id, data] of Object.entries(savedProgress)) {
+        if (data.result === 'correct') {
+            questResults[id] = 'correct';
+            totalScore += data.score || 0;
+            correctCount++;
+        } else {
+            questResults[id] = 'wrong';
+        }
+    }
+    
+    document.getElementById('total-quest').textContent = QUESTOES.length;
+    document.getElementById('correct-count').textContent = correctCount;
+    document.getElementById('total-score').textContent = totalScore;
+    
+    // Atualizar barra de progresso
+    const progressPercent = (correctCount / QUESTOES.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+    
+    renderNav();
+    renderQuest(0);
+}
+
+function renderNav() {
+    document.getElementById('quest-nav').innerHTML = QUESTOES.map((q, i) => {
+        let c = '';
+        if (i === currentQuest) c = 'active';
+        else if (questResults[q.id] === 'correct') c = 'correct';
+        else if (questResults[q.id] === 'wrong') c = 'wrong';
+        return `<button class="${c}" onclick="goToQuest(${i})" title="Questão ${q.id}">${q.id}</button>`;
+    }).join('');
+}
+
+function goToQuest(i) {
+    currentQuest = i;
+    renderNav();
+    renderQuest(i);
+}
+
+function renderQuest(i) {
+    const q = QUESTOES[i];
+    const isCompleted = questResults[q.id] === 'correct';
+    
+    document.getElementById('quest-card').innerHTML = `
+        <div class="quest-header">
+            <span class="quest-number">Questão ${q.id} ${isCompleted ? '✅' : ''}</span>
+            <span class="quest-points">⭐ ${q.pontos} pontos</span>
+        </div>
+        <div class="quest-title">${q.titulo}</div>
+        <div class="quest-desc">${q.enunciado}</div>
+        <div class="quest-example"><h4>📋 Exemplo:</h4><pre>${q.exemplo}</pre></div>
+        <div class="code-section">
+            <div class="code-editor-wrapper" id="code-editor-wrapper">
+                <div class="code-editor-header">
+                    <span>📝 main.c</span>
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <button class="btn-expand" onclick="toggleExpand(event)" title="Expandir/Recolher">⛶ Expandir</button>
+                        <span style="font-size:12px;">Ctrl+Enter</span>
+                    </span>
+                </div>
+                <div class="code-editor-body">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="code-content">
+                        <div class="code-highlight" id="code-highlight"></div>
+                        <textarea class="code-textarea" id="code-textarea" oninput="syncHighlight()" onscroll="syncScroll()" onkeydown="handleKeyDown(event)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="test-panel">
+                <h3>🧪 Testes (${q.testCases.length})</h3>
+                ${q.testCases.map((t, i) => `<div class="test-case"><div class="label">Teste ${i+1}</div><div class="value">📥 ${t.input || '(sem entrada)'}</div><div class="value">📤 ${t.expected}</div></div>`).join('')}
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:20px;">
+            ${!isCompleted ? `
+                <button class="btn btn-submit" id="submit-btn" onclick="submitCode(${q.id})">✅ Enviar e Validar</button>
+                <span class="spinner" id="spinner"></span>
+                <button class="btn btn-hint" onclick="showHint(${q.id})">💡 Dica</button>
+            ` : `
+                <p style="color: var(--correct); font-weight: 700; font-size: 18px;">✅ Questão já resolvida! +${q.pontos} pontos</p>
+                <button class="btn btn-reset" onclick="retryQuest(${q.id})" style="margin-top: 10px;">🔄 Tentar Novamente</button>
+            `}
+        </div>
+        <div class="result-box" id="result-box-${q.id}"></div>
+        <div class="hint-box" id="hint-box-${q.id}">${q.dica}</div>`;
+    
+    document.getElementById('code-textarea').value = q.codeTemplate;
+    syncHighlight();
+}
+
+function retryQuest(id) {
+    const q = QUESTOES.find(x => x.id === id);
+    if (!q) return;
+    
+    delete questResults[id];
+    
+    const progress = loadProgress();
+    delete progress[id];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    
+    totalScore -= q.pontos;
+    correctCount--;
+    
+    document.getElementById('total-score').textContent = totalScore;
+    document.getElementById('correct-count').textContent = correctCount;
+    
+    const progressPercent = (correctCount / QUESTOES.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+    
+    renderNav();
+    renderQuest(QUESTOES.indexOf(q));
+}
+
+function getCode() {
+    const t = document.getElementById('code-textarea');
+    return t ? t.value.trim() : '';
+}
+
+async function submitCode(id) {
+    const code = getCode();
+    const q = QUESTOES.find(x => x.id === id);
+    const rb = document.getElementById(`result-box-${id}`);
+    const btn = document.getElementById('submit-btn');
+    const sp = document.getElementById('spinner');
+    
+    if (!code) {
+        rb.className = 'result-box fail show';
+        rb.innerHTML = '<h3>❌ Erro</h3>Digite seu código!';
+        return;
+    }
+    
+    btn.disabled = true;
+    sp.classList.add('show');
+    rb.className = 'result-box show';
+    rb.innerHTML = '<h3>🔄 Compilando...</h3>';
+    
+    let ok = true;
+    let results = [];
+    
+    for (let i = 0; i < q.testCases.length; i++) {
+        const tc = q.testCases[i];
+        try {
+            const r = await fetch('https://siteparaestudar.onrender.com/compilar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({code, input: tc.input})
+            });
+            
+            if (!r.ok) throw new Error('Erro servidor');
+            
+            const d = await r.json();
+            const exp = tc.expected.trim();
+            const got = (d.output || '').trim();
+            const pass = got === exp && !d.error;
+            
+            results.push({
+                test: i + 1,
+                input: tc.input,
+                expected: exp,
+                got,
+                error: d.error || '',
+                passed: pass
+            });
+            
+            if (!pass) ok = false;
+        } catch(e) {
+            results.push({
+                test: i + 1,
+                input: tc.input,
+                expected: tc.expected,
+                got: 'ERRO',
+                error: e.message,
+                passed: false
+            });
+            ok = false;
+        }
+    }
+    
+    let h = ok ? `<h3>🎉 Todos passaram! +${q.pontos} pts</h3>` : '<h3>❌ Falhou</h3>';
+    results.forEach(r => {
+        h += `<div style="margin:10px 0;padding:12px;background:rgba(0,0,0,0.3);border-radius:10px;">
+            <strong>${r.passed ? '✅' : '❌'} Teste ${r.test}:</strong> 
+            📥 <code>${r.input || '(sem entrada)'}</code> → 
+            📤 Esperado: <code style="color:#6dfabc;">${r.expected}</code> | 
+            Obtido: <code style="color:${r.passed ? '#6dfabc' : '#e74c3c'};">${r.got || '(vazio)'}</code>
+            ${r.error ? `<br>⚠️ ${r.error}` : ''}
+        </div>`;
+    });
+    
+    rb.className = `result-box show ${ok ? 'success' : 'fail'}`;
+    rb.innerHTML = h;
+    
+    if (ok) {
+        questResults[id] = 'correct';
+        totalScore += q.pontos;
+        correctCount++;
+        
+        saveProgress(id, 'correct', q.pontos);
+        
+        document.getElementById('total-score').textContent = totalScore;
+        document.getElementById('correct-count').textContent = correctCount;
+        
+        const progressPercent = (correctCount / QUESTOES.length) * 100;
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+        
+        renderNav();
+        
+        const nextIndex = QUESTOES.findIndex(x => x.id === id) + 1;
+        if (nextIndex < QUESTOES.length) {
+            setTimeout(() => {
+                if (confirm('🎉 Parabéns! Deseja ir para a próxima questão?')) {
+                    goToQuest(nextIndex);
+                } else {
+                    renderQuest(QUESTOES.findIndex(x => x.id === id));
+                }
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                alert('🏆 PARABÉNS! Você completou todas as questões da Lista 2!');
+            }, 1000);
+        }
+    } else {
+        questResults[id] = 'wrong';
+        saveProgress(id, 'wrong', 0);
+        renderNav();
+    }
+    
+    btn.disabled = false;
+    sp.classList.remove('show');
+}
+
+function showHint(id) {
+    document.getElementById(`hint-box-${id}`)?.classList.toggle('show');
+}
+
+function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        const q = QUESTOES[currentQuest];
+        if (!questResults[q.id] || questResults[q.id] !== 'correct') {
+            submitCode(q.id);
+        }
+    }
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = e.target.selectionStart;
+        e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd);
+        e.target.selectionStart = e.target.selectionEnd = s + 4;
+        syncHighlight();
+    }
+}
+
+// ========== EXPANDIR ==========
+function toggleExpand(e) {
+    if (e) e.stopPropagation();
+    
+    const wrapper = document.getElementById('code-editor-wrapper');
+    const overlay = document.getElementById('code-overlay');
+    const btn = document.querySelector('.btn-expand');
+    
+    if (!wrapper || !overlay) return;
+    
+    const isExpanded = wrapper.classList.contains('expanded');
+    
+    if (!isExpanded) {
+        wrapper.classList.add('expanded');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        if (btn) btn.innerHTML = '⛶ Recolher';
+    } else {
+        wrapper.classList.remove('expanded');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        if (btn) btn.innerHTML = '⛶ Expandir';
+    }
+    
+    setTimeout(syncHighlight, 50);
+}
+
+// Inicializar
+init();
+
+// Event listeners
+document.getElementById('code-overlay').addEventListener('click', (e) => {
+    const wrapper = document.getElementById('code-editor-wrapper');
+    if (e.target.id === 'code-overlay' && wrapper && wrapper.classList.contains('expanded')) {
+        toggleExpand();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") {
+        const wrapper = document.getElementById('code-editor-wrapper');
+        if (wrapper && wrapper.classList.contains('expanded')) {
+            toggleExpand();
+        }
+    }
+});
+
+document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('code-editor-wrapper');
+    if (wrapper && wrapper.contains(e.target) && wrapper.classList.contains('expanded')) {
+        e.stopPropagation();
+    }
+});
+</script>
+<script src="JS/footer.js"></script>
+<script src="JS/sidebar.js"></script>
+
+</body>
+</html>
