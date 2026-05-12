@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia · Como Interpretar Enunciados de Programação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #6dfabc;
+            --accent3: #fa6d8a;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --warning: #fadc6d;
+            --info: #6dcffa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            font-size: 17px;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2em;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, var(--warning), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--warning);
+            margin: 35px 0 20px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--accent2);
+            margin: 20px 0 12px 0;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+        }
+
+        .highlight {
+            background: rgba(250,220,109,0.1);
+            border-left: 4px solid var(--warning);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tip-box {
+            background: rgba(109,250,188,0.08);
+            border: 2px solid rgba(109,250,188,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .danger-box {
+            background: rgba(250,109,138,0.08);
+            border: 2px solid rgba(250,109,138,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(250,220,109,0.12);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1E1E1E;
+            border: 1px solid #3C3C3C;
+            border-radius: 10px;
+            padding: 18px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 12px 0;
+            color: #D4D4D4;
+        }
+
+        .enunciado-exemplo {
+            background: rgba(255,255,255,0.03);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        .analise {
+            background: rgba(109,207,250,0.08);
+            border: 2px solid rgba(109,207,250,0.25);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: var(--warning);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            flex-shrink: 0;
+            color: #000;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 2px;
+        }
+
+        .tag-input { background: rgba(109,207,250,0.2); color: var(--info); }
+        .tag-output { background: rgba(109,250,188,0.2); color: var(--accent2); }
+        .tag-process { background: rgba(250,109,138,0.2); color: var(--accent3); }
+        .tag-storage { background: rgba(250,220,109,0.2); color: var(--warning); }
+        .tag-loop { background: rgba(124,109,250,0.2); color: var(--accent); }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+        }
+
+        .flow-box {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .flow-arrow {
+            font-size: 24px;
+            color: var(--accent2);
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; font-size: 15px; }
+            .card { padding: 15px; }
+            h1 { font-size: 1.6em; }
+            .flow-diagram { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>🔍 Guia Prático</h1>
+        <p style="text-align:center;color:var(--muted);margin-bottom:30px;">Como Interpretar Enunciados de Programação e Extrair as Informações Certas</p>
+
+        <!-- ========== INTRODUÇÃO ========== -->
+        <div class="card">
+            <h2>🧠 O Segredo para Entender Enunciados</h2>
+
+            <p>Muitos alunos travam ao ler um enunciado e pensam: <em>"Não sei por onde começar!"</em></p>
+            <p>O segredo é fazer <strong>3 perguntas fundamentais</strong> para TODO enunciado:</p>
+
+            <div class="highlight">
+                <ol style="list-style-position:inside;line-height:2.2;font-size:18px;">
+                    <li>📥 <strong>O que ENTRA?</strong> (Entradas / Input)</li>
+                    <li>⚙️ <strong>O que FAZ?</strong> (Processamento / Cálculos)</li>
+                    <li>📤 <strong>O que SAI?</strong> (Saídas / Output)</li>
+                </ol>
+            </div>
+
+            <p style="text-align:center;margin-top:20px;">Essas 3 perguntas formam o fluxo de TODO programa:</p>
+
+            <div class="flow-diagram">
+                <div class="flow-box" style="border-color:var(--info);">
+                    📥<br><strong>ENTRADA</strong><br>
+                    <small>O que o usuário<br>digita?</small>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="border-color:var(--accent3);">
+                    ⚙️<br><strong>PROCESSAMENTO</strong><br>
+                    <small>O que o programa<br>faz com os dados?</small>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="border-color:var(--accent2);">
+                    📤<br><strong>SAÍDA</strong><br>
+                    <small>O que aparece<br>na tela?</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== EXEMPLO 1 ========== -->
+        <div class="card">
+            <h2>📝 Exemplo 1: Analisando um Enunciado Simples</h2>
+
+            <div class="enunciado-exemplo">
+                <p><strong>"Escreva um programa que leia 10 números inteiros, os armazene em um vetor e mostre a sequência em ordem inversa."</strong></p>
+            </div>
+
+            <h3>Aplicando as 3 perguntas:</h3>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>📥 O que ENTRA?</strong>
+                    <p>Palavras-chave: <span class="tag tag-input">leia</span> <span class="tag tag-input">10 números inteiros</span></p>
+                    <p>→ Preciso ler 10 valores do tipo <code>int</code></p>
+                    <p>→ Ferramenta: <code>scanf("%d", &vetor[i])</code> dentro de um laço</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>⚙️ O que FAZ?</strong>
+                    <p>Palavras-chave: <span class="tag tag-storage">armazene em um vetor</span> <span class="tag tag-process">ordem inversa</span></p>
+                    <p>→ Preciso de um vetor de 10 posições</p>
+                    <p>→ "Ordem inversa" = percorrer do último ao primeiro índice</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>📤 O que SAI?</strong>
+                    <p>Palavras-chave: <span class="tag tag-output">mostre a sequência</span></p>
+                    <p>→ Imprimir na tela com <code>printf</code></p>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <p><strong>💡 Mapa mental gerado:</strong></p>
+                <p><code>Ler 10 ints → Guardar em vetor[10] → Imprimir de vetor[9] até vetor[0]</code></p>
+            </div>
+        </div>
+
+        <!-- ========== EXEMPLO 2 ========== -->
+        <div class="card">
+            <h2>📝 Exemplo 2: Enunciado Mais Complexo</h2>
+
+            <div class="enunciado-exemplo">
+                <p><strong>"Escreva um programa que leia 16 números reais e os armazene em uma matriz quadrada. Calcule o somatório dos elementos da diagonal principal e o somatório dos elementos da diagonal secundária. O programa deve imprimir o maior somatório e indicar a qual diagonal ele pertence."</strong></p>
+                <p style="font-size:13px;color:var(--muted);">(Lista 7, Exercício 6)</p>
+            </div>
+
+            <h3>Analisando palavra por palavra:</h3>
+
+            <div class="analise">
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                    <tr>
+                        <th style="text-align:left;padding:8px;color:var(--info);">Trecho do Enunciado</th>
+                        <th style="text-align:left;padding:8px;color:var(--accent2);">Tradução para Código</th>
+                    </tr>
+                    <tr>
+                        <td>"leia 16 números reais"</td>
+                        <td><code>float matriz[4][4];</code> + <code>scanf</code> em laço duplo</td>
+                    </tr>
+                    <tr>
+                        <td>"armazene em uma matriz quadrada"</td>
+                        <td>Matriz 4×4 (√16 = 4)</td>
+                    </tr>
+                    <tr>
+                        <td>"somatório dos elementos da diagonal principal"</td>
+                        <td><code>if(i == j) soma_princ += matriz[i][j];</code></td>
+                    </tr>
+                    <tr>
+                        <td>"somatório dos elementos da diagonal secundária"</td>
+                        <td><code>if(i+j == 3) soma_sec += matriz[i][j];</code></td>
+                    </tr>
+                    <tr>
+                        <td>"imprimir o maior somatório"</td>
+                        <td><code>if(soma_princ > soma_sec) ... else ...</code></td>
+                    </tr>
+                    <tr>
+                        <td>"indicar a qual diagonal ele pertence"</td>
+                        <td>Imprimir texto: "Diagonal principal" ou "Diagonal secundária"</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========== PADRÕES ========== -->
+        <div class="card">
+            <h2>🔤 3. Palavras-Chave que Aparecem nos Enunciados</h2>
+
+            <p>Aprenda a reconhecer estas palavras e o que elas significam:</p>
+
+            <h3>📥 Entrada de Dados:</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;margin:10px 0;">
+                <tr><th>Palavra/Frase</th><th>Significado</th><th>Ferramenta</th></tr>
+                <tr><td>"leia"</td><td>Entrada do usuário</td><td><code>scanf()</code></td></tr>
+                <tr><td>"receba como entrada"</td><td>Entrada do usuário</td><td><code>scanf()</code></td></tr>
+                <tr><td>"fornecido pelo usuário"</td><td>Entrada do usuário</td><td><code>scanf()</code></td></tr>
+                <tr><td>"N números"</td><td>Quantidade específica</td><td><code>for</code> com N iterações</td></tr>
+                <tr><td>"sequência de"</td><td>Vários valores</td><td>Vetor + laço</td></tr>
+            </table>
+
+            <h3>⚙️ Processamento:</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;margin:10px 0;">
+                <tr><th>Palavra/Frase</th><th>Significado</th><th>Ferramenta</th></tr>
+                <tr><td>"armazene em um vetor"</td><td>Usar array</td><td><code>tipo nome[tamanho];</code></td></tr>
+                <tr><td>"armazene em uma matriz"</td><td>Usar matriz 2D</td><td><code>tipo nome[lin][col];</code></td></tr>
+                <tr><td>"calcule a média"</td><td>Soma ÷ quantidade</td><td>Acumulador + divisão</td></tr>
+                <tr><td>"somatório"</td><td>Soma de elementos</td><td>Variável acumuladora</td></tr>
+                <tr><td>"maior" / "menor"</td><td>Comparação</td><td><code>if</code> + atualização</td></tr>
+                <tr><td>"ordem inversa"</td><td>De trás pra frente</td><td>Laço decrescente</td></tr>
+                <tr><td>"par" / "ímpar"</td><td>Resto da divisão por 2</td><td><code>% 2 == 0</code></td></tr>
+                <tr><td>"positivo" / "negativo"</td><td>Sinal do número</td><td><code>>= 0</code> ou <code>< 0</code></td></tr>
+                <tr><td>"diagonal principal"</td><td>Linha = Coluna</td><td><code>i == j</code></td></tr>
+                <tr><td>"diagonal secundária"</td><td>Linha + Coluna = N-1</td><td><code>i + j == N-1</code></td></tr>
+            </table>
+
+            <h3>📤 Saída de Dados:</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;margin:10px 0;">
+                <tr><th>Palavra/Frase</th><th>Significado</th><th>Ferramenta</th></tr>
+                <tr><td>"imprima" / "mostre"</td><td>Exibir na tela</td><td><code>printf()</code></td></tr>
+                <tr><td>"apresente na tela"</td><td>Exibir na tela</td><td><code>printf()</code></td></tr>
+                <tr><td>"informe"</td><td>Exibir resultado</td><td><code>printf()</code></td></tr>
+                <tr><td>"ao final"</td><td>Depois do laço</td><td>Código após o <code>for</code></td></tr>
+            </table>
+        </div>
+
+        <!-- ========== MÉTODO ========== -->
+        <div class="card">
+            <h2>📋 4. Método Prático: Checklist de Interpretação</h2>
+
+            <p>Para cada enunciado, siga este passo a passo:</p>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Sublinhe/destaque os VERBOS DE AÇÃO</strong>
+                    <p>Ex: <u>leia</u>, <u>armazene</u>, <u>calcule</u>, <u>imprima</u></p>
+                    <p>Cada verbo é uma ação que seu programa deve executar.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Identifique os DADOS mencionados</strong>
+                    <p>Ex: "10 números inteiros", "temperaturas na escala Celsius", "matriz 5x5"</p>
+                    <p>Isso define <strong>tipos</strong> (<code>int</code>, <code>float</code>) e <strong>tamanhos</strong>.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Encontre a ESTRUTURA DE DADOS</strong>
+                    <ul>
+                        <li><strong>Vetor:</strong> "armazene em uma matriz unidimensional", "vetor", "sequência"</li>
+                        <li><strong>Matriz:</strong> "matriz bidimensional", "matriz quadrada", "linhas e colunas"</li>
+                        <li><strong>Variável simples:</strong> "um número", "um valor"</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Identifique a ESTRUTURA DE REPETIÇÃO</strong>
+                    <ul>
+                        <li><strong>Quantidade fixa:</strong> "10 números" → <code>for(i=0; i<10; i++)</code></li>
+                        <li><strong>Até condição:</strong> "até digitar zero" → <code>while(num != 0)</code></li>
+                        <li><strong>Percorrer matriz:</strong> → Dois <code>for</code> aninhados</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>Extraia a FÓRMULA ou REGRA</strong>
+                    <p>Ex: "média" → soma/N, "25%" → valor * 1.25, "primo" → verificar divisores</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">6</div>
+                <div>
+                    <strong>Verifique o FORMATO DE SAÍDA</strong>
+                    <p>Ex: "com duas casas decimais" → <code>%.2f</code>, "em sequência" → <code>"%d "</code></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== EXEMPLO COMPLETO ========== -->
+        <div class="card">
+            <h2>📝 Exemplo Completo: Do Enunciado ao Código</h2>
+
+            <div class="enunciado-exemplo">
+                <p><strong>"Escreva um programa que leia 10 valores correspondentes a temperaturas na escala Celsius, os guarde em uma matriz unidimensional (vetor) e imprima a maior temperatura, a menor temperatura e a temperatura média."</strong></p>
+                <p style="font-size:13px;color:var(--muted);">(Lista 6, Exercício 5)</p>
+            </div>
+
+            <h3>Passo a passo da interpretação:</h3>
+
+            <table style="width:100%;border-collapse:collapse;font-size:14px;margin:10px 0;">
+                <tr>
+                    <th style="background:var(--surface);color:var(--warning);">Passo</th>
+                    <th style="background:var(--surface);color:var(--warning);">Pergunta</th>
+                    <th style="background:var(--surface);color:var(--warning);">Resposta</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Verbos de ação?</td>
+                    <td>LEIA, GUARDE, IMPRIMA</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Dados?</td>
+                    <td>10 temperaturas (Celsius) → <code>float</code></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Estrutura?</td>
+                    <td>"matriz unidimensional (vetor)" → <code>float temp[10];</code></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Repetição?</td>
+                    <td>10 valores fixos → <code>for(i=0; i<10; i++)</code></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Fórmulas?</td>
+                    <td>Maior: comparação, Menor: comparação, Média: soma/10</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Saída?</td>
+                    <td>"maior", "menor", "média" → 3 <code>printf</code> com <code>%.2f</code></td>
+                </tr>
+            </table>
+
+            <h3>Código resultante:</h3>
+            <pre><span class="preprocessor">#include</span> <span class="header-file">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="type">float</span> temp[<span class="number">10</span>];
+    <span class="type">float</span> soma = <span class="number">0</span>, maior, menor, media;
+    <span class="type">int</span> i;
+    
+    <span class="comment">// 📥 ENTRADA: leitura das temperaturas</span>
+    <span class="keyword">for</span>(i = <span class="number">0</span>; i < <span class="number">10</span>; i++) {
+        <span class="function">scanf</span>(<span class="string">"%f"</span>, &temp[i]);
+        soma += temp[i];
+    }
+    
+    <span class="comment">// ⚙️ PROCESSAMENTO: encontrar maior e menor</span>
+    maior = temp[<span class="number">0</span>];
+    menor = temp[<span class="number">0</span>];
+    <span class="keyword">for</span>(i = <span class="number">1</span>; i < <span class="number">10</span>; i++) {
+        <span class="keyword">if</span>(temp[i] > maior) maior = temp[i];
+        <span class="keyword">if</span>(temp[i] < menor) menor = temp[i];
+    }
+    media = soma / <span class="number">10.0</span>;
+    
+    <span class="comment">// 📤 SAÍDA: imprimir resultados</span>
+    <span class="function">printf</span>(<span class="string">"Maior temperatura: %.2f\n"</span>, maior);
+    <span class="function">printf</span>(<span class="string">"Menor temperatura: %.2f\n"</span>, menor);
+    <span class="function">printf</span>(<span class="string">"Temperatura media: %.2f\n"</span>, media);
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</pre>
+        </div>
+
+        <!-- ========== DICAS FINAIS ========== -->
+        <div class="card">
+            <h2>💡 5. Dicas Finais para Não se Perder</h2>
+
+            <div class="tip-box">
+                <p><strong>✅ Faça um ESBOÇO antes de codar:</strong></p>
+                <p>Escreva em português (ou em comentários) o que cada parte do programa vai fazer. Exemplo:</p>
+                <pre><span class="comment">// 1. Declarar vetor de 10 floats
+// 2. Ler 10 valores com for + scanf
+// 3. Encontrar maior e menor
+// 4. Calcular média
+// 5. Imprimir resultados</span></pre>
+            </div>
+
+            <div class="highlight">
+                <p><strong>✅ Use o EXEMPLO do enunciado:</strong></p>
+                <p>Se o enunciado mostra um exemplo de entrada e saída, <strong>use-o para testar seu raciocínio</strong>. Faça as contas manualmente com o exemplo para entender a lógica antes de programar.</p>
+            </div>
+
+            <div class="danger-box">
+                <p><strong>⚠️ Cuidado com "pegadinhas":</strong></p>
+                <ul style="list-style-position:inside;">
+                    <li>"O zero digitado não deve ser considerado" → não incluir no cálculo</li>
+                    <li>"Considere zero como positivo" → usar <code>>= 0</code></li>
+                    <li>"Utilize estrutura de repetição" → obrigatório usar <code>for</code>/<code>while</code></li>
+                    <li>"O programa deve testar qual é o menor" → fazer <code>if</code> antes</li>
+                </ul>
+            </div>
+        </div>
+
+        <p style="text-align:center;color:var(--muted);margin-top:40px;padding:20px;font-size:18px;">
+            🔍 <strong>Lembre-se:</strong> Todo enunciado tem as 3 respostas escondidas:<br>
+            <span style="color:var(--info);">📥 ENTRADA</span> · 
+            <span style="color:var(--accent3);">⚙️ PROCESSAMENTO</span> · 
+            <span style="color:var(--accent2);">📤 SAÍDA</span><br>
+            Encontre-as e você terá o mapa completo do programa! 🚀
+        </p>
+
+    </div>
+</body>
+</html>

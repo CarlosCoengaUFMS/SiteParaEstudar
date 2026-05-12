@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Didático · Lista 6 - Vetores em C</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d0d0f;
+            --surface: #15151a;
+            --card: #1c1c24;
+            --border: #2a2a38;
+            --accent: #7c6dfa;
+            --accent2: #6dfabc;
+            --accent3: #fa6d8a;
+            --text: #e8e8f0;
+            --muted: #7878a0;
+            --warning: #fadc6d;
+            --info: #6dcffa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            font-size: 17px;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2em;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--accent2);
+            margin: 25px 0 15px 0;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+        }
+
+        .highlight-box {
+            background: rgba(124,109,250,0.08);
+            border: 2px solid rgba(124,109,250,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-box {
+            background: rgba(109,250,188,0.08);
+            border: 2px solid rgba(109,250,188,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: rgba(250,220,109,0.08);
+            border: 2px solid rgba(250,220,109,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .danger-box {
+            background: rgba(250,109,138,0.08);
+            border: 2px solid rgba(250,109,138,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(124,109,250,0.15);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #DCDCAA;
+        }
+
+        pre {
+            background: #1E1E1E;
+            border: 1px solid #3C3C3C;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #D4D4D4;
+            margin: 15px 0;
+        }
+
+        pre .keyword { color: #569CD6; font-weight: 600; }
+        pre .type { color: #569CD6; }
+        pre .function { color: #DCDCAA; }
+        pre .string { color: #CE9178; }
+        pre .comment { color: #6A9955; font-style: italic; }
+        pre .number { color: #B5CEA8; }
+        pre .preprocessor { color: #C586C0; }
+        pre .header-file { color: #CE9178; }
+
+        .step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        .analogy {
+            background: linear-gradient(135deg, rgba(124,109,250,0.1), rgba(109,250,188,0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .analogy h4 {
+            color: var(--warning);
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--surface);
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        td {
+            background: rgba(21,21,26,0.5);
+        }
+
+        .matrix-viz {
+            display: inline-block;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            background: rgba(0,0,0,0.3);
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; font-size: 15px; }
+            .card { padding: 15px; }
+            h1 { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>📚 Guia Didático</h1>
+        <p style="text-align:center;color:var(--muted);margin-bottom:30px;">Lista 6 · Vetores (Arrays Unidimensionais) em Linguagem C</p>
+
+        <!-- ========== CONCEITO BÁSICO ========== -->
+        <div class="card">
+            <h2>🧠 1. O que é um Vetor (Array)?</h2>
+            
+            <div class="analogy">
+                <h4>🏠 Analogia: Prédio de Apartamentos</h4>
+                <p>Imagine um prédio com vários apartamentos. Cada apartamento:</p>
+                <ul style="list-style-position:inside;margin:10px 0;">
+                    <li>Tem um <strong>número</strong> (índice) que o identifica</li>
+                    <li>Guarda algo <strong>dentro</strong> (valor)</li>
+                    <li>Todos os apartamentos são do <strong>mesmo tamanho</strong> (mesmo tipo de dado)</li>
+                </ul>
+                <p>Um <strong>vetor</strong> é exatamente isso: uma sequência de "caixinhas" numeradas, todas do mesmo tipo, onde você pode guardar valores.</p>
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>📝 Declaração de um vetor:</strong></p>
+                <pre><span class="type">int</span> numeros[<span class="number">10</span>];   <span class="comment">// 10 "caixinhas" para números inteiros</span>
+<span class="type">float</span> notas[<span class="number">20</span>];    <span class="comment">// 20 "caixinhas" para números reais</span></pre>
+            </div>
+
+            <h3>Visualização de um vetor de 5 posições:</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;">
+                <div style="text-align:center;border:2px solid var(--accent);border-radius:8px;padding:15px;min-width:80px;background:rgba(124,109,250,0.1);">
+                    <small style="color:var(--muted);">Índice 0</small><br>
+                    <strong style="font-size:24px;">5</strong>
+                </div>
+                <div style="text-align:center;border:2px solid var(--accent);border-radius:8px;padding:15px;min-width:80px;background:rgba(124,109,250,0.1);">
+                    <small style="color:var(--muted);">Índice 1</small><br>
+                    <strong style="font-size:24px;">8</strong>
+                </div>
+                <div style="text-align:center;border:2px solid var(--accent);border-radius:8px;padding:15px;min-width:80px;background:rgba(124,109,250,0.1);">
+                    <small style="color:var(--muted);">Índice 2</small><br>
+                    <strong style="font-size:24px;">3</strong>
+                </div>
+                <div style="text-align:center;border:2px solid var(--accent);border-radius:8px;padding:15px;min-width:80px;background:rgba(124,109,250,0.1);">
+                    <small style="color:var(--muted);">Índice 3</small><br>
+                    <strong style="font-size:24px;">7</strong>
+                </div>
+                <div style="text-align:center;border:2px solid var(--accent);border-radius:8px;padding:15px;min-width:80px;background:rgba(124,109,250,0.1);">
+                    <small style="color:var(--muted);">Índice 4</small><br>
+                    <strong style="font-size:24px;">9</strong>
+                </div>
+            </div>
+            <p style="color:var(--muted);font-size:14px;">📌 <strong>Importante:</strong> Os índices começam sempre em <code>0</code> (zero) em C!</p>
+
+            <div class="warning-box">
+                <p><strong>⚠️ Cuidado:</strong> Se você declarou <code>int vetor[10]</code>, os índices válidos são <code>0</code> até <code>9</code>. Usar <code>vetor[10]</code> causa comportamento imprevisível (acesso inválido de memória)!</p>
+            </div>
+        </div>
+
+        <!-- ========== COMO LER E ESCREVER ========== -->
+        <div class="card">
+            <h2>📥📤 2. Como Ler e Escrever Dados em um Vetor</h2>
+
+            <h3>📥 Leitura (scanf com laço for):</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Crie o vetor</strong>
+                    <pre><span class="type">int</span> vetor[<span class="number">10</span>];  <span class="comment">// 10 espaços reservados</span></pre>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Use um laço for para percorrer cada índice</strong>
+                    <pre><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i < <span class="number">10</span>; i++) {
+    <span class="function">scanf</span>(<span class="string">"%d"</span>, &vetor[i]);  <span class="comment">// Lê um valor para a posição i</span>
+}</pre>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Entenda o que acontece:</strong>
+                    <p>Cada iteração do <code>for</code> lê <strong>UM</strong> número e o guarda na posição <code>i</code> do vetor.</p>
+                    <p>O <code>&</code> antes de <code>vetor[i]</code> é necessário porque <code>scanf</code> precisa do endereço de memória.</p>
+                </div>
+            </div>
+
+            <h3>📤 Escrita (printf com laço for):</h3>
+            <pre><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i < <span class="number">10</span>; i++) {
+    <span class="function">printf</span>(<span class="string">"%d "</span>, vetor[i]);  <span class="comment">// Imprime cada valor</span>
+}</pre>
+
+            <div class="tip-box">
+                <p><strong>💡 Dica de Ouro:</strong> Sempre que você ver no enunciado "leia N números", pense imediatamente em:</p>
+                <pre><span class="keyword">for</span>(i = <span class="number">0</span>; i < N; i++) {
+    <span class="function">scanf</span>(<span class="string">"%d"</span>, &vetor[i]);
+}</pre>
+            </div>
+        </div>
+
+        <!-- ========== ORDEM INVERSA ========== -->
+        <div class="card">
+            <h2>🔄 3. Padrão: Ordem Inversa (Exercício 1 e 7)</h2>
+
+            <p>Este é um dos padrões mais comuns com vetores. Vamos entender o raciocínio:</p>
+
+            <div class="highlight-box">
+                <p><strong>🎯 Objetivo:</strong> Imprimir o vetor de trás para frente.</p>
+            </div>
+
+            <h3>Lógica:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Identifique a última posição</strong>
+                    <p>Se o vetor tem tamanho N, a última posição é <code>N - 1</code></p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Faça um laço que começa do final e vai até o início</strong>
+                    <pre><span class="keyword">for</span>(i = N - <span class="number">1</span>; i >= <span class="number">0</span>; i--) {
+    <span class="function">printf</span>(<span class="string">"%d "</span>, vetor[i]);
+}</pre>
+                </div>
+            </div>
+
+            <div class="analogy">
+                <h4>🔄 Visualização:</h4>
+                <p>Vetor original: <code>[5, 8, 3, 7, 9]</code></p>
+                <p>Ordem inversa: <code>[9, 7, 3, 8, 5]</code></p>
+                <p style="color:var(--accent2);">O laço começa em <code>i=4</code> (índice do 9) e vai até <code>i=0</code> (índice do 5).</p>
+            </div>
+
+            <h3>Para copiar em ordem inversa (Exercício 7):</h3>
+            <pre><span class="keyword">for</span>(i = <span class="number">0</span>; i < <span class="number">10</span>; i++) {
+    invertido[i] = original[<span class="number">9</span> - i];  <span class="comment">// Mapeamento: 0→9, 1→8, 2→7...</span>
+}</pre>
+        </div>
+
+        <!-- ========== COMPARAÇÃO ========== -->
+        <div class="card">
+            <h2>🔍 4. Padrão: Maior/Menor Elemento (Exercícios 2, 5, 6)</h2>
+
+            <h3>Como encontrar o MAIOR valor:</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Inicialize "maior" com o primeiro elemento</strong>
+                    <pre><span class="type">int</span> maior = vetor[<span class="number">0</span>];</pre>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Compare com todos os outros elementos</strong>
+                    <pre><span class="keyword">for</span>(i = <span class="number">1</span>; i < N; i++) {
+    <span class="keyword">if</span>(vetor[i] > maior) {
+        maior = vetor[i];  <span class="comment">// Atualiza se encontrar valor maior</span>
+    }
+}</pre>
+                </div>
+            </div>
+
+            <div class="analogy">
+                <h4>🏆 Analogia: Competição</h4>
+                <p>Imagine que você está procurando a pessoa mais alta em uma fila:</p>
+                <ol style="list-style-position:inside;">
+                    <li>Você anota a altura da primeira pessoa como "mais alta até agora"</li>
+                    <li>Para cada próxima pessoa, você compara: "Essa pessoa é mais alta que a minha referência?"</li>
+                    <li>Se sim, atualiza sua referência</li>
+                    <li>No final, você tem a altura da pessoa mais alta</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- ========== CLASSIFICAÇÃO ========== -->
+        <div class="card">
+            <h2>🏷️ 5. Padrão: Classificação (Exercícios 3 e 4)</h2>
+
+            <h3>Par ou Ímpar:</h3>
+            <pre><span class="keyword">for</span>(i = <span class="number">0</span>; i < <span class="number">20</span>; i++) {
+    <span class="keyword">if</span>(vetor[i] % <span class="number">2</span> == <span class="number">0</span>) {
+        <span class="function">printf</span>(<span class="string">"%d - par\n"</span>, vetor[i]);
+    } <span class="keyword">else</span> {
+        <span class="function">printf</span>(<span class="string">"%d - impar\n"</span>, vetor[i]);
+    }
+}</pre>
+
+            <div class="tip-box">
+                <p><strong>💡 Lembrete:</strong> O operador <code>%</code> (módulo) retorna o <strong>resto da divisão</strong>. Se <code>numero % 2 == 0</code>, o número é par (resto zero).</p>
+            </div>
+
+            <h3>Positivo ou Negativo:</h3>
+            <pre><span class="keyword">if</span>(vetor[i] >= <span class="number">0</span>) {
+    <span class="comment">// Positivo (inclui zero)</span>
+} <span class="keyword">else</span> {
+    <span class="comment">// Negativo</span>
+}</pre>
+        </div>
+
+        <!-- ========== CONTAGEM ========== -->
+        <div class="card">
+            <h2>🔢 6. Padrão: Contagem com Condição (Exercício 2)</h2>
+
+            <p>"Quantos são maiores/menores/iguais ao primeiro elemento?"</p>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Guarde o valor de referência</strong>
+                    <pre><span class="type">int</span> referencia = vetor[<span class="number">0</span>];</pre>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Crie contadores (inicializados com zero)</strong>
+                    <pre><span class="type">int</span> maiores = <span class="number">0</span>, menores = <span class="number">0</span>, iguais = <span class="number">0</span>;</pre>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Percorra o vetor (a partir do índice 1) e conte</strong>
+                    <pre><span class="keyword">for</span>(i = <span class="number">1</span>; i < <span class="number">10</span>; i++) {
+    <span class="keyword">if</span>(vetor[i] > referencia) maiores++;
+    <span class="keyword">else if</span>(vetor[i] < referencia) menores++;
+    <span class="keyword">else</span> iguais++;
+}</pre>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <p><strong>⚠️ Atenção:</strong> Comece o laço de <code>i = 1</code>, não de <code>i = 0</code>. O elemento na posição 0 é a referência e não deve ser comparado com ele mesmo!</p>
+            </div>
+        </div>
+
+        <!-- ========== MÉDIA ========== -->
+        <div class="card">
+            <h2>📊 7. Padrão: Soma e Média (Exercício 5)</h2>
+
+            <pre><span class="type">float</span> soma = <span class="number">0.0</span>;
+<span class="keyword">for</span>(i = <span class="number">0</span>; i < <span class="number">10</span>; i++) {
+    soma += temp[i];  <span class="comment">// Acumula cada temperatura</span>
+}
+<span class="type">float</span> media = soma / <span class="number">10.0</span>;  <span class="comment">// Divide pelo total</span></pre>
+
+            <div class="tip-box">
+                <p><strong>💡 Fórmula da Média:</strong> <code>media = soma / quantidade_de_elementos</code></p>
+                <p>Use <code>float</code> ou <code>double</code> para a média, pois o resultado pode ter casas decimais.</p>
+            </div>
+        </div>
+
+        <!-- ========== SOMATÓRIO ESPECIAL ========== -->
+        <div class="card">
+            <h2>🧮 8. Padrão: Somatório com Índices Opostos (Exercício 6)</h2>
+
+            <p>Este exercício pede: <code>Soma = (M[0]-M[19])³ + (M[1]-M[18])³ + ... + (M[9]-M[10])³</code></p>
+
+            <h3>Observe o padrão dos índices:</h3>
+            <table>
+                <tr><th>Par</th><th>Índice da frente</th><th>Índice de trás</th></tr>
+                <tr><td>1º</td><td>0</td><td>19</td></tr>
+                <tr><td>2º</td><td>1</td><td>18</td></tr>
+                <tr><td>3º</td><td>2</td><td>17</td></tr>
+                <tr><td>...</td><td>...</td><td>...</td></tr>
+                <tr><td>10º</td><td>9</td><td>10</td></tr>
+            </table>
+
+            <p style="color:var(--accent2);">📌 Percebeu? <strong>i + (19-i) = 19</strong> sempre! O índice de trás é <code>19 - i</code>.</p>
+
+            <pre><span class="type">double</span> soma = <span class="number">0.0</span>;
+<span class="keyword">for</span>(i = <span class="number">0</span>; i < <span class="number">10</span>; i++) {
+    soma += <span class="function">pow</span>(M[i] - M[<span class="number">19</span> - i], <span class="number">3</span>);  <span class="comment">// pow(base, expoente) = base^expoente</span>
+}</pre>
+
+            <div class="danger-box">
+                <p><strong>🔧 Não esqueça:</strong> Para usar <code>pow()</code>, inclua no topo do programa:</p>
+                <pre><span class="preprocessor">#include</span> <span class="header-file">&lt;math.h&gt;</span></pre>
+            </div>
+        </div>
+
+        <!-- ========== RESUMO ========== -->
+        <div class="card">
+            <h2>📋 9. Resumo: Checklist para Resolver Exercícios de Vetores</h2>
+
+            <div class="highlight-box">
+                <ol style="list-style-position:inside;line-height:2.2;">
+                    <li>✅ <strong>Declare o vetor</strong> com o tamanho correto (ex: <code>int v[10];</code>)</li>
+                    <li>✅ <strong>Leia os dados</strong> com <code>for</code> + <code>scanf</code></li>
+                    <li>✅ <strong>Identifique o que precisa calcular:</strong>
+                        <ul style="margin-left:25px;">
+                            <li>Ordem inversa? → laço decrescente</li>
+                            <li>Maior/menor? → comparação com referência</li>
+                            <li>Pares/ímpares? → <code>% 2</code></li>
+                            <li>Soma/média? → acumulador + divisão</li>
+                            <li>Contagem? → contadores com <code>if</code></li>
+                        </ul>
+                    </li>
+                    <li>✅ <strong>Imprima o resultado</strong> formatado</li>
+                </ol>
+            </div>
+        </div>
+
+        <p style="text-align:center;color:var(--muted);margin-top:40px;padding:20px;">📚 Bons estudos! Pratique cada padrão e você dominará vetores rapidamente! 🚀</p>
+
+    </div>
+    <script src="JS/footer.js"></script>
+    <script src="JS/sidebar.js"></script>
+</body>
+</html>
