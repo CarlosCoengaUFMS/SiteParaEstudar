@@ -1,206 +1,177 @@
-// sidebar.js - Sidebar otimizada para mobile
-// Para usar: <script src="JS/sidebar.js"></script> antes de </body>
-// Requer: CSS da sidebar já definido no <style> de cada página
+/**
+ * sidebar.js - Controlador Multisistema
+ * Compatível com iOS, Android, Desktop.
+ */
 
-(function() {
-    // Verificar se a sidebar já foi carregada (evitar duplicação)
-    if (document.getElementById('sidebar')) return;
+class SidebarApp {
+    constructor() {
+        // Previne dupla inicialização
+        if (document.getElementById('spe-sidebar')) return;
+        
+        this.isOpen = false;
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+        
+        this.init();
+    }
 
-    // ========== HAMBURGER MENU ==========
-    const hamburgerHTML = `
-        <button class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </button>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    `;
-    document.body.insertAdjacentHTML('afterbegin', hamburgerHTML);
+    init() {
+        this.injectDOM();
+        this.cacheElements();
+        this.bindEvents();
+        this.highlightCurrentPage();
+    }
 
-    // ========== SIDEBAR OTIMIZADA PARA MOBILE ==========
-    const sidebarHTML = `
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">SPE</div>
-                <span class="sidebar-title">SiteParaEstudar</span>
-                <button class="sidebar-close" id="sidebar-close" aria-label="Fechar menu">✕</button>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="index.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(124,109,250,0.2);color:#7c6dfa;">🏠</span> 
-                    <div class="link-content">
-                        <span class="link-title">Início</span>
-                        <span class="link-subtitle">Página principal</span>
+    injectDOM() {
+        // Estrutura HTML limpa e semântica
+        const html = `
+            <button class="hamburger-btn" id="spe-hamburger" aria-label="Abrir Menu de Navegação" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <div class="sidebar-overlay" id="spe-overlay" aria-hidden="true"></div>
+            
+            <aside class="sidebar" id="spe-sidebar" aria-hidden="true">
+                <header class="sidebar-header">
+                    <div class="sidebar-logo">SPE</div>
+                    <span class="sidebar-title">SiteParaEstudar</span>
+                    <button class="sidebar-close" id="spe-close" aria-label="Fechar menu">✕</button>
+                </header>
+                
+                <nav class="sidebar-nav">
+                    ${this.generateLinks()}
+                </nav>
+                
+                <footer class="sidebar-footer">
+                    <div class="footer-info">
+                        <span class="footer-text">UFMS · Campus Ponta Porã</span>
+                        <span class="footer-version">v2.0</span>
                     </div>
-                </a>
-                <a href="HomeMatematica.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(124,109,250,0.2);color:#7c6dfa;">📚</span> 
-                    <div class="link-content">
-                        <span class="link-title">Matemática</span>
-                        <span class="link-subtitle">Exercícios e conteúdo</span>
-                    </div>
-                </a>
-                <a href="HomeProgramacao.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(4, 245, 12, 0.2);color:#6dfabc;">💻</span> 
-                    <div class="link-content">
-                        <span class="link-title">Programação em C</span>
-                        <span class="link-subtitle">Códigos e tutoriais</span>
-                    </div>
-                </a>
-                <a href="videos.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(250,109,138,0.15);color:#fa6d8a;">▶️</span> 
-                    <div class="link-content">
-                        <span class="link-title">Videoaulas</span>
-                        <span class="link-subtitle">Aulas em vídeo</span>
-                    </div>
-                </a>
-                <a href="livros.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(251, 42, 0, 0.15);color:#e62e00;">📚</span> 
-                    <div class="link-content">
-                        <span class="link-title">Biblioteca</span>
-                        <span class="link-subtitle">Livros e materiais</span>
-                    </div>
-                </a>
-                <a href="filmes.html" class="sidebar-link">
-                    <span class="icon" style="background:rgba(250,109,138,0.9);color:#9200e6;">🎬</span> 
-                    <div class="link-content">
-                        <span class="link-title">Filmes</span>
-                        <span class="link-subtitle">Conteúdo em vídeo</span>
-                    </div>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="footer-info">
-                    <span class="footer-text">UFMS · Campus Ponta Porã</span>
-                    <span class="footer-version">v1.2</span>
+                </footer>
+            </aside>
+        `;
+        document.body.insertAdjacentHTML('afterbegin', html);
+    }
+
+    generateLinks() {
+        const links = [
+            { href: 'index.html', icon: '🏠', color: '#7c6dfa', title: 'Início', sub: 'Página principal' },
+            { href: 'HomeMatematica.html', icon: '📚', color: '#7c6dfa', title: 'Matemática', sub: 'Exercícios e conteúdo' },
+            { href: 'HomeProgramacao.html', icon: '💻', color: '#04f50c', title: 'Programação em C', sub: 'Códigos e tutoriais' },
+            { href: 'videos.html', icon: '▶️', color: '#fa6d8a', title: 'Videoaulas', sub: 'Aulas em vídeo' },
+            { href: 'livros.html', icon: '📚', color: '#e62e00', title: 'Biblioteca', sub: 'Livros e materiais' },
+            { href: 'filmes.html', icon: '🎬', color: '#9200e6', title: 'Filmes', sub: 'Conteúdo em vídeo' }
+        ];
+
+        return links.map(l => `
+            <a href="${l.href}" class="sidebar-link">
+                <span class="icon" style="background:${this.hexToRgba(l.color, 0.15)}; color:${l.color};">${l.icon}</span> 
+                <div class="link-content">
+                    <span class="link-title">${l.title}</span>
+                    <span class="link-subtitle">${l.sub}</span>
                 </div>
-            </div>
-        </aside>
-    `;
-    document.body.insertAdjacentHTML('afterbegin', sidebarHTML);
+            </a>
+        `).join('');
+    }
 
-    // ========== LÓGICA DA SIDEBAR ==========
-    let sidebarOpen = false;
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    const closeBtn = document.getElementById('sidebar-close');
+    // Utilitário para transparência de ícones
+    hexToRgba(hex, alpha) {
+        let r = parseInt(hex.slice(1, 3), 16),
+            g = parseInt(hex.slice(3, 5), 16),
+            b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
 
-    function toggleSidebar() {
-        sidebarOpen = !sidebarOpen;
-        sidebar.classList.toggle('open', sidebarOpen);
-        overlay.classList.toggle('show', sidebarOpen);
-        hamburgerBtn.classList.toggle('open', sidebarOpen);
-        
-        // Prevenir scroll no body quando sidebar está aberta
-        document.body.style.overflow = sidebarOpen ? 'hidden' : '';
-        
-        // Feedback tátil para mobile (se disponível)
-        if (window.navigator.vibrate && sidebarOpen) {
-            window.navigator.vibrate(10);
+    cacheElements() {
+        this.dom = {
+            btn: document.getElementById('spe-hamburger'),
+            overlay: document.getElementById('spe-overlay'),
+            sidebar: document.getElementById('spe-sidebar'),
+            closeBtn: document.getElementById('spe-close'),
+            links: document.querySelectorAll('.sidebar-link')
+        };
+    }
+
+    bindEvents() {
+        // Cliques padrão
+        this.dom.btn.addEventListener('click', () => this.toggle(true));
+        this.dom.closeBtn.addEventListener('click', () => this.toggle(false));
+        this.dom.overlay.addEventListener('click', () => this.toggle(false));
+
+        // Fechar ao clicar em links (com leve atraso)
+        this.dom.links.forEach(link => {
+            link.addEventListener('click', () => {
+                setTimeout(() => this.toggle(false), 250);
+            });
+        });
+
+        // Acessibilidade: Tecla Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) this.toggle(false);
+        });
+
+        // Gestos Mobile (Swipe para fechar)
+        this.dom.sidebar.addEventListener('touchstart', e => {
+            this.touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        this.dom.sidebar.addEventListener('touchend', e => {
+            this.touchEndX = e.changedTouches[0].screenX;
+            this.handleSwipe();
+        }, { passive: true });
+    }
+
+    handleSwipe() {
+        const threshold = 60; // Distância mínima para validar o swipe
+        // Se deslizou da direita para a esquerda (Fechando)
+        if (this.touchStartX - this.touchEndX > threshold) {
+            this.toggle(false);
         }
     }
 
-    // Expor função globalmente
-    window.toggleSidebar = toggleSidebar;
+    toggle(forceState) {
+        this.isOpen = forceState !== undefined ? forceState : !this.isOpen;
 
-    // Event listeners
-    if (hamburgerBtn) hamburgerBtn.addEventListener('click', toggleSidebar);
-    if (overlay) overlay.addEventListener('click', toggleSidebar);
-    if (closeBtn) closeBtn.addEventListener('click', toggleSidebar);
+        // Classes de estado
+        this.dom.sidebar.classList.toggle('active', this.isOpen);
+        this.dom.overlay.classList.toggle('active', this.isOpen);
+        this.dom.btn.classList.toggle('active', this.isOpen);
+        document.body.classList.toggle('sidebar-is-open', this.isOpen);
 
-    // Fechar sidebar ao pressionar ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebarOpen) {
-            toggleSidebar();
-        }
-    });
+        // Acessibilidade (A11y)
+        this.dom.sidebar.setAttribute('aria-hidden', !this.isOpen);
+        this.dom.btn.setAttribute('aria-expanded', this.isOpen);
 
-    // Fechar sidebar com gesto de swipe para esquerda (mobile)
-    let touchStartX = 0;
-    
-    sidebar.addEventListener('touchstart', function(e) {
-        touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-    
-    sidebar.addEventListener('touchend', function(e) {
-        const touchEndX = e.changedTouches[0].clientX;
-        const diff = touchStartX - touchEndX;
+        // Feedback tátil nativo (Android apenas)
+        if (this.isOpen && 'vibrate' in navigator) navigator.vibrate(15);
+    }
+
+    highlightCurrentPage() {
+        let currentPath = window.location.pathname.split('/').pop();
+        if (!currentPath || currentPath === '') currentPath = 'index.html';
         
-        // Swipe para esquerda (fechar)
-        if (diff > 50 && sidebarOpen) {
-            toggleSidebar();
-        }
-    });
+        // Remove âncoras e parâmetros
+        currentPath = currentPath.split('?')[0].split('#')[0];
 
-    // ========== MARCAR LINK ATIVO ==========
-    function markActiveLink() {
-        const path = window.location.pathname;
-        const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
-        const segments = cleanPath.split('/');
-        let currentPage = segments[segments.length - 1];
-        
-        if (!currentPage || currentPage === '') {
-            currentPage = 'index.html';
-        }
-        currentPage = currentPage.split('?')[0].split('#')[0];
-
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href');
-            if (!href) return;
-
-            const hrefFile = href.split('/').pop().split('?')[0].split('#')[0];
-
-            if (hrefFile === currentPage) {
-                link.classList.add('active');
+        this.dom.links.forEach(link => {
+            const linkHref = link.getAttribute('href').split('?')[0].split('#')[0];
+            if (linkHref === currentPath) {
+                link.classList.add('active-link');
                 const icon = link.querySelector('.icon');
                 if (icon) {
-                    icon.style.boxShadow = '0 0 15px currentColor';
-                    icon.style.transform = 'scale(1.1)';
-                    icon.style.border = '2px solid currentColor';
+                    icon.style.transform = 'scale(1.15)';
+                    icon.style.boxShadow = '0 4px 10px rgba(0,0,0,0.1)';
                 }
             }
         });
     }
+}
 
-    // Marcar link ativo quando o DOM estiver pronto
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', markActiveLink);
-    } else {
-        markActiveLink();
-    }
-
-    // ========== OTIMIZAÇÕES PARA MOBILE ==========
-    
-    // Fechar sidebar ao clicar em links
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                if (sidebarOpen) {
-                    // Pequeno delay para dar feedback visual antes de fechar
-                    setTimeout(() => {
-                        toggleSidebar();
-                    }, 150);
-                }
-            });
-        });
-    });
-
-    // Ajustar altura da sidebar em dispositivos com notch
-    function adjustForSafeArea() {
-        const safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)'));
-        if (safeAreaTop > 0) {
-            document.querySelector('.sidebar-header').style.paddingTop = `${safeAreaTop + 20}px`;
-        }
-    }
-
-    if (CSS.supports('padding-top', 'env(safe-area-inset-top)')) {
-        adjustForSafeArea();
-        window.addEventListener('resize', adjustForSafeArea);
-    }
-
-    // Melhorar performance com passive event listeners
-    document.addEventListener('touchstart', function() {}, { passive: true });
-    document.addEventListener('touchmove', function() {}, { passive: true });
-
-})();
+// Inicialização segura (Garante que o DOM existe antes de injetar)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new SidebarApp());
+} else {
+    new SidebarApp();
+}

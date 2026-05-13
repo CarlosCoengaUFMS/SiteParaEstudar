@@ -633,3 +633,225 @@
             .code-highlight, .code-textarea, .line-numbers { font-size: 13px; padding: 14px; }
             .btn-run { font-size: 16px; padding: 14px 30px; }
         }
+        
+        /* ========== MENU HAMBÚRGUER (para sidebar.js) ========== */
+.hamburger-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 200;
+    width: 44px;
+    height: 44px;
+    background: rgba(21, 21, 26, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.hamburger-btn:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(124, 109, 250, 0.2);
+}
+
+.hamburger-line {
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s;
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(1),
+.hamburger-btn.open .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(2),
+.hamburger-btn.open .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(3),
+.hamburger-btn.open .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 250;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.sidebar-overlay.show,
+.sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(21, 21, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
+    z-index: 260;
+    transform: translateX(-100%);
+    transition: transform 0.35s;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.open,
+.sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-logo {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+}
+
+.sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    flex: 1;
+}
+
+.sidebar-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-close:hover {
+    background: rgba(124, 109, 250, 0.2);
+    color: var(--text);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.sidebar-link:hover {
+    background: rgba(124, 109, 250, 0.1);
+    color: var(--text);
+}
+
+.sidebar-link.active {
+    background: rgba(124, 109, 250, 0.15);
+    border: 1px solid rgba(124, 109, 250, 0.3);
+    color: #fff;
+}
+
+.sidebar-link .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.link-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.link-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.link-subtitle {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+.sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+}
+
+body.sidebar-is-open {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .hamburger-btn {
+        top: 12px;
+        left: 12px;
+        width: 38px;
+        height: 38px;
+    }
+    .sidebar {
+        width: 260px;
+    }
+    .link-subtitle {
+        display: none;
+    }
+}
