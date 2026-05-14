@@ -18,6 +18,7 @@
             --accent3: #6dfabc;
             --text: #e8e8f0;
             --muted: #7878a0;
+            --bookmark-color: #ffd700;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +32,6 @@
             flex-direction: column;
         }
 
-        /* ========== TOP BAR ========== */
         .top-bar {
             background: rgba(21, 21, 26, 0.95);
             backdrop-filter: blur(20px);
@@ -39,337 +39,339 @@
             padding: 10px 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             flex-shrink: 0;
             z-index: 100;
         }
         .btn-icon {
-            background: var(--border);
-            color: #fff;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            text-decoration: none;
+            background: var(--border); color: #fff; border: none;
+            width: 36px; height: 36px; border-radius: 8px; cursor: pointer;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; text-decoration: none;
         }
         .btn-icon:hover { background: var(--accent); }
         .doc-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            color: #fff;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+            color: #fff; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
+        
+        .bookmark-badge {
+            font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+            padding: 6px 14px; border-radius: 20px; display: flex; align-items: center;
+            gap: 6px; transition: all 0.3s; cursor: pointer; white-space: nowrap;
+        }
+        .bookmark-badge.none {
+            background: var(--surface); color: var(--muted); border: 1px solid var(--border);
+        }
+        .bookmark-badge.active {
+            background: rgba(255, 215, 0, 0.15); color: var(--bookmark-color);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            animation: pulseGold 1.5s ease-in-out infinite;
+        }
+        @keyframes pulseGold {
+            0%, 100% { border-color: rgba(255, 215, 0, 0.5); }
+            50% { border-color: rgba(255, 215, 0, 1); }
+        }
+        
         .page-indicator {
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            color: var(--muted);
-            background: var(--surface);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
+            font-family: 'Space Mono', monospace; font-size: 13px;
+            color: var(--muted); background: var(--surface);
+            padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
         }
 
-        /* ========== VIEWER ========== */
         .viewer-container {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: auto;
-            background: #1a1a1a;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
+            flex: 1; overflow-y: auto; overflow-x: auto;
+            background: #1a1a1a; display: flex; justify-content: center; padding: 20px;
         }
-        
         .pages-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            min-width: min-content;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 10px; min-width: min-content;
         }
-        
         .page-container {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            position: relative;
-            transition: box-shadow 0.3s ease;
-            flex-shrink: 0;
+            background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: relative; transition: all 0.3s ease; flex-shrink: 0; cursor: pointer;
         }
-        .page-container:hover { box-shadow: 0 4px 20px rgba(124,109,250,0.3); }
-        .page-container canvas {
-            display: block;
+        .page-container:hover { box-shadow: 0 4px 20px rgba(124,109,250,0.4); }
+        .page-container.bookmarked {
+            box-shadow: 0 0 0 4px var(--bookmark-color), 0 8px 25px rgba(255, 215, 0, 0.5) !important;
+            z-index: 2;
         }
+        .page-container canvas { display: block; }
         .page-label {
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: rgba(0,0,0,0.5);
-            background: rgba(255,255,255,0.8);
-            padding: 3px 10px;
-            border-radius: 10px;
+            position: absolute; bottom: 8px; right: 12px;
+            font-family: 'Space Mono', monospace; font-size: 11px;
+            color: rgba(255, 255, 255, 0.9); background: rgba(124, 109, 250, 0.8);
+            padding: 3px 10px; border-radius: 10px; pointer-events: none;
         }
         
-        /* Placeholder */
+        .bookmark-ribbon {
+            position: absolute; top: 0; right: 20px;
+            width: 35px; height: 45px; background: var(--bookmark-color);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.6);
+            z-index: 4; animation: bookmarkPulse 2s ease-in-out infinite; display: none;
+        }
+        .bookmark-ribbon.show { display: block; }
+        @keyframes bookmarkPulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.08); filter: brightness(1.2); }
+        }
+        
         .page-placeholder {
-            background: var(--surface);
-            border: 2px dashed var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--muted);
-            font-family: 'Space Mono', monospace;
-            font-size: 14px;
-            position: relative;
+            background: var(--surface); border: 2px dashed var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--muted); font-family: 'Space Mono', monospace; font-size: 14px;
         }
         .placeholder-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 10px;
+            width: 30px; height: 30px; border: 3px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin-right: 10px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ========== LOADING ========== */
         .loading-overlay {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(26,26,26,0.95);
-            z-index: 300;
-            gap: 20px;
+            position: fixed; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: rgba(26,26,26,0.95); z-index: 300; gap: 20px;
         }
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            width: 50px; height: 50px; border: 3px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;
         }
-        .loading-text {
-            color: var(--muted);
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-        }
+        .loading-text { color: var(--muted); font-family: 'Space Mono', monospace; font-size: 13px; }
 
-        /* ========== BOTTOM BAR ========== */
         .bottom-bar {
-            background: rgba(21, 21, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            flex-shrink: 0;
-            z-index: 100;
-            flex-wrap: wrap;
+            background: rgba(21, 21, 26, 0.95); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border); padding: 12px 20px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; flex-shrink: 0; z-index: 100; flex-wrap: wrap;
         }
         .zoom-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--surface);
-            padding: 6px 12px;
-            border-radius: 25px;
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface); padding: 6px 12px;
+            border-radius: 25px; border: 1px solid var(--border);
         }
         .zoom-btn {
-            background: var(--border);
-            color: #fff;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
+            background: var(--border); color: #fff; border: none;
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+            font-size: 16px; font-weight: 700; display: flex;
+            align-items: center; justify-content: center; transition: all 0.3s;
         }
         .zoom-btn:hover { background: var(--accent); }
         .zoom-level {
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            color: #fff;
-            min-width: 50px;
-            text-align: center;
-            font-weight: 600;
+            font-family: 'Space Mono', monospace; font-size: 13px;
+            color: #fff; min-width: 50px; text-align: center; font-weight: 600;
         }
         .preset-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 6px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            transition: all 0.3s;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--muted); padding: 6px 12px; border-radius: 15px;
+            cursor: pointer; font-family: 'Space Mono', monospace; font-size: 11px; transition: all 0.3s;
         }
         .preset-btn:hover { border-color: var(--accent); color: #fff; }
         .preset-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--accent);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-family: 'Syne', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            z-index: 400;
-            transition: transform 0.3s ease;
-            pointer-events: none;
+        
+        .action-btn {
+            font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+            padding: 8px 16px; border-radius: 20px; cursor: pointer;
+            transition: all 0.3s; display: flex; align-items: center; gap: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            background: transparent; color: var(--bookmark-color);
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+        .action-btn:hover { background: rgba(255, 215, 0, 0.15); border-color: var(--bookmark-color); }
+        .action-btn.go-btn { border-color: rgba(0, 229, 255, 0.4); color: #00e5ff; }
+        .action-btn.go-btn:hover { background: rgba(0, 229, 255, 0.15); border-color: #00e5ff; }
+        .action-btn.remove-btn { border-color: rgba(250, 109, 138, 0.4); color: #fa6d8a; }
+        .action-btn.remove-btn:hover { background: rgba(250, 109, 138, 0.15); border-color: #fa6d8a; }
+        .action-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
-        /* Info overlay */
-        .info-overlay {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            background: rgba(21, 21, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 15px;
-            z-index: 150;
+        .floating-buttons {
+            position: fixed; right: 20px; z-index: 150;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+        }
+        .fab-index {
+            font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
+            color: rgba(255, 255, 255, 0.95); background: rgba(124, 109, 250, 0.9);
+            padding: 10px 18px; border-radius: 25px; cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(124, 109, 250, 0.3);
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; z-index: 152;
+        }
+        .fab-index:hover { background: rgba(124, 109, 250, 1); transform: translateY(-2px); }
+        .fab {
+            width: 48px; height: 48px; background: var(--accent); color: #fff;
+            border: none; border-radius: 50%; font-size: 20px; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(124,109,250,0.4);
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 152;
+        }
+        .fab:hover { background: #8f80ff; transform: translateY(-2px); }
+        .fab-top { display: none; }
+        .fab-top.show { display: flex; }
+        
+        .fab-remove-bookmark {
+            background: rgba(250, 109, 138, 0.8); color: #fff;
+            box-shadow: 0 8px 25px rgba(250, 109, 138, 0.4);
             display: none;
-            font-size: 12px;
-            max-width: 280px;
+        }
+        .fab-remove-bookmark.show { display: flex; }
+        .fab-remove-bookmark:hover { background: #fa6d8a; }
+
+        .index-panel {
+            position: fixed; right: 20px;
+            background: rgba(21, 21, 26, 0.98); border: 1px solid var(--border);
+            border-radius: 16px; z-index: 151; display: none;
+            max-height: 450px; overflow: hidden; min-width: 300px; max-width: 380px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+        .index-panel.show { display: flex; flex-direction: column; }
+        .index-panel-header {
+            padding: 15px 20px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .index-panel-header h3 { font-family: 'Syne', sans-serif; font-size: 16px; color: var(--accent); margin: 0; }
+        .index-close-btn {
+            background: var(--border); color: #fff; border: none;
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+            font-size: 14px; display: flex; align-items: center; justify-content: center;
+        }
+        .index-search-container { padding: 12px 20px; border-bottom: 1px solid var(--border); }
+        .index-search-input {
+            width: 100%; background: var(--surface); border: 1px solid var(--border);
+            color: #fff; padding: 10px 14px; border-radius: 10px;
+            font-family: 'Inter', sans-serif; font-size: 13px; outline: none;
+        }
+        .index-panel-content { padding: 10px; overflow-y: auto; flex: 1; }
+        .index-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 15px;
+            margin: 4px 0; border-radius: 10px; cursor: pointer; font-size: 13px;
+        }
+        .index-item:hover { background: rgba(124, 109, 250, 0.15); color: #fff; }
+        .index-item.hidden { display: none; }
+        .index-item.bookmarked {
+            background: rgba(255, 215, 0, 0.15); border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+        .index-item-number {
+            font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+            background: rgba(124, 109, 250, 0.8); padding: 4px 10px;
+            border-radius: 10px; min-width: 45px; text-align: center;
+        }
+        .index-item.bookmarked .index-item-number { background: var(--bookmark-color); color: #000; }
+        .index-quick-jump { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--border); }
+        .index-jump-input {
+            flex: 1; background: var(--surface); border: 1px solid var(--border);
+            color: #fff; padding: 10px 14px; border-radius: 10px;
+            font-family: 'Space Mono', monospace; font-size: 13px; outline: none;
+        }
+        .index-jump-btn {
+            font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+            background: rgba(124, 109, 250, 0.8); border: none; padding: 10px 18px;
+            border-radius: 10px; cursor: pointer; white-space: nowrap;
+        }
+
+        .info-overlay {
+            position: fixed; right: 20px;
+            background: rgba(21, 21, 26, 0.95); border: 1px solid var(--border);
+            border-radius: 12px; padding: 15px; z-index: 151; display: none;
+            font-size: 12px; max-width: 280px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
         .info-overlay.show { display: block; }
-        .info-overlay h4 {
-            color: var(--accent);
-            margin-bottom: 10px;
-            font-family: 'Syne', sans-serif;
-        }
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .info-key {
-            background: var(--accent);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-        }
+        .info-overlay h4 { color: var(--accent); margin-bottom: 10px; font-family: 'Syne', sans-serif; }
+        .info-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .info-key { background: var(--accent); color: white; padding: 2px 8px; border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 11px; }
         .info-desc { color: var(--muted); }
 
-        .no-pdf {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--muted);
+        .toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent); color: #fff; padding: 10px 20px;
+            border-radius: 20px; font-family: 'Syne', sans-serif; font-size: 13px;
+            font-weight: 700; z-index: 400; transition: transform 0.3s ease; pointer-events: none;
         }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .bookmark-toast {
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            padding: 14px 28px; border-radius: 30px;
+            font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+            z-index: 400; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        .bookmark-toast.show { transform: translateX(-50%) translateY(0); }
+        .bookmark-toast.saved { background: var(--bookmark-color); color: #000; }
+        .bookmark-toast.removed { background: var(--accent2); color: #fff; }
+
+        .no-pdf { text-align: center; padding: 80px 20px; color: var(--muted); }
         .no-pdf .icon-big { font-size: 80px; margin-bottom: 20px; }
-        .no-pdf h2 {
-            font-family: 'Syne', sans-serif;
-            font-size: 24px;
-            color: #fff;
-            margin-bottom: 10px;
-        }
+        .no-pdf h2 { font-family: 'Syne', sans-serif; font-size: 24px; color: #fff; margin-bottom: 10px; }
         .btn-back-big {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--accent);
-            color: #fff;
-            padding: 12px 28px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s;
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--accent); color: #fff; padding: 12px 28px;
+            border-radius: 25px; text-decoration: none;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
         }
-        .btn-back-big:hover { background: #8f80ff; }
 
-        .fab {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(124,109,250,0.4);
-            z-index: 150;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
+        @media (min-width: 769px) {
+            .floating-buttons { bottom: 100px; }
+            .index-panel { bottom: 160px; }
+            .info-overlay { bottom: 270px; }
         }
-        .fab.show { display: flex; }
-        .fab:hover { background: #8f80ff; }
-        .fab-top { bottom: 160px; }
-
         @media (max-width: 768px) {
-            .top-bar { padding: 8px 12px; }
-            .bottom-bar { padding: 10px 12px; gap: 8px; }
+            .top-bar { padding: 8px 10px; gap: 6px; }
+            .bottom-bar { padding: 10px 12px; gap: 6px; }
             .doc-title { font-size: 13px; }
+            .bookmark-badge { font-size: 10px; padding: 4px 10px; }
+            .floating-buttons { bottom: 90px; right: 15px; gap: 10px; }
+            .fab-index { font-size: 11px; padding: 8px 14px; }
+            .index-panel { right: 10px; min-width: 280px; max-width: 320px; bottom: 145px; }
+            .fab { width: 42px; height: 42px; font-size: 18px; }
+            .action-btn { font-size: 10px; padding: 6px 10px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Loading -->
     <div class="loading-overlay" id="loading-overlay">
         <div class="loading-spinner"></div>
         <div class="loading-text" id="loading-text">Carregando PDF...</div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
+    <div class="bookmark-toast" id="bookmark-toast">🔖 <span id="bookmark-toast-text"></span></div>
 
-    <!-- Info Overlay -->
+    <!-- Painel de Índice -->
+    <div class="index-panel" id="index-panel">
+        <div class="index-panel-header">
+            <h3>📑 Índice de Páginas</h3>
+            <button class="index-close-btn" onclick="toggleIndex()">✕</button>
+        </div>
+        <div class="index-search-container">
+            <input type="text" class="index-search-input" id="index-search" placeholder="🔍 Pesquisar..." oninput="filterIndex()">
+        </div>
+        <div class="index-panel-content" id="index-content"></div>
+        <div class="index-quick-jump">
+            <input type="number" class="index-jump-input" id="jump-input" placeholder="Ir para página..." min="1" onkeypress="if(event.key==='Enter') jumpToPage()">
+            <button class="index-jump-btn" onclick="jumpToPage()">IR →</button>
+        </div>
+    </div>
+
+    <!-- Painel de Atalhos -->
     <div class="info-overlay" id="info-overlay">
         <h4>⌨️ Como usar</h4>
-        <div class="info-item"><span class="info-desc">Zoom +</span><span class="info-key">Ctrl +</span></div>
-        <div class="info-item"><span class="info-desc">Zoom -</span><span class="info-key">Ctrl -</span></div>
-        <div class="info-item"><span class="info-desc">Original</span><span class="info-key">Ctrl 0</span></div>
-        <div class="info-item"><span class="info-desc">Pinça zoom</span><span class="info-key">Mobile</span></div>
-        <div class="info-item"><span class="info-desc">Atalhos</span><span class="info-key">?</span></div>
+        <div class="info-item"><span class="info-desc">Marcar página</span><span class="info-key">Clique na página</span></div>
+        <div class="info-item"><span class="info-desc">Desmarcar</span><span class="info-key">Ctrl D</span></div>
+        <div class="info-item"><span class="info-desc">Ir ao marca</span><span class="info-key">Ctrl G</span></div>
+        <div class="info-item"><span class="info-desc">Zoom +/-</span><span class="info-key">Ctrl +/-</span></div>
+        <div class="info-item"><span class="info-desc">Índice</span><span class="info-key">Ctrl I</span></div>
     </div>
 
     <!-- Barra Superior -->
     <div class="top-bar" id="top-bar">
         <a href="livros.html" class="btn-icon" title="Voltar">←</a>
         <span class="doc-title" id="pdf-title">Carregando...</span>
+        
+        <div class="bookmark-badge none" id="bookmark-badge" onclick="goToBookmark()" title="Clique para ir à página marcada">
+            🔖 <span id="bookmark-badge-text">Nenhuma marca</span>
+        </div>
+        
         <span class="page-indicator" id="page-indicator">0 páginas</span>
         <a href="#" class="btn-icon" id="btn-download" download title="Baixar">📥</a>
     </div>
@@ -389,66 +391,77 @@
     <!-- Barra Inferior -->
     <div class="bottom-bar" id="bottom-bar">
         <div class="zoom-group">
-            <button class="zoom-btn" id="btn-zoom-out" title="Diminuir Zoom (Ctrl -)">−</button>
+            <button class="zoom-btn" id="btn-zoom-out" title="Diminuir Zoom">−</button>
             <span class="zoom-level" id="zoom-level">100%</span>
-            <button class="zoom-btn" id="btn-zoom-in" title="Aumentar Zoom (Ctrl +)">+</button>
+            <button class="zoom-btn" id="btn-zoom-in" title="Aumentar Zoom">+</button>
         </div>
-        
         <button class="preset-btn" data-zoom="0.8">📖 80%</button>
         <button class="preset-btn" data-zoom="1.0">📄 100%</button>
         <button class="preset-btn" data-zoom="1.3">🔍 130%</button>
-        <button class="preset-btn" data-zoom="1.5">🔎 150%</button>
-        
         <button class="zoom-btn" id="btn-reset-zoom" title="Resetar zoom" style="font-size:13px;border-radius:8px;">↺</button>
+        
+        <button class="action-btn go-btn" id="go-btn" onclick="goToBookmark()" title="Ir para página marcada (Ctrl+G)" disabled>🎯 Ir ao marca</button>
+        <button class="action-btn remove-btn" id="remove-btn" onclick="removeBookmarkAction()" title="Remover marcação (Ctrl+D)" disabled>✕ Remover marca</button>
     </div>
 
-    <!-- FABs -->
-    <button class="fab fab-top" id="fab-top" onclick="scrollToTop()">↑</button>
-    <button class="fab" id="fab-info" onclick="toggleInfo()" style="bottom:100px;">?</button>
+    <!-- Botões flutuantes -->
+    <div class="floating-buttons">
+        <button class="fab" id="fab-info" onclick="toggleInfo()" title="Atalhos">?</button>
+        <button class="fab fab-top" id="fab-top" onclick="scrollToTop()" title="Voltar ao topo">↑</button>
+        <button class="fab fab-remove-bookmark" id="fab-remove" onclick="removeBookmarkAction()" title="Remover marcação (Ctrl+D)">✕</button>
+        <button class="fab" id="fab-go" onclick="goToBookmark()" title="Ir ao marca (Ctrl+G)" style="background:#00e5ff;color:#000;">🎯</button>
+        <div class="fab-index" id="fab-index" onclick="toggleIndex()">
+            <span>📑</span><span>Índice</span>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // ========== ESTADO GLOBAL ==========
+        // ========== ESTADO ==========
         let pdfDoc = null;
         let totalPages = 0;
         let currentScale = 1.0;
         let pdfIdentifier = '';
-        let renderedCanvases = new Map(); // pageNum -> {canvas, scale}
+        let renderedCanvases = new Map();
         let observer = null;
         let renderQueue = new Set();
         let isRendering = false;
+        let bookmarkedPage = null;
         
         const viewerContainer = document.getElementById('viewer-container');
         const pagesWrapper = document.getElementById('pages-wrapper');
         const STORAGE_KEY = 'pdf_reader_zoom';
+        const BOOKMARK_KEY = 'pdf_reader_bookmarks_v2';
 
         // ========== UTILITÁRIOS ==========
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
         }
-
-        function getQueryParam(param) {
-            return new URLSearchParams(window.location.search).get(param);
+        function showBookmarkToast(msg, type = 'saved') {
+            const t = document.getElementById('bookmark-toast');
+            document.getElementById('bookmark-toast-text').textContent = msg;
+            t.className = 'bookmark-toast ' + type + ' show';
+            setTimeout(() => t.classList.remove('show'), 2000);
         }
-
+        function getQueryParam(p) { return new URLSearchParams(window.location.search).get(p); }
         function loadZoomSetting(id) {
-            try {
-                const settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-                return settings[id] || 1.0;
-            } catch(e) { return 1.0; }
+            try { return (JSON.parse(localStorage.getItem(STORAGE_KEY)) || {})[id] || 1.0; } catch(e) { return 1.0; }
         }
-
-        function saveZoomSetting(id, scale) {
-            try {
-                const settings = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-                settings[id] = scale;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-            } catch(e) {}
+        function saveZoomSetting(id, s) {
+            try { const d = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; d[id] = s; localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e) {}
+        }
+        function loadBookmark(id) {
+            try { return (JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || {})[id] || null; } catch(e) { return null; }
+        }
+        function saveBookmark(id, page) {
+            try { const d = JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || {}; d[id] = { page, timestamp: Date.now() }; localStorage.setItem(BOOKMARK_KEY, JSON.stringify(d)); console.log('💾 Bookmark salvo:', id, 'página', page); } catch(e) { console.error('Erro ao salvar:', e); }
+        }
+        function removeBookmark(id) {
+            try { const d = JSON.parse(localStorage.getItem(BOOKMARK_KEY)) || {}; delete d[id]; localStorage.setItem(BOOKMARK_KEY, JSON.stringify(d)); console.log('🗑️ Bookmark removido:', id); } catch(e) { console.error('Erro ao remover:', e); }
         }
 
         // ========== INICIALIZAÇÃO ==========
@@ -458,399 +471,396 @@
 
         document.getElementById('pdf-title').textContent = decodeURIComponent(pdfTitle);
         document.title = decodeURIComponent(pdfTitle) + ' · SiteParaEstudar';
-        
-        const downloadBtn = document.getElementById('btn-download');
-        if (pdfPath) {
-            downloadBtn.href = pdfPath;
-            downloadBtn.download = decodeURIComponent(pdfTitle) + '.pdf';
-        }
+        const dBtn = document.getElementById('btn-download');
+        if (pdfPath) { dBtn.href = pdfPath; dBtn.download = decodeURIComponent(pdfTitle) + '.pdf'; }
 
         currentScale = loadZoomSetting(pdfIdentifier);
         updateZoomDisplay();
         updatePresetButtons();
 
-        // ========== CARREGAR PDF (SÓ METADADOS) ==========
+        const saved = loadBookmark(pdfIdentifier);
+        if (saved) { 
+            bookmarkedPage = saved.page; 
+            console.log('📖 Bookmark carregado:', bookmarkedPage);
+        }
+        updateAllUI();
+
+        // ========== CARREGAR PDF ==========
         async function loadPDF(path) {
-            const overlay = document.getElementById('loading-overlay');
-            const loadingText = document.getElementById('loading-text');
-            
+            const ov = document.getElementById('loading-overlay');
+            const lt = document.getElementById('loading-text');
             try {
-                loadingText.textContent = 'Abrindo PDF...';
+                lt.textContent = 'Abrindo PDF...';
                 pdfDoc = await pdfjsLib.getDocument(path).promise;
                 totalPages = pdfDoc.numPages;
-                
                 document.getElementById('page-indicator').textContent = totalPages + ' páginas';
-                
-                // Criar estrutura de containers (SEM RENDERIZAR)
                 createPageContainers();
-                
-                overlay.style.display = 'none';
-                
-                // Configurar observer para lazy loading
+                generateIndex();
+                ov.style.display = 'none';
                 setupObserver();
-                
-                // Forçar renderização das primeiras páginas visíveis
-                setTimeout(() => renderVisiblePages(), 100);
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                pagesWrapper.innerHTML = `
-                    <div class="no-pdf">
-                        <div class="icon-big">❌</div>
-                        <h2>Erro ao carregar PDF</h2>
-                        <p>${error.message}</p>
-                        <a href="livros.html" class="btn-back-big">📚 Voltar para Biblioteca</a>
-                    </div>
-                `;
-                overlay.style.display = 'none';
+                setTimeout(() => renderVisiblePages(), 200);
+                if (bookmarkedPage) {
+                    setTimeout(() => { scrollToPage(bookmarkedPage); }, 700);
+                }
+            } catch(e) {
+                console.error(e);
+                pagesWrapper.innerHTML = `<div class="no-pdf"><div class="icon-big">❌</div><h2>Erro</h2><p>${e.message}</p><a href="livros.html" class="btn-back-big">📚 Voltar</a></div>`;
+                ov.style.display = 'none';
             }
         }
 
-        // ========== CRIAR CONTAINERS (LEVE, SEM RENDERIZAR) ==========
+        // ========== ÍNDICE ==========
+        function generateIndex() {
+            const c = document.getElementById('index-content');
+            c.innerHTML = '';
+            if (totalPages <= 50) {
+                for (let i = 1; i <= totalPages; i++) c.appendChild(createIndexItem(i, `Página ${i}`));
+            } else {
+                for (let i = 0; i < Math.ceil(totalPages / 10); i++) {
+                    const s = i * 10 + 1, e = Math.min((i + 1) * 10, totalPages);
+                    c.appendChild(createIndexItem(s, `Páginas ${s} até ${e}`, e));
+                }
+            }
+            document.getElementById('jump-input').max = totalPages;
+            updateIndexHighlight();
+        }
+        function createIndexItem(start, title, end = null) {
+            const el = document.createElement('div');
+            el.className = 'index-item';
+            el.dataset.pages = end ? `${start}-${end}` : `${start}`;
+            el.dataset.searchText = title.toLowerCase();
+            el.onclick = () => { scrollToPage(start); };
+            el.innerHTML = `<span class="index-item-number">${end ? `${start}-${end}` : start}</span><span style="flex:1">${title}</span>`;
+            return el;
+        }
+        function filterIndex() {
+            const q = document.getElementById('index-search').value.toLowerCase().trim();
+            document.querySelectorAll('.index-item').forEach(el => {
+                el.classList.toggle('hidden', q !== '' && !el.dataset.searchText.includes(q) && !el.dataset.pages.includes(q));
+            });
+        }
+        function updateIndexHighlight() {
+            document.querySelectorAll('.index-item').forEach(el => {
+                const [a, b] = el.dataset.pages.split('-').map(Number);
+                const start = a, end = b || a;
+                el.classList.toggle('bookmarked', bookmarkedPage && bookmarkedPage >= start && bookmarkedPage <= end);
+            });
+        }
+
+        // ========== CONTAINERS ==========
         function createPageContainers() {
             pagesWrapper.innerHTML = '';
             renderedCanvases.clear();
             renderQueue.clear();
-            
-            // Estimativa de altura baseada no scale atual
-            const estimatedWidth = Math.min(window.innerWidth - 40, 900);
-            const estimatedHeight = estimatedWidth * 1.414; // Proporção A4
-            
+            const w = Math.min(window.innerWidth - 40, 900), h = w * 1.414;
             for (let i = 1; i <= totalPages; i++) {
-                const container = document.createElement('div');
-                container.className = 'page-container page-placeholder';
-                container.id = 'page-' + i;
-                container.dataset.page = i;
-                container.style.width = estimatedWidth + 'px';
-                container.style.height = estimatedHeight + 'px';
-                container.style.minHeight = '300px';
-                container.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div class="placeholder-spinner"></div>
-                        <span>Página ${i}</span>
-                    </div>
-                `;
-                pagesWrapper.appendChild(container);
+                const el = document.createElement('div');
+                el.className = 'page-container page-placeholder';
+                el.id = 'page-' + i;
+                el.dataset.page = i;
+                el.style.width = w + 'px'; el.style.height = h + 'px';
+                el.style.minHeight = '300px';
+                el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><div class="placeholder-spinner"></div><span>Página ${i}</span></div>`;
+                // CLIQUE = SEMPRE MARCAR
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    bookmarkPage(i);
+                });
+                pagesWrapper.appendChild(el);
             }
         }
 
-        // ========== RENDERIZAR UMA PÁGINA ==========
-        async function renderPage(pageNum) {
-            const container = document.getElementById('page-' + pageNum);
-            if (!container || !pdfDoc) return;
-            
-            // Verificar se já está renderizada com a escala correta
-            const cached = renderedCanvases.get(pageNum);
-            if (cached && Math.abs(cached.scale - currentScale) < 0.001) {
-                return; // Já está renderizada com essa escala
-            }
-            
+        // ========== RENDER ==========
+        async function renderPage(pn) {
+            const el = document.getElementById('page-' + pn);
+            if (!el || !pdfDoc) return;
+            const cached = renderedCanvases.get(pn);
+            if (cached && Math.abs(cached.scale - currentScale) < 0.001) return;
             try {
-                const page = await pdfDoc.getPage(pageNum);
-                const viewport = page.getViewport({ scale: currentScale });
-                
+                const page = await pdfDoc.getPage(pn);
+                const vp = page.getViewport({ scale: currentScale });
                 const canvas = document.createElement('canvas');
-                canvas.width = viewport.width;
-                canvas.height = viewport.height;
+                canvas.width = vp.width; canvas.height = vp.height;
                 canvas.style.display = 'block';
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
                 
-                const ctx = canvas.getContext('2d');
+                const wasBookmarked = el.classList.contains('bookmarked');
+                el.className = 'page-container';
+                if (wasBookmarked || pn === bookmarkedPage) el.classList.add('bookmarked');
+                el.style.width = vp.width + 'px'; el.style.height = vp.height + 'px';
+                el.innerHTML = '';
+                el.appendChild(canvas);
                 
-                // Renderizar com qualidade
-                await page.render({
-                    canvasContext: ctx,
-                    viewport: viewport,
-                    enableWebGL: true,
-                    renderInteractiveForms: false,
-                }).promise;
+                const lbl = document.createElement('div');
+                lbl.className = 'page-label';
+                lbl.textContent = 'Pág. ' + pn;
+                el.appendChild(lbl);
                 
-                // Atualizar container
-                container.className = 'page-container';
-                container.style.width = viewport.width + 'px';
-                container.style.height = viewport.height + 'px';
-                container.innerHTML = '';
-                container.appendChild(canvas);
-                
-                // Adicionar label
-                const label = document.createElement('div');
-                label.className = 'page-label';
-                label.textContent = 'Pág. ' + pageNum;
-                container.appendChild(label);
-                
-                // Salvar no cache
-                renderedCanvases.set(pageNum, { canvas, scale: currentScale });
-                
-                // Limpar cache se muito grande
-                if (renderedCanvases.size > 30) {
-                    const firstKey = renderedCanvases.keys().next().value;
-                    const oldContainer = document.getElementById('page-' + firstKey);
-                    if (oldContainer && !isElementInViewport(oldContainer)) {
-                        // Restaurar placeholder para páginas distantes
-                        restorePlaceholder(firstKey);
-                    }
+                if (pn === bookmarkedPage) {
+                    el.classList.add('bookmarked');
+                    const rb = document.createElement('div');
+                    rb.className = 'bookmark-ribbon show';
+                    el.appendChild(rb);
                 }
                 
-            } catch (error) {
-                console.error('Erro ao renderizar página ' + pageNum + ':', error);
-                container.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:10px;color:#fa6d8a;">
-                        <span>⚠️</span>
-                        <span>Erro na página ${pageNum}</span>
-                    </div>
-                `;
-            }
+                el.addEventListener('click', (e) => { e.stopPropagation(); bookmarkPage(pn); });
+                renderedCanvases.set(pn, { canvas, scale: currentScale });
+                if (renderedCanvases.size > 30) {
+                    const fk = renderedCanvases.keys().next().value;
+                    if (!isInViewport(document.getElementById('page-' + fk))) restorePlaceholder(fk);
+                }
+            } catch(e) { console.error('Erro pág ' + pn, e); }
         }
 
-        function restorePlaceholder(pageNum) {
-            const container = document.getElementById('page-' + pageNum);
-            if (!container) return;
-            
-            renderedCanvases.delete(pageNum);
-            
-            const estimatedWidth = Math.min(window.innerWidth - 40, 900);
-            const estimatedHeight = estimatedWidth * 1.414;
-            
-            container.className = 'page-container page-placeholder';
-            container.style.width = estimatedWidth + 'px';
-            container.style.height = estimatedHeight + 'px';
-            container.style.minHeight = '300px';
-            container.innerHTML = `
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div class="placeholder-spinner"></div>
-                    <span>Página ${pageNum}</span>
-                </div>
-            `;
+        function restorePlaceholder(pn) {
+            const el = document.getElementById('page-' + pn);
+            if (!el) return;
+            renderedCanvases.delete(pn);
+            const w = Math.min(window.innerWidth - 40, 900), h = w * 1.414;
+            el.className = 'page-container page-placeholder';
+            el.style.width = w + 'px'; el.style.height = h + 'px';
+            el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><div class="placeholder-spinner"></div><span>Página ${pn}</span></div>`;
+            el.addEventListener('click', (e) => { e.stopPropagation(); bookmarkPage(pn); });
         }
 
-        // ========== INTERSECTION OBSERVER ==========
+        // ========== OBSERVER ==========
         function setupObserver() {
             if (observer) observer.disconnect();
-            
-            observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const pageNum = parseInt(entry.target.dataset.page);
-                        if (!renderQueue.has(pageNum)) {
-                            renderQueue.add(pageNum);
-                        }
-                    }
-                });
-                
-                if (renderQueue.size > 0) {
-                    processQueue();
-                }
-            }, {
-                root: viewerContainer,
-                rootMargin: '300px 0px',
-                threshold: 0
-            });
-            
-            document.querySelectorAll('.page-container').forEach(el => {
-                observer.observe(el);
-            });
+            observer = new IntersectionObserver(entries => {
+                entries.forEach(e => { if (e.isIntersecting) renderQueue.add(parseInt(e.target.dataset.page)); });
+                if (renderQueue.size > 0) processQueue();
+            }, { root: viewerContainer, rootMargin: '300px 0px', threshold: 0 });
+            document.querySelectorAll('.page-container').forEach(el => observer.observe(el));
         }
-
-        function isElementInViewport(el) {
-            const rect = el.getBoundingClientRect();
-            const containerRect = viewerContainer.getBoundingClientRect();
-            return (
-                rect.bottom >= containerRect.top - 300 &&
-                rect.top <= containerRect.bottom + 300
-            );
+        function isInViewport(el) {
+            if (!el) return false;
+            const r = el.getBoundingClientRect(), cr = viewerContainer.getBoundingClientRect();
+            return r.bottom >= cr.top - 300 && r.top <= cr.bottom + 300;
         }
-
         async function processQueue() {
             if (isRendering || renderQueue.size === 0) return;
-            
             isRendering = true;
-            
-            // Pegar até 2 páginas da fila
             const batch = Array.from(renderQueue).slice(0, 2);
             batch.forEach(p => renderQueue.delete(p));
-            
-            // Renderizar em paralelo
-            await Promise.all(batch.map(pageNum => renderPage(pageNum)));
-            
+            await Promise.all(batch.map(p => renderPage(p)));
             isRendering = false;
-            
-            // Continuar se ainda há itens
-            if (renderQueue.size > 0) {
-                requestAnimationFrame(() => processQueue());
-            }
+            if (renderQueue.size > 0) requestAnimationFrame(() => processQueue());
         }
-
         function renderVisiblePages() {
             document.querySelectorAll('.page-container').forEach(el => {
-                if (isElementInViewport(el)) {
-                    const pageNum = parseInt(el.dataset.page);
-                    if (!renderQueue.has(pageNum)) {
-                        renderQueue.add(pageNum);
-                    }
-                }
+                if (isInViewport(el)) renderQueue.add(parseInt(el.dataset.page));
             });
             processQueue();
         }
 
-        // ========== ZOOM (RECONSTRUIR TUDO) ==========
-        function applyZoom(newScale) {
-            newScale = Math.max(0.4, Math.min(3.0, newScale));
-            newScale = Math.round(newScale * 100) / 100;
+        // ========== MARCAR PÁGINA (SEMPRE) ==========
+        function bookmarkPage(pageNum) {
+            if (!pdfDoc) return;
             
-            if (Math.abs(currentScale - newScale) < 0.001) return;
+            console.log('🔖 Tentando marcar página:', pageNum, '| Atual:', bookmarkedPage);
             
-            const oldScale = currentScale;
-            currentScale = newScale;
+            // Se já existe uma marca, remove a antiga primeiro
+            if (bookmarkedPage && bookmarkedPage !== pageNum) {
+                // Remove ribbon da página antiga
+                const oldEl = document.getElementById('page-' + bookmarkedPage);
+                if (oldEl) {
+                    oldEl.classList.remove('bookmarked');
+                    const oldRibbon = oldEl.querySelector('.bookmark-ribbon');
+                    if (oldRibbon) oldRibbon.remove();
+                }
+            }
             
-            updateZoomDisplay();
-            updatePresetButtons();
-            saveZoomSetting(pdfIdentifier, currentScale);
-            showToast('🔍 Zoom: ' + Math.round(currentScale * 100) + '%');
+            // Salvar nova marca
+            saveBookmark(pdfIdentifier, pageNum);
+            bookmarkedPage = pageNum;
             
-            // Limpar cache de renderização
-            renderedCanvases.clear();
-            renderQueue.clear();
+            // Atualizar ribbon na página atual
+            updateBookmarkRibbons();
             
-            // Recriar containers com tamanho estimado
-            createPageContainers();
+            // Re-renderizar a página para garantir o ribbon
+            renderPage(pageNum);
             
-            // Reconfigurar observer
-            setupObserver();
+            updateAllUI();
+            updateIndexHighlight();
+            showBookmarkToast('🔖 Página ' + pageNum + ' marcada!');
+        }
+
+        // ========== REMOVER MARCA (BOTÃO/TECLA) ==========
+        function removeBookmarkAction() {
+            if (!bookmarkedPage) {
+                showToast('⚠️ Nenhuma marca para remover');
+                return;
+            }
             
-            // Renderizar páginas visíveis
+            console.log('🗑️ Removendo marca da página:', bookmarkedPage);
+            
+            // Remover do storage
+            removeBookmark(pdfIdentifier);
+            
+            // Remover ribbon visual
+            const el = document.getElementById('page-' + bookmarkedPage);
+            if (el) {
+                el.classList.remove('bookmarked');
+                const ribbon = el.querySelector('.bookmark-ribbon');
+                if (ribbon) ribbon.remove();
+            }
+            
+            const oldPage = bookmarkedPage;
+            bookmarkedPage = null;
+            
+            updateAllUI();
+            updateIndexHighlight();
+            showBookmarkToast('🔖 Marca removida (era pág. ' + oldPage + ')', 'removed');
+        }
+
+        function goToBookmark() {
+            if (!bookmarkedPage) { 
+                showToast('⚠️ Nenhuma página marcada. Clique em uma página para marcar.'); 
+                return; 
+            }
+            scrollToPage(bookmarkedPage);
+            showBookmarkToast('🎯 Página ' + bookmarkedPage);
+        }
+
+        function updateBookmarkRibbons() {
+            // Limpar todos
+            document.querySelectorAll('.bookmark-ribbon').forEach(r => r.remove());
+            document.querySelectorAll('.page-container.bookmarked').forEach(el => el.classList.remove('bookmarked'));
+            
+            // Adicionar na página marcada
+            if (bookmarkedPage) {
+                const el = document.getElementById('page-' + bookmarkedPage);
+                if (el && !el.classList.contains('page-placeholder')) {
+                    el.classList.add('bookmarked');
+                    const rb = document.createElement('div');
+                    rb.className = 'bookmark-ribbon show';
+                    el.appendChild(rb);
+                }
+            }
+        }
+
+        function updateAllUI() {
+            const badge = document.getElementById('bookmark-badge');
+            const badgeText = document.getElementById('bookmark-badge-text');
+            const goBtn = document.getElementById('go-btn');
+            const removeBtn = document.getElementById('remove-btn');
+            const fabRemove = document.getElementById('fab-remove');
+            
+            if (bookmarkedPage) {
+                badge.className = 'bookmark-badge active';
+                badgeText.textContent = '🔖 Pág. ' + bookmarkedPage;
+                goBtn.disabled = false;
+                removeBtn.disabled = false;
+                fabRemove.classList.add('show');
+            } else {
+                badge.className = 'bookmark-badge none';
+                badgeText.textContent = 'Nenhuma marca';
+                goBtn.disabled = true;
+                removeBtn.disabled = true;
+                fabRemove.classList.remove('show');
+            }
+        }
+
+        // ========== ZOOM ==========
+        function applyZoom(s) {
+            s = Math.max(0.4, Math.min(3.0, Math.round(s * 100) / 100));
+            if (Math.abs(currentScale - s) < 0.001) return;
+            currentScale = s;
+            updateZoomDisplay(); updatePresetButtons();
+            saveZoomSetting(pdfIdentifier, s);
+            showToast('🔍 Zoom: ' + Math.round(s * 100) + '%');
+            renderedCanvases.clear(); renderQueue.clear();
+            createPageContainers(); setupObserver();
             setTimeout(() => renderVisiblePages(), 50);
         }
-
-        function updateZoomDisplay() {
-            document.getElementById('zoom-level').textContent = Math.round(currentScale * 100) + '%';
-        }
-
+        function updateZoomDisplay() { document.getElementById('zoom-level').textContent = Math.round(currentScale * 100) + '%'; }
         function updatePresetButtons() {
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                const zoom = parseFloat(btn.dataset.zoom);
-                if (Math.abs(currentScale - zoom) < 0.01) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+            document.querySelectorAll('.preset-btn').forEach(b => {
+                b.classList.toggle('active', Math.abs(currentScale - parseFloat(b.dataset.zoom)) < 0.01);
             });
         }
 
-        // ========== EVENT LISTENERS ==========
+        // ========== NAVEGAÇÃO ==========
+        function scrollToPage(pn) {
+            const el = document.getElementById('page-' + pn);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (window.innerWidth <= 768) toggleIndex(); }
+        }
+        function jumpToPage() {
+            const inp = document.getElementById('jump-input');
+            let p = parseInt(inp.value) || 1;
+            p = Math.max(1, Math.min(p, totalPages));
+            inp.value = p;
+            scrollToPage(p);
+        }
+        function toggleIndex() {
+            const p = document.getElementById('index-panel');
+            if (!p.classList.contains('show')) { document.getElementById('info-overlay').classList.remove('show'); updateIndexHighlight(); }
+            p.classList.toggle('show');
+            if (p.classList.contains('show')) { document.getElementById('index-search').value = ''; filterIndex(); setTimeout(() => document.getElementById('index-search').focus(), 100); }
+        }
+        function toggleInfo() {
+            const i = document.getElementById('info-overlay');
+            if (!i.classList.contains('show')) document.getElementById('index-panel').classList.remove('show');
+            i.classList.toggle('show');
+        }
+
+        // ========== EVENTOS ==========
         document.getElementById('btn-zoom-in').addEventListener('click', () => applyZoom(currentScale + 0.1));
         document.getElementById('btn-zoom-out').addEventListener('click', () => applyZoom(currentScale - 0.1));
-        document.getElementById('btn-reset-zoom').addEventListener('click', () => {
-            const saved = loadZoomSetting(pdfIdentifier);
-            applyZoom(saved);
-            showToast('↺ Zoom restaurado');
+        document.getElementById('btn-reset-zoom').addEventListener('click', () => { applyZoom(loadZoomSetting(pdfIdentifier)); showToast('↺ Zoom restaurado'); });
+        document.querySelectorAll('.preset-btn').forEach(b => b.addEventListener('click', () => applyZoom(parseFloat(b.dataset.zoom))));
+
+        document.addEventListener('click', e => {
+            const p = document.getElementById('index-panel'), i = document.getElementById('info-overlay');
+            if (p.classList.contains('show') && !p.contains(e.target) && !document.getElementById('fab-index').contains(e.target)) p.classList.remove('show');
+            if (i.classList.contains('show') && !i.contains(e.target) && !document.getElementById('fab-info').contains(e.target)) i.classList.remove('show');
         });
 
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const zoom = parseFloat(btn.dataset.zoom);
-                applyZoom(zoom);
-            });
-        });
-
-        // Scroll
-        let scrollTimeout;
+        let scrollTimer;
         viewerContainer.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(renderVisiblePages, 150);
-            
-            // Mostrar/esconder botão voltar ao topo
-            const fab = document.getElementById('fab-top');
-            if (viewerContainer.scrollTop > 500) {
-                fab.classList.add('show');
-            } else {
-                fab.classList.remove('show');
-            }
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => renderVisiblePages(), 200);
+            document.getElementById('fab-top').classList.toggle('show', viewerContainer.scrollTop > 500);
         }, { passive: true });
 
-        // Teclado
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
+            if (e.target.tagName === 'INPUT') return;
             if (e.key === 'Escape') {
                 document.getElementById('info-overlay').classList.remove('show');
+                document.getElementById('index-panel').classList.remove('show');
                 return;
             }
-            
-            if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
-                e.preventDefault();
-                toggleInfo();
-                return;
-            }
-            
+            if (e.key === '?' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); toggleInfo(); return; }
             if (e.ctrlKey || e.metaKey) {
-                if (e.key === '=' || e.key === '+') {
-                    e.preventDefault();
-                    applyZoom(currentScale + 0.1);
-                } else if (e.key === '-') {
-                    e.preventDefault();
-                    applyZoom(currentScale - 0.1);
-                } else if (e.key === '0') {
-                    e.preventDefault();
-                    applyZoom(1.0);
-                }
-            } else if (e.key === 'Home') {
-                e.preventDefault();
-                scrollToTop();
-            }
+                if (e.key === '=' || e.key === '+') { e.preventDefault(); applyZoom(currentScale + 0.1); }
+                else if (e.key === '-') { e.preventDefault(); applyZoom(currentScale - 0.1); }
+                else if (e.key === '0') { e.preventDefault(); applyZoom(1.0); }
+                else if (e.key === 'i' || e.key === 'I') { e.preventDefault(); toggleIndex(); }
+                else if (e.key === 'g' || e.key === 'G') { e.preventDefault(); goToBookmark(); }
+                else if (e.key === 'd' || e.key === 'D') { e.preventDefault(); removeBookmarkAction(); }
+            } else if (e.key === 'Home') { e.preventDefault(); scrollToTop(); }
         });
 
-        // Pinça zoom (mobile)
-        let lastDistance = 0;
-        viewerContainer.addEventListener('touchstart', (e) => {
+        let lastDist = 0;
+        viewerContainer.addEventListener('touchstart', e => { if (e.touches.length === 2) lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); });
+        viewerContainer.addEventListener('touchmove', e => {
             if (e.touches.length === 2) {
-                lastDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-            }
-        });
-
-        viewerContainer.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2) {
-                const distance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
-                
-                if (Math.abs(distance - lastDistance) > 5) {
-                    const factor = distance / lastDistance;
-                    applyZoom(currentScale * factor);
-                    lastDistance = distance;
-                }
+                const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                if (Math.abs(d - lastDist) > 5) { applyZoom(currentScale * (d / lastDist)); lastDist = d; }
             }
         }, { passive: true });
 
-        // ========== FUNÇÕES AUXILIARES ==========
-        function scrollToTop() {
-            viewerContainer.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function toggleInfo() {
-            const info = document.getElementById('info-overlay');
-            info.classList.toggle('show');
-        }
-
-        // Mostrar botão de info sempre
+        function scrollToTop() { viewerContainer.scrollTo({ top: 0, behavior: 'smooth' }); }
         document.getElementById('fab-info').classList.add('show');
 
         // ========== INICIAR ==========
-        if (pdfPath) {
-            loadPDF(pdfPath);
-        } else {
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
+        if (pdfPath) { loadPDF(pdfPath); } 
+        else { document.getElementById('loading-overlay').style.display = 'none'; }
 
-        // Mostrar dica inicial
-        setTimeout(() => {
-            if (pdfPath) {
-                showToast('💡 Role para carregar páginas | Use Ctrl +/- para zoom | ? para atalhos');
-            }
+        setTimeout(() => { 
+            if (pdfPath) showToast('👆 Clique na página para MARCAR | Ctrl+D para REMOVER | Ctrl+G para IR'); 
         }, 2000);
     </script>
-
-    <script src="JS/sidebar.js"></script>
     <script src="JS/footer.js"></script>
 </body>
 </html>

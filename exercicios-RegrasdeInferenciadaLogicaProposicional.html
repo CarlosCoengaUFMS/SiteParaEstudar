@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lógica Proposicional · Verificador de Regras de Inferência</title>
+    <link rel="stylesheet" href="Style/favicon.svg">
+    <link rel="stylesheet" href="Style/style.css">
+    <link rel="stylesheet" href="Style/sidbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0b0c10;
+            --surface: #13161f;
+            --card: #1a1e2a;
+            --border: #2c3142;
+            --accent: #6c5ce7;
+            --accent2: #a855f7;
+            --accent3: #38bdf8;
+            --text: #eef2ff;
+            --muted: #8b92b0;
+            --correct: #10b981;
+            --warning: #f59e0b;
+            --wrong: #ef4444;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            color: var(--muted);
+            margin-bottom: 20px;
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+        }
+
+        .toolbar {
+            background: var(--surface);
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-weight: 600;
+        }
+        .stats span {
+            background: var(--card);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(95deg, var(--accent), var(--accent2));
+            border: none;
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .btn-outline { border-color: var(--accent); color: var(--accent); }
+        .btn-outline:hover { background: rgba(108,92,231,0.1); }
+        .btn-danger { border-color: var(--wrong); color: var(--wrong); }
+        .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+        .quest-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Fira Code', monospace;
+        }
+        .nav-btn:hover { border-color: var(--accent); }
+        .nav-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .nav-btn.correct { background: var(--correct); border-color: var(--correct); color: #fff; }
+        .nav-btn.wrong { background: var(--wrong); border-color: var(--wrong); color: #fff; }
+        .nav-btn.has-answer { border-color: var(--accent2); background: rgba(168,85,247,0.2); }
+
+        .quest-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+        .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .quest-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .status-badge {
+            padding: 5px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-correct { background: rgba(16,185,129,0.2); color: var(--correct); }
+        .status-wrong { background: rgba(239,68,68,0.2); color: var(--wrong); }
+        .expression-box {
+            background: #0a0c14;
+            padding: 18px 22px;
+            border-radius: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+            border-left: 6px solid var(--accent);
+            word-break: break-word;
+        }
+        .editor-wrapper {
+            background: #1E1E1E;
+            border: 1px solid #3C3C3C;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .editor-header {
+            background: #2D2D2D;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3C3C3C;
+            font-size: 0.8rem;
+        }
+        .btn-expand {
+            background: transparent;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-expand:hover { background: #3C3C3C; }
+        .answer-textarea {
+            width: 100%;
+            background: #1E1E1E;
+            border: none;
+            color: #D4D4D4;
+            font-family: 'Fira Code', monospace;
+            font-size: 15px;
+            line-height: 1.7;
+            padding: 20px;
+            resize: vertical;
+            outline: none;
+        }
+        .answer-textarea:focus { outline: none; }
+        .editor-wrapper.expanded {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            z-index: 10000;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .editor-wrapper.expanded .answer-textarea {
+            height: calc(100% - 50px);
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+        .overlay.show { display: block; }
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .result-box {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 16px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .result-box.show { display: block; }
+        .result-box.success { background: rgba(16,185,129,0.1); border: 2px solid rgba(16,185,129,0.4); color: var(--correct); }
+        .result-box.fail { background: rgba(239,68,68,0.1); border: 2px solid rgba(239,68,68,0.4); color: #ff8a8a; }
+        .hint-box {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .hint-box.show { display: block; }
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--correct), var(--accent2));
+            transition: width 0.4s;
+        }
+        @media (max-width: 700px) {
+            .quest-card { padding: 20px; }
+            .expression-box { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="overlay" id="fullscreen-overlay"></div>
+<div class="container">
+    <h1>📐 Lógica Proposicional · Regras de Inferência</h1>
+    <div class="sub">Responda as questões • Verifique suas respostas • Exporte PDF com suas demonstrações</div>
+
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="toolbar">
+        <div class="stats">
+            <span>📋 Total: <span id="totalQuest">0</span> questões</span>
+            <span id="correctCounter">✓ 0 corretas</span>
+            <span id="answeredCounter">📝 0 respondidas</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="clearAllBtn">🗑️ Limpar respostas</button>
+            <button class="btn btn-primary" id="exportPdfBtn">📄 Exportar PDF</button>
+        </div>
+    </div>
+
+    <div class="quest-nav" id="questNav"></div>
+    <div class="quest-card" id="questCard"></div>
+</div>
+
+<script>
+// ==============================================================
+// BANCO DE QUESTÕES
+// ==============================================================
+const QUESTOES = [
+    { id: 1, expr: "C, S -> A, C -> S  |-  A", hint: "Use Modus Ponens duas vezes", keywords: ["MP", "Modus Ponens"], minLength: 30 },
+    { id: 2, expr: "P ∧ Q  |-  Q ∧ P", hint: "Comutatividade da conjunção", keywords: ["∧E", "∧I", "comutatividade"], minLength: 25 },
+    { id: 3, expr: "P  |-  P ∧ P", hint: "Idempotência", keywords: ["∧I", "idempotência"], minLength: 20 },
+    { id: 4, expr: "P, ¬(P -> Q)  |-  (R ∧ S) ∨ Q", hint: "¬(P->Q) equivale a P ∧ ¬Q", keywords: ["¬(P->Q)", "DeMorgan", "∨I"], minLength: 40 },
+    { id: 5, expr: "P  |-  P ∨ P", hint: "Idempotência da disjunção", keywords: ["∨I", "idempotência"], minLength: 15 },
+    { id: 6, expr: "S ∨ D, S -> F, D -> F  |-  F", hint: "Prova por casos", keywords: ["∨E", "casos"], minLength: 50 },
+    { id: 7, expr: "P <-> Q  |-  Q <-> P", hint: "Simetria da bicondicional", keywords: ["<->", "simetria"], minLength: 25 },
+    { id: 8, expr: "P -> Q, P ∧ R  |-  Q", hint: "Simplificação + MP", keywords: ["∧E", "MP"], minLength: 30 },
+    { id: 9, expr: "P ∧ Q, (P ∨ R) -> S  |-  P ∧ S", hint: "Simplificação, ∨I, MP", keywords: ["∧E", "∨I", "MP"], minLength: 45 },
+    { id: 10, expr: "P -> (Q -> R), P -> Q, P  |-  R", hint: "MP duplo", keywords: ["MP"], minLength: 40 },
+    { id: 11, expr: "(P ∨ Q) -> R, (R ∨ Q) -> (P -> (S <-> T)), P ∧ S  |-  S <-> T", hint: "MP e equivalências", keywords: ["MP", "∧E", "<->I"], minLength: 60 },
+    { id: 12, expr: "P  |-  (P -> Q) -> Q", hint: "Teorema da exportação", keywords: ["->I", "MP"], minLength: 35 },
+    { id: 13, expr: "(P ∧ Q) -> R  |-  P -> (Q -> R)", hint: "Exportação", keywords: ["->I", "∧I"], minLength: 45 },
+    { id: 14, expr: "P ∨ Q  |-  Q ∨ P", hint: "Comutatividade da disjunção", keywords: ["∨E"], minLength: 30 },
+    { id: 15, expr: "(P ∧ Q) ∨ (P ∧ R)  |-  P ∧ (Q ∨ R)", hint: "Distributividade", keywords: ["distributividade", "∨E", "∧I"], minLength: 55 },
+    { id: 16, expr: "P <-> ¬Q  |-  ¬(P ∧ Q)", hint: "Bicondicional com negação", keywords: ["<->", "contradição"], minLength: 40 },
+    { id: 17, expr: "¬P -> P  |-  P", hint: "Lei de Clavius", keywords: ["Clavius", "absurdo"], minLength: 35 },
+    { id: 18, expr: "¬(¬P ∧ ¬Q), ¬P  |-  Q", hint: "DeMorgan + silogismo disjuntivo", keywords: ["DeMorgan", "∨E"], minLength: 40 },
+    { id: 19, expr: "¬P ∨ ¬Q  |-  ¬(P ∧ Q)", hint: "DeMorgan", keywords: ["DeMorgan"], minLength: 35 },
+    { id: 20, expr: "P -> Q  |-  ¬P ∨ Q", hint: "Equivalência material", keywords: ["equivalência material"], minLength: 30 },
+    { id: 21, expr: "¬(P ∧ Q)  |-  ¬P ∨ ¬Q", hint: "DeMorgan", keywords: ["DeMorgan"], minLength: 35 },
+    { id: 22, expr: "¬(P ∨ Q)  |-  ¬P ∧ ¬Q", hint: "DeMorgan para ∨", keywords: ["DeMorgan", "∧I"], minLength: 40 },
+    { id: 23, expr: "(G ∨ N) -> ¬C  |-  ¬C -> ¬(G ∨ N)", hint: "Contrapositiva", keywords: ["contrapositiva"], minLength: 30 },
+    { id: 24, expr: "P  |-  Q -> P", hint: "Weakening", keywords: ["->I"], minLength: 20 },
+    { id: 25, expr: "(P ∨ Q) ∧ (P ∨ R)  |-  P -> (Q ∧ R)", hint: "Distribuição", keywords: ["∧E", "∨E", "∧I"], minLength: 50 },
+    { id: 26, expr: "(P ∨ Q) ∨ R, (Q ∨ R) -> S  |-  P -> S", hint: "Associatividade + MP", keywords: ["∨I", "MP"], minLength: 45 },
+    { id: 27, expr: "P -> (Q -> ¬R), R  |-  P ∨ ¬Q", hint: "Modus Tollens", keywords: ["MT", "absurdo"], minLength: 50 },
+    { id: 28, expr: "¬P ∨ ¬Q, R -> P, ¬Q ∨ ¬S  |-  S ∨ ¬R", hint: "Resolução", keywords: ["resolução", "silogismo disjuntivo"], minLength: 55 },
+    { id: 29, expr: "P <- Q, Q <- R  |-  P <- R", hint: "Transitividade", keywords: ["<-", "transitividade"], minLength: 30 },
+    { id: 30, expr: "P <- Q  |-  P <- ¬Q", hint: "Contraposição", keywords: ["<-", "contraposição"], minLength: 30 },
+    { id: 31, expr: "¬P ∨ Q  |-  ¬(P ∧ ¬Q)", hint: "DeMorgan", keywords: ["DeMorgan"], minLength: 25 },
+    { id: 32, expr: "P -> Q, P -> ¬Q  |-  ¬P", hint: "Redução ao absurdo", keywords: ["absurdo", "¬I"], minLength: 40 },
+    { id: 33, expr: "(P -> Q) ∧ (P -> R)  |-  P -> (Q ∧ R)", hint: "Combinação", keywords: ["∧E", "MP", "∧I"], minLength: 35 },
+    { id: 34, expr: "P -> Q  |-  (P ∧ R) -> (Q ∧ R)", hint: "Monotonicidade", keywords: ["∧E", "MP", "∧I"], minLength: 40 },
+    { id: 35, expr: "P -> Q  |-  (P ∨ R) -> (Q ∨ R)", hint: "Monotonicidade", keywords: ["∨E", "MP", "∨I"], minLength: 45 },
+    { id: 36, expr: "¬P  |-  P -> Q", hint: "Princípio da explosão", keywords: ["explosão", "ex falso"], minLength: 30 },
+    { id: 37, expr: "P ∧ Q  |-  P -> Q", hint: "Simplificação", keywords: ["∧E", "->I"], minLength: 25 }
+];
+
+// ==============================================================
+// FUNÇÃO VERIFICADORA
+// ==============================================================
+function verificarResposta(resposta, questao) {
+    if (!resposta || resposta.trim().length < questao.minLength) {
+        return { pass: false, reason: "Resposta muito curta (mínimo " + questao.minLength + " caracteres)." };
+    }
+    const lowerResposta = resposta.toLowerCase();
+    let keywordsFound = 0;
+    for (let kw of questao.keywords) {
+        if (lowerResposta.includes(kw.toLowerCase())) keywordsFound++;
+    }
+    if (keywordsFound === 0) {
+        return { pass: false, reason: "Nenhuma regra reconhecida. Use: " + questao.keywords.slice(0, 3).join(", ") };
+    }
+    if (!/\d+\./.test(resposta)) {
+        return { pass: false, reason: "Use numeração (1., 2., ...) para cada passo." };
+    }
+    return { pass: true, reason: "Correto! Usou " + keywordsFound + " regra(s)." };
+}
+
+// ==============================================================
+// STORAGE
+// ==============================================================
+const STORAGE_KEY = "logica_respostas_final";
+let savedAnswers = {};
+let verifiedStatus = {};
+
+function loadStorage() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) { const p = JSON.parse(data); savedAnswers = p.answers || {}; verifiedStatus = p.status || {}; }
+    } catch(e) { savedAnswers = {}; verifiedStatus = {}; }
+}
+
+function persistAll() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ answers: savedAnswers, status: verifiedStatus }));
+}
+
+function saveAnswer(id, text) {
+    if (text && text.trim()) savedAnswers[id] = text;
+    else { delete savedAnswers[id]; delete verifiedStatus[id]; }
+    persistAll();
+    updateStats();
+    renderNavButtons();
+}
+
+function updateStats() {
+    const total = QUESTOES.length;
+    const correct = Object.values(verifiedStatus).filter(v => v === 'correct').length;
+    const answered = Object.keys(savedAnswers).filter(id => savedAnswers[id]?.trim()).length;
+    document.getElementById("totalQuest").textContent = total;
+    document.getElementById("correctCounter").innerHTML = "✓ " + correct + " corretas";
+    document.getElementById("answeredCounter").innerHTML = "📝 " + answered + " respondidas";
+    document.getElementById("progressFill").style.width = (correct / total) * 100 + "%";
+}
+
+let currentQuestIndex = 0;
+
+function renderNavButtons() {
+    const nav = document.getElementById("questNav");
+    if (!nav) return;
+    nav.innerHTML = QUESTOES.map((q, idx) => {
+        let cls = "";
+        if (idx === currentQuestIndex) cls = "active";
+        else if (verifiedStatus[q.id] === 'correct') cls = "correct";
+        else if (verifiedStatus[q.id] === 'wrong') cls = "wrong";
+        else if (savedAnswers[q.id]?.trim()) cls = "has-answer";
+        return `<button class="nav-btn ${cls}" data-idx="${idx}">${q.id}</button>`;
+    }).join("");
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => goToQuest(parseInt(btn.dataset.idx)));
+    });
+}
+
+function goToQuest(index) {
+    currentQuestIndex = index;
+    renderNavButtons();
+    renderCurrentQuest();
+}
+
+let expandedWrapper = null;
+function toggleExpand(wrapperId) {
+    const wrapper = document.getElementById(wrapperId);
+    const overlay = document.getElementById("fullscreen-overlay");
+    if (!wrapper) return;
+    if (wrapper.classList.contains("expanded")) {
+        wrapper.classList.remove("expanded");
+        overlay.classList.remove("show");
+        document.body.style.overflow = "";
+    } else {
+        if (expandedWrapper) expandedWrapper.classList.remove("expanded");
+        wrapper.classList.add("expanded");
+        overlay.classList.add("show");
+        document.body.style.overflow = "hidden";
+        expandedWrapper = wrapper;
+    }
+}
+
+function verificarQuestao(id) {
+    const q = QUESTOES.find(qq => qq.id === id);
+    const resposta = savedAnswers[id] || "";
+    const result = verificarResposta(resposta, q);
+    verifiedStatus[id] = result.pass ? 'correct' : 'wrong';
+    persistAll();
+    updateStats();
+    renderNavButtons();
+    const rb = document.getElementById("result-" + id);
+    if (rb) {
+        rb.className = "result-box " + (result.pass ? "success" : "fail") + " show";
+        rb.innerHTML = result.pass ? "<strong>✓ " + result.reason + "</strong>" : "<strong>✗ " + result.reason + "</strong><br><br>💡 Dica: " + q.hint;
+    }
+    renderCurrentQuest();
+}
+
+function renderCurrentQuest() {
+    const q = QUESTOES[currentQuestIndex];
+    const savedVal = savedAnswers[q.id] || "";
+    const isCorrect = verifiedStatus[q.id] === 'correct';
+    const wrapperId = "editor-" + q.id;
+    const statusHtml = isCorrect ? '<div class="status-badge status-correct">✓ Correta</div>' : (verifiedStatus[q.id] === 'wrong' ? '<div class="status-badge status-wrong">✗ Incorreta</div>' : '');
+    const cardHtml = `
+        <div class="quest-header"><span class="quest-number">Questão ${q.id}</span><div>${statusHtml}</div></div>
+        <div class="expression-box">|- ${q.expr}</div>
+        <div class="answer-expandable"><div class="editor-wrapper" id="${wrapperId}">
+            <div class="editor-header"><span>📝 Sua demonstração</span><button class="btn-expand" onclick="toggleExpand('${wrapperId}')">⛶ Expandir</button></div>
+            <textarea class="answer-textarea" id="answer-${q.id}" rows="10" placeholder="Exemplo:&#10;1. C (Premissa)&#10;2. C -> S (Premissa)&#10;3. S (MP 1,2)&#10;4. S -> A (Premissa)&#10;5. A (MP 3,4)">${escapeHtml(savedVal)}</textarea>
+        </div></div>
+        <div class="action-buttons">
+            ${!isCorrect ? `<button class="btn btn-primary" id="checkBtn-${q.id}">🔍 Verificar</button><button class="btn btn-outline" id="hintBtn-${q.id}">💡 Dica</button>` : `<span style="background:rgba(16,185,129,0.2);padding:8px 20px;border-radius:40px;">✓ Verificada como correta!</span><button class="btn btn-danger" id="resetQuestBtn-${q.id}">🔄 Revisar</button>`}
+        </div>
+        <div class="result-box" id="result-${q.id}"></div>
+        <div class="hint-box" id="hint-${q.id}">💡 ${q.hint}</div>
+    `;
+    document.getElementById("questCard").innerHTML = cardHtml;
+    const ta = document.getElementById("answer-" + q.id);
+    if (ta) ta.addEventListener('input', (e) => { saveAnswer(q.id, e.target.value); if (verifiedStatus[q.id]) { delete verifiedStatus[q.id]; persistAll(); renderCurrentQuest(); } renderNavButtons(); updateStats(); });
+    if (!isCorrect) {
+        document.getElementById("checkBtn-" + q.id)?.addEventListener("click", () => verificarQuestao(q.id));
+        document.getElementById("hintBtn-" + q.id)?.addEventListener("click", () => document.getElementById("hint-" + q.id)?.classList.toggle("show"));
+    } else {
+        document.getElementById("resetQuestBtn-" + q.id)?.addEventListener("click", () => { delete verifiedStatus[q.id]; persistAll(); updateStats(); renderNavButtons(); renderCurrentQuest(); });
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+}
+
+function clearAll() {
+    if (confirm("Apagar TODAS as respostas e verificações?")) {
+        savedAnswers = {}; verifiedStatus = {};
+        persistAll(); updateStats(); renderNavButtons(); renderCurrentQuest();
+    }
+}
+
+// ==============================================================
+// PDF EXPORT - RESPOSTA: (sem barra), fonte maior, negrito
+// Expressão da questão também em negrito
+// ==============================================================
+async function exportToPDF() {
+    const toast = document.createElement("div");
+    toast.innerText = "Gerando PDF...";
+    toast.style.cssText = "position:fixed;bottom:20px;right:20px;background:#1a1e2a;padding:12px 24px;border-radius:40px;z-index:10001;border:1px solid #6c5ce7;";
+    document.body.appendChild(toast);
+    try {
+        const pdfDoc = document.createElement("div");
+        pdfDoc.style.cssText = "font-family: 'Arial', 'Helvetica', sans-serif; background: white; color: black; padding: 30px; max-width: 1100px; margin: 0 auto;";
+        pdfDoc.innerHTML = `
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid black; padding-bottom: 15px;">
+                <div style="font-size: 18px; font-weight: bold;">Universidade Federal de Mato Grosso do Sul</div>
+                <div style="font-size: 14px;">Campus de Ponta Porã</div>
+                <div style="font-size: 13px; margin-top: 5px;">Disciplina: Fundamentos Matemáticos para Computação</div>
+                <div style="font-size: 16px; font-weight: bold; margin-top: 15px;">Lista de Exercícios – Regras de Inferência da Lógica Proposicional</div>
+            </div>
+        `;
+        for (let q of QUESTOES) {
+            const resp = savedAnswers[q.id]?.trim() || "Nenhuma resposta fornecida";
+            const div = document.createElement("div");
+            div.style.cssText = "margin-bottom: 25px; border: 1px solid #aaa; padding: 15px; page-break-inside: avoid; background: white;";
+            div.innerHTML = `
+                <div style="font-weight: bold; font-size: 15px; border-bottom: 1px solid #999; padding-bottom: 5px; margin-bottom: 10px;">${q.id}.</div>
+                <div style="font-family: 'Courier New', monospace; background: #f9f9f9; padding: 10px 14px; border-left: 4px solid black; margin: 10px 0; font-size: 13px; font-weight: bold;">|- ${escapeHtml(q.expr)}</div>
+                <div style="font-weight: bold; font-size: 13px; margin-top: 12px; margin-bottom: 8px;">RESPOSTA:</div>
+                <div style="font-family: 'Courier New', monospace; background: white; border: 1px solid #bbb; padding: 12px; font-size: 13px; font-weight: bold; line-height: 1.6; white-space: pre-wrap; color: #000;">${escapeHtml(resp)}</div>
+            `;
+            pdfDoc.appendChild(div);
+        }
+        pdfDoc.innerHTML += `<div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #aaa; text-align: center; font-size: 9px;">Lista de Exercícios - Regras de Inferência da Lógica Proposicional</div>`;
+        await html2pdf().set({ margin: 0.5, filename: "lista_inferencia_logica.pdf", image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: "white" }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(pdfDoc).save();
+        toast.innerText = "PDF gerado!";
+        setTimeout(() => toast.remove(), 2000);
+    } catch(e) { toast.innerText = "Erro"; setTimeout(() => toast.remove(), 2000); }
+}
+
+function init() {
+    loadStorage();
+    updateStats();
+    renderNavButtons();
+    renderCurrentQuest();
+    document.getElementById("clearAllBtn")?.addEventListener("click", clearAll);
+    document.getElementById("exportPdfBtn")?.addEventListener("click", exportToPDF);
+    document.getElementById("fullscreen-overlay")?.addEventListener("click", () => {
+        const exp = document.querySelector(".editor-wrapper.expanded");
+        if (exp) { exp.classList.remove("expanded"); document.getElementById("fullscreen-overlay")?.classList.remove("show"); document.body.style.overflow = ""; }
+    });
+}
+
+window.toggleExpand = toggleExpand;
+window.goToQuest = goToQuest;
+init();
+</script>
+<script src="JS/footer.js"></script>
+<script src="JS/sidebar.js"></script>
+</body>
+</html>
